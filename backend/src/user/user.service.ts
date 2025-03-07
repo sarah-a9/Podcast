@@ -8,6 +8,8 @@ import { Model } from 'mongoose';
 @Injectable()
 export class UserService {
   constructor(@InjectModel(User.name) private UserModel: Model<User>){}; //
+
+
   async create(createUserDto: CreateUserDto) {
     const newUser = new this.UserModel(createUserDto);
     const savedUser = await newUser.save();
@@ -15,19 +17,62 @@ export class UserService {
 
   }
 
-  findAll() {
-    return `This action returns all user`;
+  // async findAll() {
+  //   return this.UserModel.find().
+  //   populate({path: 'podcasts', model:"Podcast", select: 'podcastName podcastDescription podcastImage categories ',
+  //   populate:{path:'categories', model:'Category' , select:'categoryName'},match: {}  }).
+  //   populate({path:'playlists', model:'Playlist' , select:'playlistName playlistDescription' , 
+  //   populate:{path:'episodes' ,model:'Episode' , select :'episodeName episodeDescription '}}).exec(); // 🔥 Populate podcasts when fetching users
+  // }
+
+  async findAll() {
+    return this.UserModel.find()
+        .populate({
+            path: 'podcasts',
+            model: "Podcast",
+            select: 'podcastName podcastDescription podcastImage categories',
+            populate: { path: 'categories', model: 'Category', select: 'categoryName' },
+        })
+        .populate({
+            path: 'playlists',
+            model: 'Playlist',
+            select: 'playlistName playlistDescription',
+            populate: {
+                path: 'episodes',
+                model: 'Episode',
+                select: 'episodeName episodeDescription',
+                populate: {
+                    path: 'podcast', // Populate the podcast of each episode
+                    model: 'Podcast',
+                    select: 'podcastName',
+                    populate: {
+                        path: 'creator', // Get the creator of the podcast
+                        model: 'User',
+                        select: 'firstName lastName email',
+                    }
+                }
+            }
+        })
+        .exec();
+}
+
+
+  
+
+  async findOne(id: string) {
+    return this.UserModel.findById(id).populate({
+      path: 'podcasts',
+      select: 'podcastName podcastDescription podcastImage categories',  // Select only the needed podcast fields
+      populate:{path:'categories', model:'Category' , select:'categoryName'}}).
+      populate({path:'playlists', model:'Playlist' , select:'playlistName playlistDescription' , 
+      populate:{path:'episodes' ,model:'Episode' , select :'episodeName episodeDescription '}}).exec(); // 🔥 Populate podcasts for a single user
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  update(id: string, updateUserDto: UpdateUserDto) {
+    return this.UserModel.findByIdAndUpdate(id, updateUserDto, { new: true }).populate('podcasts');
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  remove(id: string) {
+    return this.UserModel.findByIdAndDelete(id);
   }
 }
