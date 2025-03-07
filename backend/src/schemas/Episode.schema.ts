@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 import { Document } from 'mongoose';
 
-export type EpisodeDocument = Episode & Document;
+// export type EpisodeDocument = Episode & Document;
 
 export enum Episodestatus{
     DRAFT = 'draft',
@@ -13,7 +13,7 @@ export enum Episodestatus{
 }
 
 @Schema({timestamps: true})
-export class Episode{
+export class Episode extends Document{
 
     @Prop({required:true})
     episodeTitle: string;
