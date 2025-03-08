@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 import { Document } from 'mongoose';
+import { User } from "./User.schema";
 
 // export type PodcastDocument = Podcast & Document;
 
@@ -16,11 +17,18 @@ export class Podcast extends Document{
     @Prop({required : true})
     podcastImage: string;
 
-    @Prop({type: [{type: Types.ObjectId, ref:'Category'}]}) // Un podcast peut avoir plusieurs catégories
+    @Prop({ type: [{ type: Types.ObjectId, ref: 'Category' }], required : true  ,default: [] }) // Un podcast peut avoir plusieurs catégories
     categories: Types.ObjectId[];
 
-    @Prop({type: Types.ObjectId, ref:'User', required:true}) //Un podcast appartient à un seul utilisateur aka creator et un creatur peut avoir plusieurs podcasts
+    @Prop({ type: Types.ObjectId, ref: 'User', required: true })
     creator: Types.ObjectId;
+
+    @Prop({ type: [{ type: Types.ObjectId, ref: 'Episode' }], default: [] })// Un podcast peut avoir plusieurs episodes
+    episodes : Types.ObjectId[];
+
+    @Prop({ default: 0 })
+    likes: number;
+  
 }
 
 export const PodcastSchema = SchemaFactory.createForClass(Podcast);

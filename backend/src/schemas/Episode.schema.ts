@@ -15,13 +15,13 @@ export enum Episodestatus{
 @Schema({timestamps: true})
 export class Episode extends Document{
 
-    @Prop({required:true})
+    @Prop({required:true , unique:true})
     episodeTitle: string;
 
     @Prop({required:true})
     episodeDescription: string;
 
-    @Prop({required:true})
+    @Prop({required:true , unique:true})
     audioUrl: string;
 
     @Prop({type: Types.ObjectId, ref:'Podcast', required:true})
@@ -29,6 +29,12 @@ export class Episode extends Document{
 
     @Prop({enum: Episodestatus, default:Episodestatus.DRAFT})
     status: Episodestatus;
+
+    @Prop({ type: [{ type: Types.ObjectId, ref: "Playlist" }], default: [] })
+    playlists: Types.ObjectId[];
+
+    @Prop({ default: 0 })
+    listens: number;
 }
 
 export const EpisodeSchema = SchemaFactory.createForClass(Episode);
