@@ -3,10 +3,10 @@ import { Types } from "mongoose";
 import { Document } from 'mongoose';
 import { User } from "./User.schema";
 
-export type PodcastDocument = Podcast & Document;
+// export type PodcastDocument = Podcast & Document;
 
 @Schema({ timestamps: true })
-export class Podcast{
+export class Podcast extends Document{
 
     @Prop({required : true , unique: true})
     podcastName: string;

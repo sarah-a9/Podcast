@@ -2,10 +2,10 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from "mongoose";
 import { Document } from 'mongoose';
 
-export type PlaylistDocument = Playlist & Document ;
+// export type PlaylistDocument = Playlist & Document ;
 
 @Schema()
-export class Playlist {
+export class Playlist extends Document{
 
     @Prop({required: true , unique:true})
     playlistName : string;
