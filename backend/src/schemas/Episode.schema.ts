@@ -38,3 +38,4 @@ export class Episode extends Document{
 }
 
 export const EpisodeSchema = SchemaFactory.createForClass(Episode);
+export type EpisodeDocument = Episode & Document;
