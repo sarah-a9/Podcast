@@ -32,3 +32,5 @@ export class Podcast extends Document{
 }
 
 export const PodcastSchema = SchemaFactory.createForClass(Podcast);
+export type PodcastDocument = Podcast & Document;
+

@@ -26,3 +26,4 @@ export class Playlist extends Document{
 
 }
 export const PlaylistSchema = SchemaFactory.createForClass(Playlist);
+export type PlaylistDocument = Playlist & Document;
