@@ -15,7 +15,7 @@ export class CreateEpisodeDto{
     @IsString()
     audioUrl: string;
 
-    @IsMongoId()
+    @IsString()
     @IsNotEmpty()
     podcast: string;  // The podcast this episode belongs to
 

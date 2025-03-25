@@ -28,6 +28,9 @@ export class Podcast extends Document{
 
     @Prop({ default: 0 })
     likes: number;
+
+    @Prop({type : [{ type :Types.ObjectId , ref:'User'}], default: [] })
+    favoritedByUsers: Types.ObjectId[];
   
 }
 

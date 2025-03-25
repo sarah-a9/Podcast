@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { Episode, EpisodeDocument } from 'src/schemas/Episode.schema';
 import { CreateEpisodeDto } from './dto/create-episode.dto';
 import { UpdateEpisodeDto } from './dto/update-episode.dto';
@@ -11,6 +11,32 @@ export class EpisodeService {
 constructor (@InjectModel(Episode.name)private EpisodeModel: Model<EpisodeDocument> ,@InjectModel(Podcast.name)private PodcastModel: Model<PodcastDocument>){}
 
 
+
+// async createEpisode(createEpisodeDto: CreateEpisodeDto) {
+//     // Step 1: Create the new episode using the data from the DTO
+//     const newEpisode = new this.EpisodeModel(createEpisodeDto);
+    
+//     // Step 2: Save the new episode to the database
+//     const savedEpisode = await newEpisode.save();
+    
+//     // Step 3: Find the podcast using the podcast ID from the episode's reference
+//     const podcastId = createEpisodeDto.podcastId;  // Assuming you pass the podcastId in DTO
+    
+//     const podcast = await this.PodcastModel.findById(podcastId);
+    
+//     if (!podcast) {
+//         throw new NotFoundException("Podcast not found");
+//     }
+    
+//     // Step 4: Push the new episode's ID into the podcast's 'episodes' array
+//     podcast.episodes.push(savedEpisode._id);
+
+//     // Step 5: Save the updated podcast document
+//     await podcast.save();
+    
+//     // Step 6: Return the saved episode
+//     return savedEpisode;
+// }
 
 
 async createEpisode(createEpisodeDto: CreateEpisodeDto) {
@@ -36,6 +62,10 @@ async createEpisode(createEpisodeDto: CreateEpisodeDto) {
 
     return savedEpisode;
 }
+
+
+
+
 
 
 

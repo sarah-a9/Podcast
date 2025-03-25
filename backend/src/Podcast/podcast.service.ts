@@ -76,6 +76,29 @@ export class PodcastService {
   }
 
 
+  async getEpisodeByPodcastId(podcastId: string, episodeId: string) {
+    // Find the podcast by ID
+    const podcast = await this.PodcastModel.findById(podcastId)
+      .populate({
+        path: 'episodes',
+        model: 'Episode',
+        match: { _id: episodeId },  // Match the specific episode ID
+        select: 'episodeTitle episodeDescription audioUrl createdAt',  // Fields to return from the episode
+      })
+      .exec();
+
+    if (!podcast) {
+      throw new NotFoundException('Podcast not found');
+    }
+
+    // If the episode is not found in the podcast, throw an error
+    const episode = podcast.episodes.find((ep) => ep._id.toString() === episodeId);
+    if (!episode) {
+      throw new NotFoundException('Episode not found in this podcast');
+    }
+
+    return episode;
+  }
 
 
 
