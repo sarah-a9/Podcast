@@ -9,29 +9,32 @@ import {
     Patch, 
     Post, 
     UseGuards,
-    Request
+    Request 
 } from '@nestjs/common';
 import { PodcastService } from './podcast.service';
 import { CreatePodcastDto } from './dto/create-podcast.dto';
 import { UpdatePodcastDto } from './dto/update-podcast.dto';
 import { Types } from 'mongoose';
+import { AuthGuard } from '../guards/auth.guard'; // Import the AuthGuard
 
 @Controller('podcast')
 export class PodcastController {
     constructor(private readonly podcastService: PodcastService) {}
 
-
-    // @UseGuards() 
+    // Protect this route with the AuthGuard
+    // @UseGuards(AuthGuard)
     @Post()
     async createPodcast(@Body() createPodcastDto: CreatePodcastDto ) {
-        return await this.podcastService.createPodcast( createPodcastDto );
+        return await this.podcastService.createPodcast(createPodcastDto);
     }
 
+    // This route can be public, so no need to protect it with AuthGuard
     @Get()
     async getAllPodcasts() {
         return await this.podcastService.getAllPodcast();
     }
 
+    // This route can be public, so no need to protect it with AuthGuard
     @Get(':id')
     async getPodcastById(@Param('id') id: string) {
         if (!Types.ObjectId.isValid(id)) {
@@ -45,8 +48,20 @@ export class PodcastController {
 
         return podcast;
     }
-     
-    // @UseGuards() 
+
+
+
+    
+    @Get(':podcastId/episode/:episodeId')
+    async getEpisodeByPodcastId(
+      @Param('podcastId') podcastId: string,
+      @Param('episodeId') episodeId: string
+    ) {
+      return this.podcastService.getEpisodeByPodcastId(podcastId, episodeId);
+    }
+
+    // Protect this route with the AuthGuard
+    // @UseGuards(AuthGuard)
     @Patch(':id')
     async updatePodcast(
         @Param('id') id: string, 
@@ -64,7 +79,8 @@ export class PodcastController {
         return updatedPodcast;
     }
 
-    // @UseGuards() 
+    // Protect this route with the AuthGuard
+    // @UseGuards(AuthGuard)
     @Delete(':id')
     async deletePodcast(@Param('id') id: string) {
         if (!Types.ObjectId.isValid(id)) {
