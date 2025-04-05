@@ -6,12 +6,17 @@
 
 import React, { useState } from "react";
 import { Menu, Plus, ChevronLeft, ChevronRight, Star, Heart, Download, Folder } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-
+  const pathname = usePathname();
+    // Hide Sidebar on auth pages
+    if (pathname.startsWith('/auth')) return null;
+    
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
+
   };
 
   return (
