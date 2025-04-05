@@ -23,8 +23,52 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  /* overflow: scroll; Allows scrolling */
+  /* overflow-x: hidden; */
+  overflow: hidden;  /* Prevent the entire page from scrolling */
+  
+}
+
+body::-webkit-scrollbar {
+  display: none; /* Hides the scrollbar in Webkit-based browsers */
+}
+
+
+.scrollable-container {
+  height: calc(100vh - 146px); /* Adjust the height to fit in the screen */
+   /* Or whatever height you want */
+  overflow-y: auto; /* Allows vertical scrolling */
+   /* Prevents horizontal scrolling */
+  
+}
+.height{
+  height: calc(100vh - 146px);
 }
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+.audio-player {
+  padding: 10px;  /* Adjust padding as needed */
+}
+
+/* @layer utilities {
+.podcast_grid {
+  @apply grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4;
+} */
+/* .image_div {
+  @apply flex-center mt-5 h-[142px] w-full cursor-pointer flex-col gap-3 rounded-xl border-[3.2px] border-dashed border-black-6 bg-black-1;
+} */
+/* Main content container */
+.main-content {
+  flex: 1;  /* Take remaining space after the sidebar */
+  height: 100vh;  /* Full viewport height */
+   /* Allow scrolling inside the main content */
+  padding-bottom: 60px;  /* Ensure the bottom bar doesn't overlap */
 }

@@ -16,12 +16,12 @@ const Sidebar = () => {
 
   return (
     <div
-      className={`h-full bg-gray-900 text-white p-4 transition-all duration-300 ${
+      className={`sticky h-screen height   bg-gray-800 text-white p-4 transition-all duration-300 ${
         isCollapsed ? "w-16" : "w-64"
-      } rounded-2xl shadow-lg flex flex-col relative`}
+      } rounded-lg shadow-lg flex flex-col relative`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between ">
         <button className="text-white">
           <Menu size={24} />
         </button>

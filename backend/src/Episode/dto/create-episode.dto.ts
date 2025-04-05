@@ -19,4 +19,6 @@ export class CreateEpisodeDto{
     @IsNotEmpty()
     podcast: string;  // The podcast this episode belongs to
 
+    
+
 }

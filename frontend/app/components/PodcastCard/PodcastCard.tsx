@@ -47,10 +47,10 @@ const PodcastCard: React.FC<PodcastProps> = ({ podcastName, creator, podcastImag
   }
   
   return (
-    
-    <div className="w-1/7 flex-flex-col flex-shrink-0 shadow-sm cursor-pointer "onClick={handleViews}>
+    // flex-shrink-0 flex-flex-col w-1/7 
+    <div className="w-1/7  flex-shrink-0 flex-flex-col shadow-sm cursor-pointer "onClick={handleViews}>
       <div className='flex flex-col'>
-        <img className=" rounded-t-lg  rounded-lg w-full h-40 object-cove bg-gray-300"  src={podcastImage} alt={podcastName} />
+        <img className="  rounded-lg w-full h-40 object-cove bg-gray-300 "  src={podcastImage} alt={podcastName} />
         <p className='truncate text-l'>
           {podcastName}
         </p>
