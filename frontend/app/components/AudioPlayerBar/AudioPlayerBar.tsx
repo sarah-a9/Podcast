@@ -7,6 +7,7 @@ import { useAudio } from "../Providers/AudioProvider";
 import { useEffect, useState } from "react";
 import PreviousButton from "../PreviousButton/PreviousButton";
 import NextButton from "../NextButton/NextButton";
+import { usePathname } from "next/navigation";
 
 
 const AudioPlayerBar = () => {
@@ -20,10 +21,15 @@ const AudioPlayerBar = () => {
     audioRef
   } = useAudio();
 
+  const pathname = usePathname();
+  // Hide audioplayer on auth pages
+  if (pathname.startsWith('/auth')) return null;
+  
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
 
+  
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !currentEpisode?.audioUrl) return;

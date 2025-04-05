@@ -4,9 +4,13 @@ import { Search, Sun, User } from "lucide-react";
 import { FaHome } from "react-icons/fa";
 import Link from "next/link";
 import { GoHome } from "react-icons/go";
+import { usePathname } from "next/navigation";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const pathname = usePathname();
+  // Hide Navbar on auth pages
+  if (pathname.startsWith('/auth')) return null;
 
   return (
     <div className="bg-black sticky top-0 z-10 text-white">

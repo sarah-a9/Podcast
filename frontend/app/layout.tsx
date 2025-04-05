@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar/Navbar";
-import Footer from "./components/AudioPlayerBar/AudioPlayerBar";
 import Sidebar from "./components/Sidebar/Sidebar";
-import MainContent from "./components/MainContent/MainContent";
 import { AudioProvider } from "./components/Providers/AudioProvider";
-import AudioPlayer from "./components/AudioPlayerBar/AudioPlayerBar";
 import AudioPlayerBar from "./components/AudioPlayerBar/AudioPlayerBar";
+import { AuthProvider } from "./components/Providers/AuthContext/AuthContext";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -42,9 +39,10 @@ export default function RootLayout({
             {/* Main Content */}
            
             <div className="main-content  pl-2 pr-2 ">
-              {children} {/* 👈 ADD THIS LINE */}
+            <AuthProvider>
+                {children}
+              </AuthProvider> 
             </div>
-            
           </div>
           <AudioPlayerBar />
         </div>
