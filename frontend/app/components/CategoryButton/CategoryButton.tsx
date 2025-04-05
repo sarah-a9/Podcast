@@ -18,17 +18,35 @@
 
 
 
+
+
+import { useRouter } from 'next/navigation';
 import React from 'react';
 
+
 interface CategoryProps {
+  id :string ;
   categoryName: string;
 }
 
-const CategoryButton: React.FC<CategoryProps> = ({ categoryName }) => {
+const CategoryButton: React.FC<CategoryProps> = ({ categoryName  , id}) => {
+  console.log("CategoryButton received id:", id); // ✅ Debugging
+  const router = useRouter();
+   const handleViews = () => {
+    if (!id) {
+      console.error("Category ID is undefined!");
+      return;
+    }
+    console.log('Navigating to category:', id);
+    router.push(`/categoryFeed/${id}`);
+    
+    
+  };
+  
   return (
     <div
-      className={`relative w-1/12 flex-shrink-0 h-10 rounded-full shadow-md flex items-center justify-center cursor-pointer text-white font-bold text-xs bg-gray-800`}
-    >
+      className={`relative w-1/11 flex-shrink-0 h-10 rounded-full shadow-md flex items-center justify-center cursor-pointer text-white font-light text-s bg-gray-800`}
+      onClick={handleViews}>
       {categoryName}
     </div>  );
 };

@@ -2,11 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CiStar, CiCalendar } from "react-icons/ci";
+import { CiCalendar } from "react-icons/ci";
 import { MdOutlineAccessTime } from "react-icons/md";
 
-import { ArrowLeft } from "lucide-react";
-import CategoryButton from "@/app/components/CategoryButton/CategoryButton";
 import EpisodeCard from "@/app/components/EpisodeCard/EpisodeCard";
 import { FaRegStar, FaStar } from "react-icons/fa";
 
@@ -49,8 +47,8 @@ const PodcastDetails = ({ params }: { params: { id: string } }) => {
 
   const router = useRouter();
   const [isFavorite, setIsFavorite] = useState(false); 
-
-
+  
+  console.log("liste episodes",podcast?.episodes);
   // Handle favorite button click
 const handleFavoriteClick = (e: React.MouseEvent) => {
   e.stopPropagation(); // Prevent click event from propagating to the parent div
@@ -64,29 +62,45 @@ const handleFavoriteClick = (e: React.MouseEvent) => {
   };
 
   return (
-    <div className="h-full text-white rounded-2xl">
-      <div className="bg-gray-800 p-8 rounded-2xl h-screen shadow-lg w-full mb-4 flex flex-col">
+    <div className=" h-screen   text-white rounded-lg scrollable-container scrollbar-hide">
+      <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full flex flex-col  ">
         {podcast ? (
           <>
             {/* Podcast Details */}
             <div className="grid grid-cols-6 gap-4">
               <div className="col-span-1">
                 <img
-                  className="rounded-2xl"
+                  className="rounded-lg"
                   src={podcast.podcastImage}
                   alt={podcast.podcastName}
                 />
               </div>
               <div className="col-span-4">
-                <h2 className="text-3xl font-bold mb-4">
+                <h2 className="text-3xl font-bold mb-2 mt-8">
                   {podcast.podcastName}
                 </h2>
-                <p className="text-lg mb-4">{podcast.podcastDescription}</p>
+                {/* <p className="text-lg mb-4">{podcast.podcastDescription}</p> */}
                 <p className="text-sm text-gray-400">
                   Created by {podcast.creator.firstName}{" "}
                   {podcast.creator.lastName}
                 </p>
+                {/* <div className="flex gap-2 flex-wrap">
+                {podcast && podcast.categories.length > 0 ? (
+                  podcast.categories.map((category) => (
+                    <div
+                      key={category._id}
+                      className="w-1/12 flex-shrink-0 h-10 rounded-full shadow-md flex items-center justify-center  text-white font-bold text-xs bg-cyan-950 px-4 mt-2"
+                    >
+                      {category.categoryName}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No categories available</p>
+                )}
+              </div> */}
+            
               </div>
+              
               <div className="col-span-1 content-center">
                 <button onClick={handleFavoriteClick}>
                   {isFavorite ? <FaStar size={40} /> : <FaRegStar size={40} />}
@@ -98,10 +112,25 @@ const handleFavoriteClick = (e: React.MouseEvent) => {
             <div className="mt-4 mb-4">
               <hr style={{ color: "grey" }} />
             </div>
+             <p className="text-lg font- ">{podcast.podcastDescription}</p>
+            <div className="flex gap-2 flex-wrap">
+                {podcast && podcast.categories.length > 0 ? (
+                  podcast.categories.map((category) => (
+                    <div
+                      key={category._id}
+                      className="w-1/12 flex-shrink-0 h-10 rounded-full shadow-md flex items-center justify-center border-1 border-white  text-white font-bold text-xs bg-transparent  px-4 mt-2"
+                    >
+                      {category.categoryName}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No categories available</p>
+                )}
+              </div>
 
             {/* Episodes Header */}
-            <div className="mt-4 justify-between flex flex-row">
-              <p>Episodes</p>
+            <div className="mt-20 justify-between flex flex-row">
+              <p className="font-bold text-xl">All Episodes</p>
               <p>
                 <CiCalendar />
               </p>
@@ -110,20 +139,23 @@ const handleFavoriteClick = (e: React.MouseEvent) => {
               </p>
             </div>
 
-            {/* Separator */}
-            <div className="mt-4 mb-4">
+            {/* Separator  mb-4*/}
+            <div className="mt-4 ">
               <hr style={{ color: "grey" }} />
             </div>
 
-            <div className="mt-4 mb-4 h-80 overflow-y-auto pr-2  scrollbar-hide">
+            <div className="    pr-2  ">
               {/* Episodes List */}
               {podcast.episodes.length > 0 ? (
+                
                 podcast.episodes.map((episode) => (
+                  
                   <EpisodeCard
-                    key={episode._id}
-                    episode={episode}
-                    podcastImage={podcast.podcastImage}
-                  />
+                  
+                  key={episode._id}
+                  episode={episode}
+                  podcast={podcast}
+                />
                 ))
               ) : (
                 <p className="text-gray-500">No episodes available</p>

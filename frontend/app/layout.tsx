@@ -2,19 +2,22 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar/Navbar";
-import Footer from "./components/Footer/Footer";
+import Footer from "./components/AudioPlayerBar/AudioPlayerBar";
 import Sidebar from "./components/Sidebar/Sidebar";
 import MainContent from "./components/MainContent/MainContent";
+import { AudioProvider } from "./components/Providers/AudioProvider";
+import AudioPlayer from "./components/AudioPlayerBar/AudioPlayerBar";
+import AudioPlayerBar from "./components/AudioPlayerBar/AudioPlayerBar";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+// const geistSans = Geist({
+//   variable: "--font-geist-sans",
+//   subsets: ["latin"],
+// });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// const geistMono = Geist_Mono({
+//   variable: "--font-geist-mono",
+//   subsets: ["latin"],
+// });
 
 export const metadata: Metadata = {
   title: "Podcast",
@@ -28,20 +31,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <div className="flex flex-col h-screen">
+      <body >
+      <AudioProvider> {/* Wrap the children with AudioProvider */}
+        <div className="flex flex-col ">
           <Navbar />
-          <div className="flex flex-1">
+          <div className="flex flex-shrink-0  flex-1">
             {/* Sidebar */}
             <Sidebar />
 
             {/* Main Content */}
-            <div className="flex-1 pl-8 pr-8">
+           
+            <div className="main-content  pl-2 pr-2 ">
               {children} {/* 👈 ADD THIS LINE */}
             </div>
+            
           </div>
-          <Footer />
+          <AudioPlayerBar />
         </div>
+        </AudioProvider>
       </body>
     </html>
   );

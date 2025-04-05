@@ -6,6 +6,8 @@ import { CreatePodcastDto } from './dto/create-podcast.dto';
 import { UpdatePodcastDto } from './dto/update-podcast.dto';
 import { Episode, EpisodeDocument } from 'src/schemas/Episode.schema'; // Import Episode schema
 import { User, UserDocument } from 'src/schemas/User.schema';
+import { Category, CategoryDocument } from 'src/schemas/Category.schema';
+import { populate } from 'dotenv';
 
 @Injectable()
 export class PodcastService {
@@ -13,6 +15,7 @@ export class PodcastService {
     @InjectModel(Podcast.name) private PodcastModel: Model<PodcastDocument>,
     @InjectModel(Episode.name) private EpisodeModel: Model<EpisodeDocument>, // Inject Episode model
     @InjectModel(User.name) private UserModel: Model<UserDocument>,
+    @InjectModel(Category.name) private CategoryModel: Model<CategoryDocument>,
   ) {}
 
 
@@ -24,12 +27,21 @@ export class PodcastService {
   async createPodcast(createPodcastDto: CreatePodcastDto) {
     const newPodcast = new this.PodcastModel(createPodcastDto);
     const savedPodcast = await newPodcast.save();
+
+    
+
      // Update the user's podcasts list
      await this.UserModel.findByIdAndUpdate(
       createPodcastDto.creator,  // User's ID
       { $push: { podcasts: savedPodcast._id } },  // Add the podcast ID
       { new: true }
       
+  );
+
+  // Ajouter l'ID du podcast aux catégories associées
+  await this.CategoryModel.updateMany(
+    { _id: { $in: createPodcastDto.categories } }, // Trouver les catégories concernées
+    { $push: { listePodcasts: savedPodcast._id } } // Ajouter l'ID du podcast
   );
   return savedPodcast;
   }
@@ -44,7 +56,7 @@ export class PodcastService {
       .find()
       .populate({
         path: 'creator',  // Populate only the creator field
-        select: 'firstName'  // Only the creator's firstName, not all user details
+        select: 'firstName lastName'  // Only the creator's firstName, not all user details
         
       })
       .populate({path: 'episodes', model:"Episode"  ,match: {}}).populate({path: 'categories',
@@ -60,11 +72,11 @@ export class PodcastService {
       .findById(id)
       .populate({
         path: 'creator',  // Populate only the creator field
-        select: 'firstName'  // Only the creator's firstName, not all user details
+        select: 'firstName lastName'  // Only the creator's firstName, not all user details
       }).populate({
         path: 'episodes', // Populate episodes
          model:"Episode",
-        select: 'episodeTitle episodeDescription  createdAt' // Specify which fields you want from the episodes
+        select: 'episodeTitle episodeDescription  createdAt audioUrl' // Specify which fields you want from the episodes
       }).populate({path: 'categories', // Populate episodes
         model:"Category" ,select:'categoryName'}).exec();
 
@@ -83,7 +95,17 @@ export class PodcastService {
         path: 'episodes',
         model: 'Episode',
         match: { _id: episodeId },  // Match the specific episode ID
-        select: 'episodeTitle episodeDescription audioUrl createdAt',  // Fields to return from the episode
+        select: 'episodeTitle episodeDescription audioUrl createdAt podcast',  // Fields to return from the episode
+        populate: {
+          path: 'podcast',  // Populate the 'podcast' field inside the Episode model
+          model: 'Podcast',
+          select:'podcastName podcastImage creator',
+          populate:{
+           path:'creator',
+           model:'User',
+           select:'firstName lastName'
+          },
+        },
       })
       .exec();
 

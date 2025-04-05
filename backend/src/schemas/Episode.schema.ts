@@ -39,6 +39,10 @@ export class Episode extends Document{
     //  Array of users who liked this episode
     @Prop({ type: [{ type: Types.ObjectId, ref: "User" }], default: [] })
     likedByUsers: Types.ObjectId[];
+
+
+   
+    
 }
 
 export const EpisodeSchema = SchemaFactory.createForClass(Episode);

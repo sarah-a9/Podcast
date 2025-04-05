@@ -1,16 +1,20 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import PodcastCard from '../PodcastCard/PodcastCard';
 import CategoryButton from '../CategoryButton/CategoryButton';
+import CreatorCard from '../CreatorCard/CreatorCard';
 
 const MainContent = () => {
   const [podcasts, setPodcasts] = useState<{
     creator: any; _id: string; podcastName: string; podcastDescription: string; podcastImage: string 
 }[]>([]);
   const [categories, setCategories] = useState<{ _id: string; categoryName: string }[]>([]);
-
+  const [users , setUsers]= useState<{_id:string , firstName:string , lastName:string , profilePic:string}[]>([]);
   useEffect(() => {
     console.log('Fetching podcasts...');
+
+
+    //fetch podcasts
     fetch('http://localhost:3000/podcast')  // Make sure the endpoint is correct
       .then((res) => res.json())
       .then((data) => {
@@ -26,6 +30,9 @@ const MainContent = () => {
         console.error('Error fetching podcasts:', error);
       });
 
+
+
+
     // Fetch categories
     fetch('http://localhost:3000/category')  // Assuming this is correct endpoint for categories
       .then((res) => res.json())
@@ -40,10 +47,27 @@ const MainContent = () => {
       .catch((error) => {
         console.error('Error fetching categories:', error);
       });
+
+
+
+
+      //fetch creators aka users
+      fetch('http://localhost:3000/user')
+      .then((res)=>res.json())
+      .then((data)=>{
+        if (Array.isArray(data)){
+          setUsers(data);
+        }else{
+          console.error('Received Users is not an array :', data);
+        }
+      })
+      .catch((error)=>{
+        console.error('Error fetching users', error);
+      })
   }, []);
 
   return (
-    <div>
+    <div className='scrollable-container scrollbar-hide'>
       <h2 className='text-4xl pb-3'>Suggestions</h2>
       <div className="container max-w-full overflow-hidden">
       <div className="podcast-list overflow-x-auto overflow-y-hidden flex space-x-4 whitespace-nowrap flex-nowrap scrollbar-hide w-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -62,7 +86,7 @@ const MainContent = () => {
         </div>
       </div>
 
-      <h2 className='text-4xl pb-3 pt-5'>Categories</h2>
+      <h2 className='text-4xl   pb-3 pt-12'>Categories</h2>
 
       <div className="category-list">
       <div className="container  w-full">
@@ -70,13 +94,32 @@ const MainContent = () => {
 
         {categories.length > 0 ? (
           categories.map((category) => (
-            <CategoryButton key={category._id} categoryName={category.categoryName} />
+            <CategoryButton key={category._id} categoryName={category.categoryName} id={category._id} />
           ))
         ) : (
           <p>No categories available.</p>
         )}
       </div>
       </div>
+      </div>
+
+      <h2 className="text-4xl pb-3 pt-12">Creators</h2>
+      <div className="creator-list">
+        <div className="container w-full">
+          <div className="overflow-x-auto flex space-x-8">
+            {users.length > 0 ? (
+              users.map((users) => (
+                <CreatorCard
+                  key={users._id}
+                  firstName={users.firstName}
+                  lastName={users.lastName}
+                  profilePic={users.profilePic} id={users._id}                 />
+              ))
+            ) : (
+              <p>No creators available.</p>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

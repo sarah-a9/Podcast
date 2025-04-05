@@ -16,11 +16,19 @@ export class CategoryService {
     }
 
     async getAllCategories(){
-        return this.categoryModel.find();
+        return this.categoryModel.find().populate({
+            path:'listePodcasts',
+            model:'Podcast',
+            select:'podcastName podcastDescription podcastImage'
+        }).exec();
     }
 
     async getCategoryById(id:string){
-        return this.categoryModel.findById(id);
+        return this.categoryModel.findById(id).populate({
+            path:'listePodcasts',
+            model:'Podcast',
+            select:'podcastName podcastDescription podcastImage'
+        }).exec();
     }
 
     async updateCategory(id :string, updateCategoryDto : UpdateCategoryDto){

@@ -5,12 +5,13 @@ import { PodcastService } from "./podcast.service";
 import { PodcastController } from "./podcast.controller";
 import { EpisodeModule } from "../Episode/episode.module";
 import { UserModule } from "../user/user.module";
+import { CategoryModule } from "src/Category/category.module";
  
 
 @Module({
   imports:[
     MongooseModule.forFeature([{ name: Podcast.name, schema: PodcastSchema }]),
-    forwardRef(() => EpisodeModule),forwardRef(() => UserModule),
+    forwardRef(() => EpisodeModule),forwardRef(() => UserModule),forwardRef(() => CategoryModule),
   ],
   providers: [PodcastService],
   controllers: [PodcastController],
