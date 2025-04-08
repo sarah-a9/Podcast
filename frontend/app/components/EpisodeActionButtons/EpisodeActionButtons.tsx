@@ -100,7 +100,7 @@ import { useState } from "react";
 import PlayPauseButton from "../PlayPauseButton/PlayPauseButton";
 import LikeButton from "../LikeButton/LikeButton";
 import MenuButton from "../MenuButton/MenuButton";
-import { Episode, Podcast } from "../Providers/AudioProvider";
+import { Episode , Podcast } from "@/app/Types";
 
 const ActionButtons = ({
   episode,
@@ -109,20 +109,22 @@ const ActionButtons = ({
   onLikeClick,
   size = "md",
 }: {
-  episode: {
-    _id: string;
-    episodeTitle: string;
-    audioUrl: string;
-    episodeDescription: string;
-    createdAt: string;
-    podcast: Podcast;
-  };
-  podcast: {
-    _id: string;
-    podcastName: string;
-    podcastImage: string;
-    episodes: Episode[]; // Define the podcast structure
-  };
+  episode:Episode;
+  // episode: {
+  //   _id: string;
+  //   episodeTitle: string;
+  //   audioUrl: string;
+  //   episodeDescription: string;
+  //   createdAt: string;
+  //   podcast: Podcast;
+  // };
+  podcast:Podcast;
+  //  {
+  //   _id: string;
+  //   podcastName: string;
+  //   podcastImage: string;
+  //   episodes: Episode[]; // Define the podcast structure
+  // };
   isLiked: boolean;
   onLikeClick: (e: React.MouseEvent) => void;
   size?: "md" | "lg";

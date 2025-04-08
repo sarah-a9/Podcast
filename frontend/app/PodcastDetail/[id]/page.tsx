@@ -7,14 +7,9 @@ import { MdOutlineAccessTime } from "react-icons/md";
 
 import EpisodeCard from "@/app/components/EpisodeCard/EpisodeCard";
 import { FaRegStar, FaStar } from "react-icons/fa";
+import { Episode } from "@/app/Types";
 
-interface Episode {
-  _id: string;
-  episodeTitle: string;
-  episodeDescription: string;
-  audioUrl: string;
-  createdAt: string;
-}
+
 const PodcastDetails = ({ params }: { params: { id: string } }) => {
   const [podcast, setPodcast] = useState<{
     creator: any;

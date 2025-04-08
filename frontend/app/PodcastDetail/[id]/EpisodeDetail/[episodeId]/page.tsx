@@ -2,6 +2,7 @@
 import ActionButtons from "@/app/components/EpisodeActionButtons/EpisodeActionButtons";
 import EpisodeActionButtons from "@/app/components/EpisodeActionButtons/EpisodeActionButtons";
 import { Episode, useAudio } from "@/app/components/Providers/AudioProvider";
+import { Podcast } from "@/app/Types";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -12,17 +13,7 @@ import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
 import { IoPlayOutline } from "react-icons/io5";
 import { MdMoreVert, MdOutlineAccessTime } from "react-icons/md";
 
-interface Podcast {
-  _id: string;
-  podcastName: string;
-  podcastImage: string;
-  podcastDescription: string;
-  creator: {
-    firstName: string;
-    lastName: string;
-  };
-  episodes:Episode[];
-}
+
 const EpisodeDetail = ({
   params,
 }: {

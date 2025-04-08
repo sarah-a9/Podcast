@@ -7,6 +7,7 @@
 import React, { useState } from "react";
 import { Menu, Plus, ChevronLeft, ChevronRight, Star, Heart, Download, Folder } from "lucide-react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -31,9 +32,21 @@ const Sidebar = () => {
           <Menu size={24} />
         </button>
         {!isCollapsed && <span className="text-lg font-semibold">Your Library</span>}
-        <button className="text-white">
+
+       
+        <button className="text-white cursor-pointer rounded-full bg-gray-700 ">
           <Plus size={24} />
         </button>
+        
+        {/* {menuOpen && (
+              <div className="absolute right-0 mt-2 w-32 bg-gray-900 text-white rounded-lg shadow-lg">
+                <ul>
+                  <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">Create a Playlist</li>
+                  <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">Settings</li>
+                  <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">Login</li>
+                </ul>
+              </div>
+            )} */}
       </div>
       
       {/* Menu Items */}

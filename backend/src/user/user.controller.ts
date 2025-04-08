@@ -28,7 +28,7 @@ export class UserController {
   }
 
   // Protect this route with AuthGuard (get a user by ID, needs authentication)
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const isValid = mongoose.Types.ObjectId.isValid(id);
