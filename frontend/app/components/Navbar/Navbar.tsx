@@ -52,9 +52,15 @@ const Navbar = () => {
             {menuOpen && (
               <div className="absolute right-0 mt-2 w-32 bg-gray-900 text-white rounded-lg shadow-lg">
                 <ul>
-                  <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">Profile</li>
-                  <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">Settings</li>
-                  <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">Login</li>
+                  <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">
+                  <Link href={`/Profile/${"defaultUserId"}`}>Profile</Link>
+                  </li>
+                  <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">
+                    <Link href="/settings">Settings</Link>
+                  </li>
+                  <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">
+                    <Link href="/signout">signout</Link>
+                  </li>
                 </ul>
               </div>
             )}
