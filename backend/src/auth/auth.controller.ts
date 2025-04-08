@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Put, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
@@ -6,10 +6,14 @@ import { RefreshTokenDto } from './dto/refreshTokens.dto';
 import { ChangePasswordDto } from './dto/changePassword.dto';
 import { AuthGuard } from '../guards/auth.guard';
 import { ForgotPasswordDto } from './dto/forgotPassword.dto';
+import { UserService } from '../user/user.service';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService){}
+    constructor(private authService: AuthService, 
+                private userService: UserService,
+    ){}
 
     //POST Method for Signup
     @Post('signup')
@@ -37,6 +41,18 @@ export class AuthController {
             changePasswordDto.oldPassword,
             changePasswordDto.newPassword
         );
+    }
+
+    @ApiBearerAuth()
+    @UseGuards(AuthGuard)
+    @Get('me')
+    async getCurrentUser(@Request() req) {
+        // req.userId is set in the AuthGuard after verifying the token.
+        const user = await this.userService.findOne(req.userId);
+        if (!user) {
+        throw new Error('User not found');
+        }
+        return user;
     }
 
     // //POST Method for Forgetting Password

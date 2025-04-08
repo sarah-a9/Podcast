@@ -28,7 +28,7 @@ export class UserController {
   }
 
   // Protect this route with AuthGuard (get a user by ID, needs authentication)
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const isValid = mongoose.Types.ObjectId.isValid(id);
@@ -39,7 +39,7 @@ export class UserController {
   }
 
   // Protect this route with AuthGuard (update a user by ID, needs authentication)
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     const isValid = mongoose.Types.ObjectId.isValid(id);
@@ -50,7 +50,7 @@ export class UserController {
   }
 
   // Protect this route with AuthGuard (delete a user by ID, needs authentication)
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const isValid = mongoose.Types.ObjectId.isValid(id);
@@ -61,7 +61,7 @@ export class UserController {
   }
 
 
-
+  @UseGuards(AuthGuard)
   @Post(':userId/favorite/:podcastId')
   async FavoritePodcast(@Param('userId') userId: string,@Param('podcastId') podcastId: string,) {
     const user = await this.userService.findOne(userId);
@@ -95,7 +95,7 @@ export class UserController {
     return { message: isAlreadyFavorited ? 'Podcast unfavorited' : 'Podcast favorited' };
   }
 
-
+  @UseGuards(AuthGuard)
   @Post(':userId/like/:episodeId')
   async likeOrUnlikeEpisode(
     @Param('userId') userId: string,

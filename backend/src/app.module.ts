@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import config from './config/config';
+import { SwaggerModule } from '@nestjs/swagger';
 
 @Module({
   imports: [
@@ -44,7 +45,8 @@ import config from './config/config';
     PodcastModule,
     CategoryModule,
     PlaylistModule,
-    AuthModule
+    AuthModule,
+    SwaggerModule
   ],
   controllers: [AppController],
   providers: [AppService],
