@@ -12,7 +12,7 @@ const ProgressBar = ({
    console.log("current time progress bar ",currentTime );
    console.log("duration progress bar ",duration );
   return (
-    <div className="flex-1 mx-4">
+    <div className="w-full  mx-4">
       <input
         type="range"
         min="0"

@@ -7,76 +7,9 @@ import {
   MdOutlineAccessTime,
   MdPlayArrow,
 } from "react-icons/md";
-import { CiCalendar } from "react-icons/ci";
 import { useRouter } from "next/navigation";
-import { IoPlayOutline } from "react-icons/io5";
-import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
 import ActionButtons from "../EpisodeActionButtons/EpisodeActionButtons";
 
-// const PodcastDetails = ({ params }: { params: { id: string } }) => {
-//   const [podcast, setPodcast] = useState<{
-//     creator: any;
-//     _id: string;
-//     podcastName: string;
-//     podcastDescription: string;
-//     podcastImage: string;
-//     episodes: any[];
-//     categories: any[];
-//   } | null>(null);
-
-//   useEffect(() => {
-//     console.log("Fetching podcast details...");
-
-//     fetch(`http://localhost:3000/podcast/${params.id}`)
-//       .then((res) => res.json())
-//       .then((data) => {
-//         console.log(data);
-//         if (data) {
-//           setPodcast(data);
-//         } else {
-//           console.error("No data received:", data);
-//         }
-//       })
-//       .catch((error) => {
-//         console.error("Error fetching podcast:", error);
-//       });
-//   }, [params.id]);
-
-//   if (!podcast) return <p>Loading...</p>;
-
-//   return (
-//     <div className="p-4">
-//       <h1 className="text-3xl font-bold">{podcast.podcastName}</h1>
-//       <p className="text-gray-500">{podcast.podcastDescription}</p>
-
-//       <div className="mt-6">
-//         {podcast.episodes.map((episode) => (
-//           <EpisodeCard
-//             key={episode._id}
-//             episode={episode}
-//             podcastImage={podcast.podcastImage}
-//           />
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// interface Podcast {
-//   _id: string;
-//   podcastName: string;
-//   podcastDescription: string;
-//   podcastImage: string;
-// }
-
-// interface Episode {
-//   _id: string;
-//   episodeTitle: string;
-//   episodeDescription: string;
-//   audioUrl: string;
-//   createdAt: string;
-
-// }
 
 const EpisodeCard = ({ episode, podcast }: { episode: any; podcast: any }) => {
   const router = useRouter();

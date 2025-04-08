@@ -92,43 +92,54 @@ const AudioPlayerBar = () => {
   };
 
   return (
-    <div className="sticky bottom-0  w-full bg-black flex items-center justify-between text-white">
-      <div className="flex items-center space-x-4 p-2">
+    <div className="sticky bottom-0 w-full bg-black flex text-white">
+      {/* Left Column: Episode Image & Title */}
+      <div className="flex items-center space-x-4 p-2 w-1/3">
         <img
-        src={currentPodcast?.podcastImage}
+          src={currentPodcast?.podcastImage}
           alt={currentEpisode?.episodeTitle || "Episode"}
-          className="w-14 h-14 rounded-sm  object-cover"
+          className="w-14 h-14 rounded-sm object-cover"
         />
         <div>
           <p className="text-sm">{currentEpisode?.episodeTitle || "No episode playing"}</p>
         </div>
       </div>
-    
-      <div className="flex flex-col items-center space-y-2">
-        
-        {currentEpisode && currentPodcast && ( // ✅ Ensure both are available before rendering
-          <PlayPauseButton
-            episode={currentEpisode}
-            podcast={currentPodcast} // ✅ Pass the podcast to PlayPauseButton
-            buttonSize="p-2"
-            iconSize={24}
-          />
-        )}
-        <ProgressBar currentTime={currentTime} duration={duration} onProgressChange={handleProgressBarChange} />
-      </div>
-
-      <div className="flex items-center space-x-4 p-4">
-        <VolumeControl volume={volume} onVolumeChange={handleVolumeChange} />
-        <div className="flex items-center space-x-2">
-          {/* <NextPreviousButton onPrevClick={prevEpisode} onNextClick={nextEpisode} /> */}
-          <PreviousButton  onPrevClick={prevEpisode} />
-          <NextButton onNextClick={nextEpisode} /> 
+  
+      {/* Center Column: Buttons & Progress Bar */}
+      <div className="flex flex-col items-center justify-center w-1/3">
+        {/* Controls Row: Previous, Play/Pause, Next */}
+        <div className="flex items-center space-x-4 ">
+          <PreviousButton onPrevClick={prevEpisode} />
+          
+          {currentEpisode && currentPodcast && (
+            <PlayPauseButton
+              episode={currentEpisode}
+              podcast={currentPodcast}
+              buttonSize="p-2"
+              iconSize={24}
+            />
+          )}
+          
+          <NextButton onNextClick={nextEpisode} />
         </div>
-       
-
+        
+        {/* Progress Bar */}
+        <ProgressBar
+          currentTime={currentTime}
+          duration={duration}
+          onProgressChange={handleProgressBarChange}
+          
+        />
+      </div>
+  
+      {/* Right Column: Volume Control */}
+      <div className="flex items-center p-5 w-1/3 justify-end">
+        <VolumeControl volume={volume} onVolumeChange={handleVolumeChange} />
       </div>
     </div>
   );
+  
+
 };
 
 export default AudioPlayerBar;

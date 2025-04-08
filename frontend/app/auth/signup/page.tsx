@@ -41,7 +41,7 @@ export default function Signup() {
       }
       setSuccess("Signup successful! Redirecting...");
       setTimeout(() => router.push("../../auth/login"), 2000); // Redirect to homepage after successful signup
-      router.push("/"); // Redirect to homepage after successful signup
+      // router.push("/"); // Redirect to homepage after successful signup
     } catch (error: any) {
       setError(error.message);
     }

@@ -1,17 +1,9 @@
 "use client";
 import PodcastCard from '@/app/components/PodcastCard/PodcastCard';
+import { Podcast } from '@/app/Types';
 import React, { useEffect, useState } from 'react'
 
-interface Podcast {
-    _id: string;
-    podcastName: string;
-    podcastDescription: string;
-    podcastImage: string;
-    creator: {
-        firstName: string;
-        lastName: string;
-      }
-  }
+
 
 
   interface Category {

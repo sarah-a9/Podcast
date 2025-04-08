@@ -20,16 +20,17 @@
 
 
 
+import { Category } from '@/app/Types';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
 
-interface CategoryProps {
-  id :string ;
-  categoryName: string;
-}
+// interface CategoryProps {
+//   id :string ;
+//   categoryName: string;
+// }
 
-const CategoryButton: React.FC<CategoryProps> = ({ categoryName  , id}) => {
+const CategoryButton: React.FC<Category> = ({ categoryName  , id}) => {
   console.log("CategoryButton received id:", id); // ✅ Debugging
   const router = useRouter();
    const handleViews = () => {

@@ -2,7 +2,7 @@ import { FiVolume, FiVolume1, FiVolume2, FiVolumeX } from "react-icons/fi";
 
 const VolumeControl = ({ volume, onVolumeChange }: { volume: number, onVolumeChange: (volume: number) => void }) => {
   return (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center space-x-2 w-full justify-end">
       <button>
         {volume >= 0.75 ? (
           <FiVolume2 size={24} className="text-white" />

@@ -1,5 +1,6 @@
 'use client';
 
+import { User } from '@/app/Types';
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
 interface User {
@@ -47,6 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
     }
   }, []);
+ 
 
   return (
     <AuthContext.Provider value={{ user, setUser, token, setToken }}>
