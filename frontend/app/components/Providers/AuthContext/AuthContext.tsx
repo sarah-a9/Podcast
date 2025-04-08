@@ -2,9 +2,18 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
+interface User {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  bio?: string;
+  profilePic?: string;
+}
+
 interface AuthContextType {
-  user: any;
-  setUser: (user: any) => void;
+  user: User | null;
+  setUser: (user: User | null) => void;
   token: string | null;
   setToken: (token: string | null) => void;
 }
@@ -12,21 +21,30 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
 
-  // On mount, check for a saved token in localStorage
   useEffect(() => {
     const savedToken = localStorage.getItem('token');
     if (savedToken) {
       setToken(savedToken);
-      // Optionally, you can fetch user data with this token
-      fetch('http://localhost:3001/auth/me', {
+      fetch('http://localhost:3000/auth/me', {
+        method: 'GET',
         headers: { Authorization: `Bearer ${savedToken}` },
       })
-        .then((res) => res.json())
-        .then((data) => setUser(data))
-        .catch((err) => console.error(err));
+        .then((res) => {
+          if (!res.ok) 
+            {throw new Error(`HTTP error! status: ${res.status}`);}
+          return res.json();
+        })
+        .then((data) => {
+          console.log("Fetched user from /auth/me:", data); // 👈
+          setUser(data);
+        })
+        .catch((err) => {
+          console.error("Error fetching current user:", err);
+          //setUser(null);
+        });
     }
   }, []);
 
@@ -39,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
