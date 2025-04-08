@@ -1,12 +1,18 @@
 import { MdMoreHoriz } from "react-icons/md";
-import { useState } from "react";
 
-const MenuButton = ({ showMenu, setShowMenu, buttonSize, iconSize }: { showMenu: boolean, setShowMenu:  (e: React.MouseEvent) => void, buttonSize: string, iconSize: number}) => {
+interface MenuButtonProps {
+  onClick: (e: React.MouseEvent) => void;
+  buttonSize: string;
+  iconSize: number;
+}
 
-
+const MenuButton: React.FC<MenuButtonProps> = ({ onClick, buttonSize, iconSize }) => {
   return (
-    <button className={`text-gray-400 hover:text-white relative ${buttonSize}`} onClick={setShowMenu}>
-      <MdMoreHoriz size={iconSize}  />
+    <button
+      className={`text-gray-400 hover:text-white relative ${buttonSize}`}
+      onClick={onClick}
+    >
+      <MdMoreHoriz size={iconSize} />
     </button>
   );
 };

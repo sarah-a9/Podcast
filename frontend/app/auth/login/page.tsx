@@ -1,5 +1,6 @@
 'use client';
 
+import Link from "next/link";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../components/Providers/AuthContext/AuthContext';
@@ -34,8 +35,8 @@ export default function Login() {
       localStorage.setItem('token', token);
       setToken(token);
       setUser(user);
-
-      router.push('/');
+      router.push('/'); // Redirect to the home page or dashboard
+    
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -81,12 +82,9 @@ export default function Login() {
 
         <div className="mt-4 text-center">
           <p className="text-gray-400">
-            <a
-              href="/signup"
-              className="text-blue-400 hover:underline"
-            >
+            <Link href="/auth/signup" className="text-blue-400 hover:underline" >
               Create an account
-            </a>
+            </Link>
             {' '}or{' '}
             <a
               href="/forgot-password"
