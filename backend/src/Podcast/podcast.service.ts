@@ -95,11 +95,11 @@ export class PodcastService {
         path: 'episodes',
         model: 'Episode',
         match: { _id: episodeId },  // Match the specific episode ID
-        select: 'episodeTitle episodeDescription audioUrl createdAt podcast',  // Fields to return from the episode
+        select: 'episodeTitle episodeDescription audioUrl createdAt podcast likedByUsers',  // Fields to return from the episode
         populate: {
           path: 'podcast',  // Populate the 'podcast' field inside the Episode model
           model: 'Podcast',
-          select:'podcastName podcastImage creator',
+          select:'podcastName podcastImage creator favoritedByUsers',
           populate:{
            path:'creator',
            model:'User',

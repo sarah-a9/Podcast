@@ -23,44 +23,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const savedUser = localStorage.getItem('user');
 
     if (savedToken) {
-      setToken(savedToken);
-      fetch('http://localhost:3000/auth/me', {
-        method: 'GET',
-        headers: { Authorization: `Bearer ${savedToken}` },
-      })
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
-          }
-          return res.json();
-        })
-        .then((data) => {
-          console.log("Fetched user from /auth/me:", data);
-          setUser(data);  // Update the state
-          localStorage.setItem('user', JSON.stringify(data));  // Persist user data
-          setLoading(false);  // Once user data is fetched, stop loading
-        })
-        .catch((err) => {
-          console.error("Error fetching current user:", err);
-          setLoading(false);  // In case of error, stop loading
-        });
-    } else if (savedUser) {
+      setToken(savedToken);  // Set token
+    }
+
+    if (savedUser) {
       setUser(JSON.parse(savedUser));  // Set user from localStorage if available
       setLoading(false);  // Stop loading once we have the user data from localStorage
+    } else {
+      setLoading(false);  // In case there's no user or token, stop loading
     }
   };
 
-  // Only fetch data once component is mounted
+  // Fetch user data based on token
+  const fetchUserData = async () => {
+    const savedToken = localStorage.getItem('token');
+    if (savedToken) {
+      try {
+        const res = await fetch('http://localhost:3000/auth/me', {
+          method: 'GET',
+          headers: { Authorization: `Bearer ${savedToken}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data);
+          localStorage.setItem('user', JSON.stringify(data)); // Persist user data
+        } else {
+          console.error('Failed to fetch user data');
+        }
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+      } finally {
+        setLoading(false);  // Stop loading once the fetch is done
+      }
+    }
+  };
+
+  // Run when the token or savedUser changes
   useEffect(() => {
     loadUserData();
-  }, []);  // Run once on initial load
+  }, []);  // Initial load when component mounts
 
-  // Update the user data in localStorage whenever user state changes
   useEffect(() => {
-    if (user) {
-      localStorage.setItem('user', JSON.stringify(user)); // Persist user data
+    if (token) {
+      fetchUserData();  // Fetch user data when token is set
     }
-  }, [user]);  // Persist whenever user state changes
+  }, [token]);  // Run only when token is updated
 
   // If loading, show nothing or a loading spinner
   if (loading) {

@@ -24,11 +24,11 @@ const ActionButtons = ({
 
   const handleMenuClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setShowMenu(!showMenu);
+    setShowMenu((prev) => !prev);
   };
 
   return (
-    <div className="flex items-center space-x-10">
+    <div className="flex items-center space-x-10 relative">
       {/* Play/Pause Button */}
       <PlayPauseButton
         episode={episode}
@@ -51,7 +51,7 @@ const ActionButtons = ({
 
       {/* Menu Options */}
       {showMenu && (
-        <div className="absolute bg-gray-800 text-white rounded-lg shadow-md p-2 mt-2 w-36">
+        <div className="absolute top-full left-0 z-10 bg-gray-800 text-white rounded-lg shadow-md p-2 mt-2 w-36">
           <p className="cursor-pointer p-2 hover:bg-gray-700 rounded-md">Add to Playlist</p>
           <p className="cursor-pointer p-2 hover:bg-gray-700 rounded-md">Download</p>
           <p className="cursor-pointer p-2 hover:bg-gray-700 rounded-md">Share</p>

@@ -120,3 +120,7 @@ input[type="range"]:active::-webkit-slider-thumb {
   animation-timing-function: linear;
   animation-iteration-count: infinite;
 }
+
+.no-play {
+  cursor: not-allowed; /* or you can use "cursor: url('path-to-your-x-cursor.png'), auto;" */
+}

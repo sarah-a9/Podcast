@@ -1,23 +1,29 @@
-// 
-
-
+//
 
 "use client";
 
 import React, { useState } from "react";
-import { Menu, Plus, ChevronLeft, ChevronRight, Star, Heart, Download, Folder } from "lucide-react";
+import {
+  Menu,
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+  Star,
+  Heart,
+  Download,
+  Folder,
+} from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
-    // Hide Sidebar on auth pages
-    if (pathname.startsWith('/auth')) return null;
-    
+  // Hide Sidebar on auth pages
+  if (pathname.startsWith("/auth")) return null;
+
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
-
   };
 
   return (
@@ -29,16 +35,16 @@ const Sidebar = () => {
       {/* Header */}
       <div className="flex items-center justify-between ">
         <button className="text-white">
-          
-          <Menu size={24}  / >
-
+          <Menu size={24} />
         </button>
-        {!isCollapsed && <span className="text-lg font-semibold">Your Library</span>}
+        {!isCollapsed && (
+          <span className="text-lg font-semibold">Your Library</span>
+        )}
 
         <button className="text-white cursor-pointer rounded-full p-1 bg-gray-700 ">
           <Plus size={24} />
         </button>
-        
+
         {/* {menuOpen && (
               <div className="absolute right-0 mt-2 w-32 bg-gray-900 text-white rounded-lg shadow-lg">
                 <ul>
@@ -49,17 +55,29 @@ const Sidebar = () => {
               </div>
             )} */}
       </div>
-      
+
       {/* Menu Items */}
       <div className="mt-6 space-y-6">
         <div className="flex items-center space-x-2">
-          <Star size={24} />
-          {!isCollapsed && <span>Favourites Podcasts</span>}
+          <Link
+            href="/FavoritePodcastsPage"
+            className="flex items-center space-x-2"
+          >
+            <Star size={24} />
+            {!isCollapsed && <span>Favourites Podcasts</span>}
+          </Link>
         </div>
+
         <div className="flex items-center space-x-2">
-          <Heart size={24} />
-          {!isCollapsed && <span>Liked Episodes</span>}
+          <Link
+            href="/LikedEpisodesPage"
+            className="flex items-center space-x-2"
+          >
+            <Heart size={24} />
+            {!isCollapsed && <span>Liked Episodes</span>}
+          </Link>
         </div>
+
         <div className="flex items-center space-x-2">
           <Download size={24} />
           {!isCollapsed && <span>Downloads</span>}

@@ -9,6 +9,7 @@ import { useAudio } from "../Providers/AudioProvider";
 import { usePathname } from "next/navigation";
 import LikeButton from "../LikeButton/LikeButton";
 import { useAuth } from "../Providers/AuthContext/AuthContext"; // Import useAuth hook
+import Link from "next/link";
 
 const AudioPlayerBar = () => {
   const {
@@ -136,11 +137,17 @@ const AudioPlayerBar = () => {
         )}
 
         <div className="flex flex-col">
-          <p className="text-sm font-medium">
-            {currentEpisode?.episodeTitle || "No episode playing"}
-          </p>
+          <Link
+            href={`/PodcastDetail/${currentPodcast?._id}/EpisodeDetail/${currentEpisode?._id}`}
+          >
+            <p className="text-sm font-medium hover:underline">
+              {currentEpisode?.episodeTitle || "No episode playing"}
+            </p>
+          </Link>
+
           <p className="text-xs text-gray-400 italic">
-            {currentPodcast?.creator.firstName} {currentPodcast?.creator.lastName}
+            {currentPodcast?.creator.firstName}{" "}
+            {currentPodcast?.creator.lastName}
           </p>
 
           {!currentEpisode && (
@@ -151,7 +158,7 @@ const AudioPlayerBar = () => {
         </div>
 
         <div className="mt-2 ml-2">
-          {currentEpisode && (  // Only show the LikeButton if an episode is selected
+          {currentEpisode && ( // Only show the LikeButton if an episode is selected
             <LikeButton
               episodeId={currentEpisode._id} // Pass the episodeId prop
               isLiked={isLiked} // Pass the current like status

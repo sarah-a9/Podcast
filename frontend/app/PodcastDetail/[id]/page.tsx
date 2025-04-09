@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // You still use the router for navigating, but not for getting params
+import { useRouter } from "next/navigation";
 import { CiCalendar } from "react-icons/ci";
 import { MdOutlineAccessTime } from "react-icons/md";
 
@@ -17,48 +17,37 @@ const PodcastDetails = ({ params }: { params: { id: string } }) => {
     podcastDescription: string;
     podcastImage: string;
     episodes: Episode[];
+    favoritedByUsers:string[];
     categories: any[];
   } | null>(null);
 
   const [isFavorite, setIsFavorite] = useState(false);
-  const { user, setUser } = useAuth();
+  const { user, setUser } = useAuth(); // Removed loading as it does not exist in AuthContextType
 
-  // Use params.id directly as it is passed from the App Router's dynamic route
-  const podcastId = params.id; // Directly destructure id from params
+  const podcastId = params.id;
+
+  // Removed loading state check as it is not part of AuthContextType
 
   useEffect(() => {
-    console.log("Fetching podcast details...");
     fetch(`http://localhost:3000/podcast/${podcastId}`)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         if (data) {
           setPodcast(data);
           if (user) {
             const favoritePodcasts = Array.isArray(user.favoritePodcasts)
               ? user.favoritePodcasts
               : [];
-            setIsFavorite(favoritePodcasts.includes(data._id));
+            setIsFavorite(favoritePodcasts.includes(data._id)); // Check if this podcast is in user's favorites
           }
-        } else {
-          console.error("No data received:", data);
         }
       })
       .catch((error) => {
-        console.error("Error fetching podcast:", error);
+        console.error("Error fetching podcast details:", error);
       });
-  }, [podcastId, user]);
+  }, [podcastId, user]); // Re-fetch when user or podcastId changes
 
   const router = useRouter();
-
-  useEffect(() => {
-    if (user && podcast) {
-      const favoritePodcasts = Array.isArray(user.favoritePodcasts)
-        ? user.favoritePodcasts
-        : [];
-      setIsFavorite(favoritePodcasts.includes(podcast._id));
-    }
-  }, [user, podcast]);
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -71,6 +60,7 @@ const PodcastDetails = ({ params }: { params: { id: string } }) => {
         ...user,
         favoritePodcasts: updatedFavoritePodcasts,
       });
+      console.log("podcastId", podcast);
     }
     setIsFavorite((prev) => !prev);
   };
@@ -113,12 +103,12 @@ const PodcastDetails = ({ params }: { params: { id: string } }) => {
               <hr style={{ color: "grey" }} />
             </div>
 
-            <p className="text-lg">{podcast.podcastDescription}</p>
+            <p className="text-lg italic">{podcast.podcastDescription}</p>
 
             <div className="mt-20 justify-between flex flex-row">
               <p className="font-bold text-xl">All Episodes</p>
-              <p><CiCalendar /></p>
-              <p><MdOutlineAccessTime /></p>
+              <p className="pr-10"><CiCalendar /></p>
+              <p> {/* <MdOutlineAccessTime />*/}</p> 
             </div>
 
             <div className="mt-4">

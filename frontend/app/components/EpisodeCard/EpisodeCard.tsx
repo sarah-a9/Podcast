@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ActionButtons from "../EpisodeActionButtons/EpisodeActionButtons";
 import { useAuth } from "../Providers/AuthContext/AuthContext"; // Import the useAuth hook
+import { Episode, Podcast } from "@/app/Types";
 
-const EpisodeCard = ({ episode, podcast }: { episode: any; podcast: any }) => {
+const EpisodeCard = ({ episode, podcast }: { episode: Episode; podcast: Podcast }) => {
   const router = useRouter();
   const { user, setUser } = useAuth(); // Access user and setUser from context
   const [showMenu, setShowMenu] = useState(false);
@@ -68,8 +69,8 @@ const EpisodeCard = ({ episode, podcast }: { episode: any; podcast: any }) => {
 
       {/* Episode Date */}
       <div className="col-span-1">
-        <p className="text-sm text-gray-400 mt-5">
-          {episode.createdAt.split("T")[0]}
+        <p className="text-sm text-gray-400 mt-16">
+          {episode.createdAt ? episode.createdAt.split("T")[0] : "Unknown Date"}
         </p>
       </div>
 

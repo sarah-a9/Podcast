@@ -38,6 +38,35 @@ export class UserController {
     return findUser;
   }
 
+
+
+  @UseGuards(AuthGuard)
+  @Get(':id/favoritePodcasts')
+  async getFavoritePodcasts(@Param('id') id:string){
+    const isValid = mongoose.Types.ObjectId.isValid(id);
+    if (!isValid) throw new HttpException('Usee Not Found', 404);
+    const favoritePodcasts = await this.userService.getFavoritePodcasts(id);
+    if (!favoritePodcasts) throw new HttpException("User Not Found", 404);
+    return favoritePodcasts;
+
+  }
+
+
+
+
+  @UseGuards(AuthGuard)
+  @Get(':id/likedEpisodes')
+  async getLikedEpisodes(@Param('id') id:string){
+    const isValid = mongoose.Types.ObjectId.isValid(id);
+    if (!isValid) throw new HttpException('Usee Not Found', 404);
+    const LikedEpisodes = await this.userService.getLikedEpisodes(id);
+    if (!LikedEpisodes) throw new HttpException("User Not Found", 404);
+    return LikedEpisodes;
+
+  }
+
+
+
   // Protect this route with AuthGuard (update a user by ID, needs authentication)
   @UseGuards(AuthGuard)
   @Patch(':id')
