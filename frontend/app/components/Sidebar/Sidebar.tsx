@@ -29,12 +29,13 @@ const Sidebar = () => {
       {/* Header */}
       <div className="flex items-center justify-between ">
         <button className="text-white">
-          <Menu size={24} />
+          
+          <Menu size={24}  / >
+
         </button>
         {!isCollapsed && <span className="text-lg font-semibold">Your Library</span>}
 
-       
-        <button className="text-white cursor-pointer rounded-full bg-gray-700 ">
+        <button className="text-white cursor-pointer rounded-full p-1 bg-gray-700 ">
           <Plus size={24} />
         </button>
         
@@ -57,7 +58,7 @@ const Sidebar = () => {
         </div>
         <div className="flex items-center space-x-2">
           <Heart size={24} />
-          {!isCollapsed && <span>Favourites Episodes</span>}
+          {!isCollapsed && <span>Liked Episodes</span>}
         </div>
         <div className="flex items-center space-x-2">
           <Download size={24} />
@@ -72,7 +73,7 @@ const Sidebar = () => {
       {/* Toggle Button */}
       <button
         onClick={toggleSidebar}
-        className="absolute top-1/2 -right-4 bg-gray-800 p-2 rounded-full text-white"
+        className="absolute top-1/2 -right-4 bg-gray-800 p-2 rounded-full  text-white"
       >
         {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
       </button>

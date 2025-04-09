@@ -1,6 +1,12 @@
 import { FiVolume, FiVolume1, FiVolume2, FiVolumeX } from "react-icons/fi";
 
-const VolumeControl = ({ volume, onVolumeChange }: { volume: number, onVolumeChange: (volume: number) => void }) => {
+const VolumeControl = ({
+  volume,
+  onVolumeChange,
+}: {
+  volume: number;
+  onVolumeChange: (volume: number) => void;
+}) => {
   return (
     <div className="flex items-center space-x-2 w-full justify-end">
       <button>
@@ -14,6 +20,8 @@ const VolumeControl = ({ volume, onVolumeChange }: { volume: number, onVolumeCha
           <FiVolumeX size={24} className="text-white" />
         )}
       </button>
+
+      {/* Thin volume slider */}
       <input
         type="range"
         min="0"
@@ -21,7 +29,10 @@ const VolumeControl = ({ volume, onVolumeChange }: { volume: number, onVolumeCha
         step="0.01"
         value={volume}
         onChange={(e) => onVolumeChange(parseFloat(e.target.value))}
-        className="w-24"
+        className="w-24 h-1 appearance-none rounded-lg cursor-pointer  bg-gray-300 focus:outline-none"
+        style={{
+          background: `linear-gradient(to right, #FFFFFF ${volume * 100}%, #535353 0%)`,
+        }}
       />
     </div>
   );

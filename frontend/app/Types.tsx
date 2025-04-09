@@ -1,11 +1,13 @@
 export interface User{
-    id:string;
+    _id:string;
     firstName:string;
     lastName:string ;
     bio:string;
     email:string;
     password:string;
     profilePic:string;
+    favoritePodcasts:string[];
+    likedEpisodes:string[];
 }
 
 export interface Episode {
@@ -14,6 +16,8 @@ export interface Episode {
     episodeDescription: string;
     audioUrl: string;
     createdAt: string;
+    likedByUsers: string[];
+    
   }
   
 
@@ -27,6 +31,7 @@ export interface Episode {
       lastName: string;
     };
     episodes:Episode[];
+    favoritedByUsers:string[];
   }
 
 
@@ -42,4 +47,20 @@ export interface Episode {
     playlistDescription:string;
     playlistImage:string;
     creator:User;
+  }
+
+  export interface LikeButtonProps {
+    episodeId: string;
+    isLiked: boolean;
+    onLikeClick: (e: React.MouseEvent) => void;
+    buttonSize: string;
+    iconSize: number;
+  }
+
+  export interface FavoriteButtonProps {
+    podcastId: string;
+    isFavorite: boolean;
+    onFavoriteClick: (e: React.MouseEvent) => void;
+    buttonSize: string;
+    iconSize:number;
   }

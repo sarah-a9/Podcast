@@ -64,10 +64,13 @@ export class UserController {
   @UseGuards(AuthGuard)
   @Post(':userId/favorite/:podcastId')
   async FavoritePodcast(@Param('userId') userId: string,@Param('podcastId') podcastId: string,) {
+    
+    
     const user = await this.userService.findOne(userId);
     const podcast = await this.podcastService.getPodcastById(podcastId);
 
      const podcastObjectId = new Types.ObjectId(podcastId);
+     const userObjectId = new Types.ObjectId(userId);
 
     if (!user || !podcast) {
       throw new Error('User or Podcast not found');
@@ -81,7 +84,7 @@ export class UserController {
         (id) => !id.equals(podcastId),
       );
       podcast.favoritedByUsers = podcast.favoritedByUsers.filter(
-        (userId) => !userId.equals(user.id),
+        (userId) => !userObjectId.equals(user.id),
       );
     } else {
       // Favorite: Add podcast to user's favoritePodcasts and add user to podcast's favoritedByUsers
@@ -142,6 +145,7 @@ export class UserController {
       return { message: 'Episode unliked successfully' };
     }
   }
+  
 
 }
 // 
