@@ -1,9 +1,8 @@
 "use client";
 import { useState } from "react";
 import { Search, Sun, User } from "lucide-react";
-import { FaHome } from "react-icons/fa";
-import Link from "next/link";
 import { GoHome } from "react-icons/go";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const Navbar = () => {
@@ -13,28 +12,31 @@ const Navbar = () => {
   if (pathname.startsWith('/auth')) return null;
 
   return (
-    <div className="bg-black sticky top-0 z-10 text-white">
+    <div className="bg-black sticky top-0  text-white">
       <nav className="flex items-center justify-between p-4">
-    
-        <div className="relative w-1/3 flex items-center">
-        {/* Home Icon */}
-         <Link href="/" className="text-gray-400 hover:text-white mr-2">
-          <GoHome size={25} />
-        </Link>
-       </div>
-        {/* Search Bar */}
-        <div className="relative w-1/3">
-          <input
-            type="text"
-            placeholder="Search podcasts..."
-            className="w-full p-2 pl-10 bg-gray-800 text-white rounded-lg focus:outline-none"
-          />
-          <Search className="absolute left-3 top-3 text-gray-400" size={16} />
-        </div>
-        
+        {/* Left Column: Empty */}
+        <div className="w-1/3"></div>
 
-        {/* Right Side: Theme Toggle + Profile */}
-        <div className="flex items-center gap-4">
+        {/* Center Column: Home Button and Search Bar */}
+        <div className="relative w-1/3 flex items-center justify-center space-x-4">
+          {/* Home Icon */}
+          <Link href="/" className="text-gray-400 hover:text-white bg-gray-800 rounded-full p-2">
+            <GoHome size={25} />
+          </Link>
+
+          {/* Search Bar */}
+          <div className="relative w-full">
+            <input
+              type="text"
+              placeholder="Search podcasts..."
+              className="w-full p-2 pl-10 bg-gray-800 text-white rounded-3xl focus:outline-none"
+            />
+            <Search className="absolute left-3 top-3 text-gray-400" size={16} />
+          </div>
+        </div>
+
+        {/* Right Column: Sun Icon and Profile */}
+        <div className="w-1/3 flex items-center justify-end gap-4">
           {/* Theme Toggle */}
           <button className="p-2 rounded-lg hover:bg-gray-800">
             <Sun size={20} />
@@ -53,13 +55,13 @@ const Navbar = () => {
               <div className="absolute right-0 mt-2 w-32 bg-gray-900 text-white rounded-lg shadow-lg">
                 <ul>
                   <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">
-                  <Link href={`/Profile/${"defaultUserId"}`}>Profile</Link>
+                    <Link href={`/Profile/${"defaultUserId"}`}>Profile</Link>
                   </li>
                   <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">
                     <Link href="/settings">Settings</Link>
                   </li>
                   <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">
-                    <Link href="/signout">signout</Link>
+                    <Link href="/signout">Sign out</Link>
                   </li>
                 </ul>
               </div>

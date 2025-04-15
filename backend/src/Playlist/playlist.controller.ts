@@ -1,9 +1,13 @@
-import { Controller, Post, Body, Param, Delete, Put, Get, Patch, NotFoundException, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Param, Delete, Put, Get, Patch, NotFoundException, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { PlaylistService } from './playlist.service';
 import { CreatePlaylistDto } from './dto/create-playlist.dto';
 import { UpdatePlaylistDto } from './dto/update-playlist.dto';
 import { AuthGuard } from '../guards/auth.guard'; // Import the AuthGuard
 import { Playlist } from 'src/schemas/Playlist.schema';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+
 
 @Controller('Playlist')
 export class PlaylistController {
@@ -11,13 +15,13 @@ export class PlaylistController {
 
   // Protect this route with AuthGuard (create a new playlist)
   // @UseGuards(AuthGuard)
-  @Post()
-  async create(@Body() createPlaylistDto: CreatePlaylistDto) {
-    return this.playlistService.createPlaylist(createPlaylistDto);
-  }
+  // @Post()
+  // async create(@Body() createPlaylistDto: CreatePlaylistDto) {
+  //   return this.playlistService.createPlaylist(createPlaylistDto);
+  // }
 
   // Protect this route with AuthGuard (add an episode to a playlist)
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Post(':playlistId/episode/:episodeId')
   async addEpisode(
     @Param('playlistId') playlistId: string,
@@ -26,8 +30,34 @@ export class PlaylistController {
     return this.playlistService.addEpisode(playlistId, episodeId);
   }
 
+  @UseGuards(AuthGuard)
+  @Post()
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads/playlists', // or wherever you want to store it
+        filename: (req, file, cb) => {
+          const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${extname(file.originalname)}`;
+          cb(null, uniqueName);
+        },
+      }),
+    }),
+  )
+  async create(
+    @Body() body: CreatePlaylistDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.playlistService.createPlaylist({
+      ...body,
+      playlistImg: file?.filename || '', // Store file name or path
+    });
+  }
+
+
+
+
   // Protect this route with AuthGuard (remove an episode from a playlist)
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Delete(':playlistId/episode/:episodeId')
   async removeEpisode(
     @Param('playlistId') playlistId: string,
@@ -63,7 +93,7 @@ export class PlaylistController {
   }
 
   // Protect this route with AuthGuard (update a playlist)
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Patch(':id')
   async updatePlaylist(
     @Param('id') id: string,
@@ -73,7 +103,7 @@ export class PlaylistController {
   }
 
   // Protect this route with AuthGuard (delete a playlist)
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Delete(':id')
   async deletePlaylist(@Param('id') id: string) {
     return this.playlistService.deletePlaylist(id);
