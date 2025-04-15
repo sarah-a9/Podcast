@@ -1,34 +1,8 @@
-// // components/CategoryButton.tsx
-// import React from "react";
-
-// interface CategoryButtonProps {
-//   name: string;
-//   onClick: () => void;
-// }
-
-// const CategoryButton: React.FC<CategoryButtonProps> = ({ name, onClick }) => {
-//   return (
-//     <button onClick={onClick} className="px-6 py-3 bg-gray-700 rounded-full text-white">
-//       {name}
-//     </button>
-//   );
-// };
-
-// export default CategoryButton;
-
-
-
-
 
 import { Category } from '@/app/Types';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
-
-// interface CategoryProps {
-//   id :string ;
-//   categoryName: string;
-// }
 
 const CategoryButton: React.FC<Category> = ({ categoryName  , id}) => {
   console.log("CategoryButton received id:", id); // ✅ Debugging

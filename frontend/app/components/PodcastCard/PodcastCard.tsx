@@ -53,7 +53,7 @@ const PodcastCard: React.FC<PodcastProps> = ({
   return (
     // flex-shrink-0 flex-flex-col w-1/7
     <div
-      className="w-42 flex-shrink-0 flex flex-col shadow-sm cursor-pointer hover:scale-95 transform transition-all duration-200 overflow-x-auto"
+      className="w-42 flex-shrink-0 flex flex-col shadow-sm cursor-pointer hover:scale-95 transform transition-all duration-200 "
       onClick={handleViews}
     >
       <div className="flex flex-col">

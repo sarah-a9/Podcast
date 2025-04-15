@@ -12,7 +12,7 @@ const Navbar = () => {
   if (pathname.startsWith('/auth')) return null;
 
   return (
-    <div className="bg-black sticky top-0 z-10 text-white">
+    <div className="bg-black sticky top-0  text-white">
       <nav className="flex items-center justify-between p-4">
         {/* Left Column: Empty */}
         <div className="w-1/3"></div>

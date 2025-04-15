@@ -1,5 +1,3 @@
-//
-
 "use client";
 
 import React, { useState } from "react";
@@ -15,10 +13,13 @@ import {
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import CreatePlaylistModal from "../CreatePlaylistModal/CreatePlaylistModal";
 
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const pathname = usePathname();
+
   // Hide Sidebar on auth pages
   if (pathname.startsWith("/auth")) return null;
 
@@ -26,14 +27,18 @@ const Sidebar = () => {
     setIsCollapsed(!isCollapsed);
   };
 
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+
   return (
     <div
-      className={`sticky h-screen height   bg-gray-800 text-white p-4 transition-all duration-300 ${
+      className={`sticky h-screen height bg-gray-800 text-white p-4 transition-all duration-300 ${
         isCollapsed ? "w-16" : "w-64"
       } rounded-lg shadow-lg flex flex-col relative`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between ">
+      <div className="flex items-center justify-between">
         <button className="text-white">
           <Menu size={24} />
         </button>
@@ -41,19 +46,19 @@ const Sidebar = () => {
           <span className="text-lg font-semibold">Your Library</span>
         )}
 
-        <button className="text-white cursor-pointer rounded-full p-1 bg-gray-700 ">
-          <Plus size={24} />
-        </button>
+        {/* Plus Button with Tooltip */}
+        <div className="relative group inline-block">
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap px-2 py-1 rounded bg-gray-700 text-white text-sm font-mono opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-[9999] shadow-lg">
+            Create a playlist
+          </div>
 
-        {/* {menuOpen && (
-              <div className="absolute right-0 mt-2 w-32 bg-gray-900 text-white rounded-lg shadow-lg">
-                <ul>
-                  <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">Create a Playlist</li>
-                  <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">Settings</li>
-                  <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">Login</li>
-                </ul>
-              </div>
-            )} */}
+          <button
+            onClick={toggleModal}
+            className="text-gray-400 text-sm cursor-pointer hover:text-white rounded-full p-2 bg-gray-700 hover:bg-gray-600"
+          >
+            <Plus size={20} />
+          </button>
+        </div>
       </div>
 
       {/* Menu Items */}
@@ -91,10 +96,15 @@ const Sidebar = () => {
       {/* Toggle Button */}
       <button
         onClick={toggleSidebar}
-        className="absolute top-1/2 -right-4 bg-gray-800 p-2 rounded-full  text-white"
+        className="absolute top-1/2 -right-4 bg-gray-800 p-2 rounded-full text-white"
       >
         {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
       </button>
+
+      {/* Modal Component */}
+      {isModalOpen && (
+        <CreatePlaylistModal onClose={() => setIsModalOpen(false)} />
+      )}
     </div>
   );
 };

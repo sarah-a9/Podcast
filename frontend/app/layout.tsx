@@ -22,9 +22,9 @@ export default function RootLayout({
         {/* Wrap the entire layout with both providers */}
         <AuthProvider>
           <AudioProvider>
-            <div className="flex flex-col">
+            <div className="flex flex-col ">
               <Navbar />
-              <div className="flex flex-shrink-0 pl-2 flex-1">
+              <div className="flex flex-shrink-0 pl-2 flex-1 ">
                 {/* Sidebar */}
                 <Sidebar />
 

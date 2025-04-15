@@ -87,6 +87,21 @@ const PodcastDetails = ({ params }: { params: { id: string } }) => {
                 <p className="text-sm text-gray-400">
                   Created by {podcast.creator.firstName} {podcast.creator.lastName}
                 </p>
+
+                   <div className="flex gap-2 flex-wrap">
+                {podcast && podcast.categories.length > 0 ? (
+                  podcast.categories.map((category) => (
+                    <div
+                      key={category._id}
+                      className="w-1/12 flex-shrink-0 h-10 rounded-full shadow-md flex items-center justify-center border-1 border-white  text-white font-bold text-xs bg-transparent  px-4 mt-2"
+                      >
+                      {category.categoryName}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No categories available</p>
+                )}
+              </div> 
               </div>
               <div className="col-span-1 content-center">
                 <FavoriteButton
@@ -104,6 +119,20 @@ const PodcastDetails = ({ params }: { params: { id: string } }) => {
             </div>
 
             <p className="text-lg italic">{podcast.podcastDescription}</p>
+            <div className="flex gap-2 flex-wrap">
+                {podcast && podcast.categories.length > 0 ? (
+                  podcast.categories.map((category) => (
+                    <div
+                      key={category._id}
+                      className="w-1/12 flex-shrink-0 h-10 rounded-full shadow-md flex items-center justify-center border-1 border-white  text-white font-bold text-xs bg-transparent  px-4 mt-2"
+                    >
+                      {category.categoryName}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No categories available</p>
+                )}
+              </div>
 
             <div className="mt-20 justify-between flex flex-row">
               <p className="font-bold text-xl">All Episodes</p>
