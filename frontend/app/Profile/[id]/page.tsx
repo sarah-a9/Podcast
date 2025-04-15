@@ -1,44 +1,137 @@
 'use client';
 
-import { useState } from 'react';
-import { useAuth } from '../../components/Providers/AuthContext/AuthContext';
-import ProfileHeader from '../../components/ProfileHeader/profileHeader';
-import EditProfilePopup from '../../components/PopUps/EditProfilePopUp';
-import DeleteProfilePopup from '../../components/PopUps/deleteProfilePopUp';
+import { useState, useEffect } from "react";
+import { useAuth } from "../../components/Providers/AuthContext/AuthContext";
+import ProfileHeader from "../../components/ProfileHeader/profileHeader";
+import EditProfilePopup from "../../components/PopUps/EditProfilePopUp";
+import DeleteProfilePopup from "../../components/PopUps/deleteProfilePopUp";
+import CreatePodcastButton from "../../components/CreatePodcastButton/CreatePodcastButton";
+import PodcastCard from "../../components/PodcastCard/PodcastCard";
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [myPodcasts, setMyPodcasts] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchMyPodcasts();
+  }, [user]);
+  
+  // Fetch podcasts created by this user.
+  const fetchMyPodcasts = async () => {
+    try {
+      const res = await fetch("http://localhost:3000/podcast");
+      if (!res.ok) throw new Error("Could not fetch podcasts");
+      const data = await res.json();
+      // Filter podcasts by matching the creator's id with the logged-in user's id
+      const filtered = data.filter(
+        (podcast: any) => podcast.creator && user && podcast.creator._id === user._id
+      );
+      setMyPodcasts(filtered);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   if (!user) return <div>Loading user profile...</div>;
 
-  const handleEditSave = (data: { username: string; bio: string }) => {
-    console.log("Updated data:", data);
+  
+
+  const handleEditSave = async (data: {
+    firstName: string;
+    lastName: string;
+    bio: string;
+    profilePic: string;
+  }) => {
     setShowEditPopup(false);
-    // Optionally, update the backend via a PUT/PATCH request here and update the AuthContext accordingly.
+
+    try {
+      const res = await fetch("http://localhost:3000/user/updateProfile", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.message || "Update failed");
+      }
+
+      const updatedProfile = await res.json();
+      setUser(updatedProfile);
+      console.log("Profile successfully updated!", updatedProfile);
+    } catch (error: any) {
+      console.error("Update failed:", error.message);
+      alert(`Profile update failed: ${error.message}`);
+    }
   };
 
-  const handleDeleteConfirm = () => {
-    console.log("Profile deleted");
+  const handleDeleteConfirm = async () => {
     setShowDeletePopup(false);
-    // Optionally, call your backend endpoint to delete the profile.
+    try {
+      const res = await fetch("http://localhost:3000/user/profile", {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.message || "Delete failed");
+      }
+      const result = await res.json();
+      console.log("Profile successfully deleted.", result);
+      // Optionally log out or redirect here.
+    } catch (error: any) {
+      console.error("Delete failed:", error.message);
+    }
   };
 
   return (
     <div className="p-6 min-h-screen bg-gray-900 text-white">
       <ProfileHeader
-        username={`${user.firstName} ${user.lastName}`}
+        firstName={user.firstName}
+        lastName={user.lastName}
         profilePic={user.profilePic}
         bio={user.bio}
         onEdit={() => setShowEditPopup(true)}
         onDelete={() => setShowDeletePopup(true)}
       />
 
+      {/* Create Podcast Button placed right after the profile header */}
+      <CreatePodcastButton />
+
+      {/* My Podcasts Section */}
+      <div className="mt-10">
+        <h2 className="text-2xl font-semibold mb-4">My Podcasts</h2>
+        {myPodcasts.length > 0 ? (
+          <div className="flex overflow-x-auto gap-4">
+            {myPodcasts.map((podcast) => (
+              <PodcastCard
+                key={podcast._id}
+                id={podcast._id}
+                podcastName={podcast.podcastName}
+                podcastDescription={podcast.podcastDescription}
+                podcastImage={podcast.podcastImage}
+                creator={podcast.creator}
+              />
+            ))}
+          </div>
+        ) : (
+          <p>No podcasts to show yet...</p>
+        )}
+      </div>
+
       {showEditPopup && (
         <EditProfilePopup
           user={{
-            username: `${user.firstName} ${user.lastName}`,
+            firstName: user.firstName,
+            lastName: user.lastName,
             bio: user.bio,
             profilePic: user.profilePic,
           }}

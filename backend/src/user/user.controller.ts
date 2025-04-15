@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, UseGuards, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -48,6 +48,26 @@ export class UserController {
     if (!updateUser) throw new HttpException('User Not Found', 404);
     return updateUser;
   }
+
+  @UseGuards(AuthGuard)
+  @Patch('updateProfile')
+  async updateCurrentUser(@Body() updateUserDto: UpdateUserDto, @Req() req) {
+    console.log("userId in controller:", req.userId); // 👈 Add this line
+    const userId = req.userId;
+
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      throw new HttpException("Invalid or missing user ID", 400);
+    }
+
+    const updatedUser = await this.userService.update(userId, updateUserDto);
+
+    if (!updatedUser) {
+      throw new HttpException("User Not Found", 404);
+    }
+
+    return updatedUser;
+  }
+
 
   // Protect this route with AuthGuard (delete a user by ID, needs authentication)
   @UseGuards(AuthGuard)

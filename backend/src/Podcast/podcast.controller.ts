@@ -22,7 +22,7 @@ export class PodcastController {
     constructor(private readonly podcastService: PodcastService) {}
 
     // Protect this route with the AuthGuard
-    // @UseGuards(AuthGuard)
+    @UseGuards(AuthGuard)
     @Post()
     async createPodcast(@Body() createPodcastDto: CreatePodcastDto ) {
         return await this.podcastService.createPodcast(createPodcastDto);

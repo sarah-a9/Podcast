@@ -1,23 +1,7 @@
 'use client';
 
-import { User } from '@/app/Types';
+import { AuthContextType, User } from '@/app/Types';
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-
-interface User {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  bio?: string;
-  profilePic?: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  setUser: (user: User | null) => void;
-  token: string | null;
-  setToken: (token: string | null) => void;
-}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -41,10 +25,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .then((data) => {
           console.log("Fetched user from /auth/me:", data); // 👈
           setUser(data);
+          if (data && data._id){
+            localStorage.setItem('userId', data._id); // Store user ID in localStorage
+          }
         })
         .catch((err) => {
           console.error("Error fetching current user:", err);
-          //setUser(null);
+          setUser(null);
         });
     }
   }, []);

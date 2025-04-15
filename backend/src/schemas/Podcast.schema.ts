@@ -14,7 +14,7 @@ export class Podcast extends Document{
     @Prop({required : true})
     podcastDescription: string;
 
-    @Prop({required : true})
+    @Prop({required : false})
     podcastImage: string;
 
     @Prop({ type: [{ type: Types.ObjectId, ref: 'Category' }], required : true  ,default: [] }) // Un podcast peut avoir plusieurs catégories
