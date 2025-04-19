@@ -4,18 +4,27 @@ import ActionButtons from "../EpisodeActionButtons/EpisodeActionButtons";
 import { useAuth } from "../Providers/AuthContext/AuthContext"; // Import the useAuth hook
 import { Episode, Podcast } from "@/app/Types";
 
-const EpisodeCard = ({ episode, podcast }: { episode: Episode; podcast: Podcast }) => {
+const EpisodeCard = ({
+  episode,
+  podcast,
+  className = "",
+  imageClassName = "",
+}: {
+  episode: Episode;
+  podcast: Podcast;
+  className?: string;
+  imageClassName?: string;
+}) => {
   const router = useRouter();
-  const { user, setUser } = useAuth(); // Access user and setUser from context
+  const { user, setUser } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
   const [liked, setLiked] = useState(false);
 
   useEffect(() => {
     if (user && user.likedEpisodes) {
-      // Check if the episode is in the user's likedEpisodes
       setLiked(user.likedEpisodes.includes(episode._id));
     }
-  }, [user, episode._id]); // Re-run when the user or episode changes
+  }, [user, episode._id]);
 
   const handleOnClick = () => {
     router.push(`/PodcastDetail/${podcast._id}/EpisodeDetail/${episode._id}`, {
@@ -24,38 +33,37 @@ const EpisodeCard = ({ episode, podcast }: { episode: Episode; podcast: Podcast 
   };
 
   const toggleMenu = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent triggering parent click event
+    e.stopPropagation();
     setShowMenu(!showMenu);
   };
 
-  // Handle like button click
   const handleLikeClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent click event from propagating to the parent div
+    e.stopPropagation();
     if (user && user.likedEpisodes) {
-      // Update the user's likedEpisodes list
       const updatedLikedEpisodes = liked
-        ? user.likedEpisodes.filter((id) => id !== episode._id) // Remove episode from likedEpisodes
-        : [...user.likedEpisodes, episode._id]; // Add episode to likedEpisodes
+        ? user.likedEpisodes.filter((id) => id !== episode._id)
+        : [...user.likedEpisodes, episode._id];
 
-      // Update AuthContext with the new likedEpisodes list
       setUser({
         ...user,
         likedEpisodes: updatedLikedEpisodes,
       });
     }
-    setLiked(!liked); // Toggle the liked state locally
+    setLiked(!liked);
   };
 
   return (
     <div
       key={episode._id}
-      className="grid grid-cols-8 gap-4 cursor-pointer hover:bg-gray-700 rounded-2xl mt-6"
+      className="grid grid-cols-8 gap-4 cursor-pointer rounded-2xl hover:bg-black/50 transition duration-200"
+
+
       onClick={handleOnClick}
     >
       {/* Episode Image */}
-      <div className="col-span-1">
+      <div className="col-span-1 ">
         <img
-          className="rounded-lg"
+          className={`rounded-lg ${imageClassName}`}
           src={podcast.podcastImage}
           alt={episode.episodeTitle}
         />
@@ -74,7 +82,7 @@ const EpisodeCard = ({ episode, podcast }: { episode: Episode; podcast: Podcast 
         </p>
       </div>
 
-      {/* Duration (if available) */}
+      {/* Duration (empty for now) */}
       <div className="col-span-1">
         <p className="text-sm text-gray-400 mt-5"></p>
       </div>
@@ -89,8 +97,8 @@ const EpisodeCard = ({ episode, podcast }: { episode: Episode; podcast: Podcast 
         />
       </div>
 
-      {/* Separator after each episode */}
-      <div className="col-span-8 mt-4">
+      {/* Optional Separator */}
+      <div className="col-span-8 ">
         <hr style={{ color: "grey" }} />
       </div>
     </div>

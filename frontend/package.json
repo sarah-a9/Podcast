@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@radix-ui/react-progress": "^1.1.2",
+    "color": "^5.0.0",
+    "color-thief-browser": "^2.0.2",
     "lucide-react": "^0.483.0",
     "next": "15.2.3",
     "react": "^19.0.0",

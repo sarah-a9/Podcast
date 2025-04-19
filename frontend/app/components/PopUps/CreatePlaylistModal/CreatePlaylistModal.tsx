@@ -2,18 +2,26 @@
 import React, { useRef, useState } from "react";
 import { FiCamera } from "react-icons/fi";
 import { IoClose, IoMusicalNotesOutline } from "react-icons/io5";
+import { useAuth } from "../../Providers/AuthContext/AuthContext";
+import toast from "react-hot-toast";
+import { Playlist } from "@/app/Types";
 
 type CreatePlaylistModalProps = {
   onClose: () => void;
+  onCreate: (newPlaylist: Playlist) => void; // adjust the type as needed
 };
 
-const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({ onClose }) => {
+const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
+  onClose,
+  onCreate, // <- send new playlist back up
+}) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
+  const { user, token } = useAuth();
 
   const handleImageClick = () => {
     if (fileInputRef.current) {
@@ -23,44 +31,44 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({ onClose }) =>
 
   const handleCreatePlaylist = async () => {
     if (!name.trim()) {
-      alert("Please enter a playlist name.");
+      toast.error("Please enter a playlist name.");
+      return;
+    }
+    if (!user || !token) {
+      toast.error("You must be logged in to create a playlist.");
       return;
     }
 
-    // const [formData, setFormData] = useState({
-    //   podcastName: "",
-    //   podcastDescription: "",
-    //   podcastImg: "",
-    //   userId: "",
-    // });
-
     const formData = new FormData();
-    formData.append("name", name);
-    formData.append("description", description);
+    formData.append("playlistName", name);
+    formData.append("playlistDescription", description);
+    formData.append("creator", user._id);
     if (imageFile) {
-      formData.append("image", imageFile);
+      formData.append("playlistImg", imageFile);
     }
 
     setLoading(true);
-
     try {
-      const response = await fetch("http://localhost:3000/Playlist", {
+      const res = await fetch("http://localhost:3000/playlist", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: formData,
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to create playlist.");
-      }
-      console.log(formData);
+      const data = await res.json();
 
-      const data = await response.json();
-      console.log("Playlist created:", data);
-      onClose(); // close modal
+      if (!res.ok) {
+        toast.error(data.message || "Something went wrong.");
+        return;
+      }
+
+      toast.success("Playlist created successfully!");
+      onCreate(data); // <- send new playlist back up
+      onClose(); // Optionally close modal after success
     } catch (err) {
-      console.error("Error:", err);
-      alert("Something went wrong while creating the playlist.");
+      toast.error("Failed to create playlist. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -69,7 +77,6 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({ onClose }) =>
   return (
     <div className="fixed inset-0 flex items-center justify-center backdrop-blur-sm bg-gray-900/30 z-50">
       <div className="relative bg-gray-800 text-white p-6 rounded-2xl w-[500px] shadow-lg">
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-6 right-4 text-gray-400 hover:bg-gray-500 rounded-full p-1 text-2xl"
@@ -81,7 +88,6 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({ onClose }) =>
         <h2 className="text-2xl font-bold mb-6">Create Your Playlist</h2>
 
         <div className="flex flex-row gap-4">
-          {/* Image Upload Section */}
           <div
             onClick={handleImageClick}
             className="w-40 h-40 bg-gray-700 flex items-center justify-center rounded relative group cursor-pointer overflow-hidden"
@@ -105,7 +111,6 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({ onClose }) =>
             </div>
           </div>
 
-          {/* Input Fields */}
           <div className="flex-1 flex flex-col">
             <input
               type="text"
@@ -123,16 +128,16 @@ const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({ onClose }) =>
           </div>
         </div>
 
-        {/* Submit Button */}
-        <button
-          onClick={handleCreatePlaylist}
-          disabled={loading}
-          className="w-full mt-4 py-2 bg-white text-black font-bold rounded-full hover:opacity-90 disabled:opacity-50"
-        >
-          {loading ? "Saving..." : "Save"}
-        </button>
+        <div className="flex justify-center mt-2">
+          <button
+            onClick={handleCreatePlaylist}
+            disabled={loading}
+            className="w-28 py-3 px-4 bg-white text-black text-sm font-semibold rounded-full hover:opacity-90 disabled:opacity-50"
+          >
+            {loading ? "Saving..." : "Save"}
+          </button>
+        </div>
 
-        {/* Hidden File Input */}
         <input
           ref={fileInputRef}
           type="file"

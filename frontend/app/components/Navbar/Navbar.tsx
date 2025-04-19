@@ -9,7 +9,7 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
   // Hide Navbar on auth pages
-  if (pathname.startsWith('/auth')) return null;
+  if (pathname.startsWith("/auth")) return null;
 
   return (
     <div className="bg-black sticky top-0  text-white">
@@ -20,7 +20,10 @@ const Navbar = () => {
         {/* Center Column: Home Button and Search Bar */}
         <div className="relative w-1/3 flex items-center justify-center space-x-4">
           {/* Home Icon */}
-          <Link href="/" className="text-gray-400 hover:text-white bg-gray-800 rounded-full p-2">
+          <Link
+            href="/"
+            className="text-gray-400 hover:text-white bg-gray-800 rounded-full p-3"
+          >
             <GoHome size={25} />
           </Link>
 
@@ -29,16 +32,19 @@ const Navbar = () => {
             <input
               type="text"
               placeholder="Search podcasts..."
-              className="w-full p-2 pl-10 bg-gray-800 text-white rounded-3xl focus:outline-none"
+              className="w-full p-3 pl-10 bg-gray-800 text-white rounded-4xl focus:outline-none "
             />
-            <Search className="absolute left-3 top-3 text-gray-400" size={16} />
+            <Search
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              size={20}
+            />
           </div>
         </div>
 
         {/* Right Column: Sun Icon and Profile */}
         <div className="w-1/3 flex items-center justify-end gap-4">
           {/* Theme Toggle */}
-          <button className="p-2 rounded-lg hover:bg-gray-800">
+          <button className="p-3 rounded-lg hover:bg-gray-800">
             <Sun size={20} />
           </button>
 
@@ -46,7 +52,7 @@ const Navbar = () => {
           <div className="relative">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="p-2 rounded-full bg-gray-800 hover:bg-gray-700"
+              className="p-3 rounded-full bg-gray-800 hover:bg-gray-700"
             >
               <User size={20} />
             </button>

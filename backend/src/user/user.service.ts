@@ -72,6 +72,36 @@ async getFavoritePodcasts(id: string) {
 }
 
 
+async getPlaylistsByUser(userId: string) {
+  const user = await this.UserModel.findById(userId)
+  .populate({
+    path: 'playlists',
+    model: 'Playlist',
+    select: 'playlistName playlistDescription playlistImg creator episodes',
+    populate: [
+      {
+        path: 'episodes',
+        model: 'Episode',
+        select: 'episodeName episodeDescription',
+      },
+      {
+        path: 'creator',
+        model: 'User',
+        select: 'firstName lastName',
+      },
+    ],
+  })
+  .exec();
+
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  return user.playlists; // Return the playlists
+}
+
+
 
 async getLikedEpisodes(id: string) {
   return this.UserModel.findById(id)
@@ -102,7 +132,7 @@ async getLikedEpisodes(id: string) {
       path: 'podcasts',
       select: 'podcastName podcastDescription podcastImage categories',  // Select only the needed podcast fields
       populate:{path:'categories', model:'Category' , select:'categoryName'}}).
-      populate({path:'playlists', model:'Playlist' , select:'playlistName playlistDescription' , 
+      populate({path:'playlists', model:'Playlist' , select:'playlistName playlistDescription playlistImg' , 
       populate:{path:'episodes' ,model:'Episode' , select :'episodeName episodeDescription '}}).exec(); // 🔥 Populate podcasts for a single user
   }
 

@@ -9,7 +9,7 @@ interface MenuButtonProps {
 const MenuButton: React.FC<MenuButtonProps> = ({ onClick, buttonSize, iconSize }) => {
   return (
     <button
-      className={`text-gray-400 hover:text-white relative ${buttonSize}`}
+      className={`text-gray-400 hover:text-white  ${buttonSize}`}
       onClick={onClick}
     >
       <MdMoreHoriz size={iconSize} />

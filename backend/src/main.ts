@@ -12,7 +12,7 @@ async function bootstrap() {
   // Enable CORS for your frontend URL
   app.enableCors({
     origin: 'http://localhost:3001', // Frontend URL (make sure this matches your frontend URL and port)
-    methods: 'GET, POST, PUT, DELETE', // Specify allowed HTTP methods (adjust as needed)
+    methods: 'GET, POST, PUT,PATCH , DELETE', // Specify allowed HTTP methods (adjust as needed)
     credentials: true, // Allow cookies if needed (set this to true if using cookies for authentication)
   });
 
@@ -22,6 +22,9 @@ async function bootstrap() {
     forbidNonWhitelisted: true,
   }));
   app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads',
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Cats example')

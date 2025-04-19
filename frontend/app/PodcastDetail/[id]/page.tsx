@@ -71,7 +71,7 @@ const PodcastDetails = ({ params }: { params: { id: string } }) => {
 
   return (
     <div className="h-screen text-white rounded-lg scrollable-container scrollbar-hide">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full flex flex-col">
+      <div className="bg-gray-900 p-8 rounded-lg shadow-lg w-full flex flex-col">
         {podcast ? (
           <>
             <div className="grid grid-cols-6 gap-4">
@@ -148,10 +148,13 @@ const PodcastDetails = ({ params }: { params: { id: string } }) => {
               {podcast.episodes.length > 0 ? (
                 podcast.episodes.map((episode) => (
                   <EpisodeCard key={episode._id} episode={episode} podcast={podcast} />
+                  
                 ))
+                
               ) : (
                 <p className="text-gray-500">No episodes available</p>
               )}
+              
             </div>
           </>
         ) : (

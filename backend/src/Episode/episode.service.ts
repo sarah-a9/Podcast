@@ -71,7 +71,16 @@ async createEpisode(createEpisodeDto: CreateEpisodeDto) {
 
 
  getEpisodes(){
-    return this.EpisodeModel.find();
+    return this.EpisodeModel.find().populate({
+        path:'podcast',
+        model:'Podcast',
+        select:'podcastImage podcastName podcastDescription creator',
+        populate: {
+            path: 'creator',
+            model: 'User',
+            select: 'firstName lastName',
+          },
+    });
 }
 
 

@@ -8,6 +8,7 @@ export interface User{
     profilePic:string;
     favoritePodcasts:string[];
     likedEpisodes:string[];
+    playlists:string[];
 }
 
 export interface Episode {
@@ -17,6 +18,7 @@ export interface Episode {
     audioUrl: string;
     createdAt: string;
     likedByUsers: string[];
+    podcast:Podcast;
     
   }
   
@@ -45,8 +47,12 @@ export interface Episode {
     _id:string;
     playlistName:string;
     playlistDescription:string;
-    playlistImage:string;
-    creator:User;
+    playlistImg?:string;
+    creator: {
+      firstName: string;
+      lastName: string;
+    };
+    episodes: Episode[];
   }
 
   export interface LikeButtonProps {
@@ -64,3 +70,5 @@ export interface Episode {
     buttonSize: string;
     iconSize:number;
   }
+
+  
