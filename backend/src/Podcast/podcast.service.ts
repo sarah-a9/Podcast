@@ -18,12 +18,7 @@ export class PodcastService {
     @InjectModel(Category.name) private CategoryModel: Model<CategoryDocument>,
   ) {}
 
-
-
-
-
   
-
   async createPodcast(createPodcastDto: CreatePodcastDto) {
     const newPodcast = new this.PodcastModel(createPodcastDto);
     const savedPodcast = await newPodcast.save();
@@ -71,20 +66,30 @@ export class PodcastService {
     const podcast = await this.PodcastModel
       .findById(id)
       .populate({
-        path: 'creator',  // Populate only the creator field
-        select: 'firstName lastName'  // Only the creator's firstName, not all user details
-      }).populate({
-        path: 'episodes', // Populate episodes
-         model:"Episode",
-        select: 'episodeTitle episodeDescription  createdAt audioUrl' // Specify which fields you want from the episodes
-      }).populate({path: 'categories', // Populate episodes
-        model:"Category" ,select:'categoryName'}).exec();
-
-      if (!podcast) {
-        throw new NotFoundException("Podcast not found");
-      }
-      
-     return podcast;
+        path: 'creator',
+        select: 'firstName lastName'
+      })
+      .populate({
+        path: 'episodes',
+        model: 'Episode',
+        select: 'episodeTitle episodeDescription createdAt audioUrl status scheduledAt', 
+        populate: {
+          path: 'podcast',
+          model: 'Podcast',
+          select: 'podcastName podcastImage creator'
+        }
+      })
+      .populate({
+        path: 'categories',
+        model: 'Category',
+        select: 'categoryName'
+      })
+      .exec();
+  
+    if (!podcast) {
+      throw new NotFoundException("Podcast not found");
+    }
+    return podcast;
   }
 
 
@@ -95,11 +100,11 @@ export class PodcastService {
         path: 'episodes',
         model: 'Episode',
         match: { _id: episodeId },  // Match the specific episode ID
-        select: 'episodeTitle episodeDescription audioUrl createdAt podcast',  // Fields to return from the episode
+        select: 'episodeTitle episodeDescription audioUrl createdAt podcast likedByUsers',  // Fields to return from the episode
         populate: {
           path: 'podcast',  // Populate the 'podcast' field inside the Episode model
           model: 'Podcast',
-          select:'podcastName podcastImage creator',
+          select:'podcastName podcastImage creator favoritedByUsers',
           populate:{
            path:'creator',
            model:'User',

@@ -7,7 +7,7 @@ import { useAuth } from '../../components/Providers/AuthContext/AuthContext';
 
 export default function Login() {
   const router = useRouter();
-  const { setToken, setUser } = useAuth();
+  const { setToken, setUser } = useAuth();  // Use the context here
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -31,20 +31,26 @@ export default function Login() {
       }
 
       const { token, user } = await res.json();
-      // console.log(token);
+
+      // Save the token and user in localStorage
       localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));  // Save user to localStorage
+
+      // Update the context with the user and token
       setToken(token);
       setUser(user);
-      router.push('/'); // Redirect to the home page or dashboard
-    
+
+      // Redirect to the home page or dashboard
+      router.push('/');
+      console.log('userId', user.userId);
+
     } catch (err: any) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
-  
-  
+
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <div className="bg-gray-800 rounded-xl p-8 shadow-2xl w-full max-w-md">

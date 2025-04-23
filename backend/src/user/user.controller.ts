@@ -38,6 +38,35 @@ export class UserController {
     return findUser;
   }
 
+
+
+  @UseGuards(AuthGuard)
+  @Get(':id/favoritePodcasts')
+  async getFavoritePodcasts(@Param('id') id:string){
+    const isValid = mongoose.Types.ObjectId.isValid(id);
+    if (!isValid) throw new HttpException('Usee Not Found', 404);
+    const favoritePodcasts = await this.userService.getFavoritePodcasts(id);
+    if (!favoritePodcasts) throw new HttpException("User Not Found", 404);
+    return favoritePodcasts;
+
+  }
+
+
+
+
+  @UseGuards(AuthGuard)
+  @Get(':id/likedEpisodes')
+  async getLikedEpisodes(@Param('id') id:string){
+    const isValid = mongoose.Types.ObjectId.isValid(id);
+    if (!isValid) throw new HttpException('Usee Not Found', 404);
+    const LikedEpisodes = await this.userService.getLikedEpisodes(id);
+    if (!LikedEpisodes) throw new HttpException("User Not Found", 404);
+    return LikedEpisodes;
+
+  }
+
+
+
   // Protect this route with AuthGuard (update a user by ID, needs authentication)
   @UseGuards(AuthGuard)
   @Patch(':id')
@@ -52,7 +81,7 @@ export class UserController {
   @UseGuards(AuthGuard)
   @Patch('updateProfile')
   async updateCurrentUser(@Body() updateUserDto: UpdateUserDto, @Req() req) {
-    console.log("userId in controller:", req.userId); // 👈 Add this line
+    console.log("userId in controller:", req.userId); // 👈
     const userId = req.userId;
 
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
@@ -67,6 +96,21 @@ export class UserController {
 
     return updatedUser;
   }
+
+  @UseGuards(AuthGuard)
+  @Delete('profile')
+  async deleteCurrentUser(@Req() req) {
+    const userId = req.userId;
+    
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      throw new HttpException("Invalid or missing user ID", 400);
+    }
+
+    const deletedUser = await this.userService.remove(userId);
+    if (!deletedUser) throw new HttpException("User Not Found", 404);
+    return { message: "User successfully deleted" };
+  }
+
 
 
   // Protect this route with AuthGuard (delete a user by ID, needs authentication)
@@ -84,10 +128,13 @@ export class UserController {
   @UseGuards(AuthGuard)
   @Post(':userId/favorite/:podcastId')
   async FavoritePodcast(@Param('userId') userId: string,@Param('podcastId') podcastId: string,) {
+    
+    
     const user = await this.userService.findOne(userId);
     const podcast = await this.podcastService.getPodcastById(podcastId);
 
      const podcastObjectId = new Types.ObjectId(podcastId);
+     const userObjectId = new Types.ObjectId(userId);
 
     if (!user || !podcast) {
       throw new Error('User or Podcast not found');
@@ -101,7 +148,7 @@ export class UserController {
         (id) => !id.equals(podcastId),
       );
       podcast.favoritedByUsers = podcast.favoritedByUsers.filter(
-        (userId) => !userId.equals(user.id),
+        (userId) => !userObjectId.equals(user.id),
       );
     } else {
       // Favorite: Add podcast to user's favoritePodcasts and add user to podcast's favoritedByUsers
@@ -162,6 +209,7 @@ export class UserController {
       return { message: 'Episode unliked successfully' };
     }
   }
+  
 
 }
 // 

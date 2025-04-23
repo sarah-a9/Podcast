@@ -16,7 +16,7 @@ export default function DeleteProfilePopup({ onCancel, onConfirm }: DeleteProfil
           >
             Cancel
           </button>
-          <button
+           <button
             onClick={onConfirm}
             className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded"
           >

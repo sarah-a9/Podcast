@@ -1,34 +1,33 @@
 "use client";
+
 import ActionButtons from "@/app/components/EpisodeActionButtons/EpisodeActionButtons";
+import { useAuth } from "@/app/components/Providers/AuthContext/AuthContext"; // Import the useAuth hook
 import { Podcast } from "@/app/Types";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { MdOutlineAccessTime } from "react-icons/md";
 
-const EpisodeDetail = ({
-  params,
-}: {
-  params: { id: string; episodeId: string };
-}) => {
-  const [episode, setEpisode] = useState<{
+const EpisodeDetail = ({ params }: { params: Promise<{ id: string; episodeId: string }> }) => {
+  const { id, episodeId } = use(params);  const [episode, setEpisode] = useState<{
     _id: string;
     episodeTitle: string;
     episodeDescription: string;
     audioUrl: string;
     podcast: Podcast;
-    createdAt: string;
+    likedByUsers: string[];
+    createdAt : string;
     categories: any[];
-  } | null>(null);
-
+  } | null>(null); // Initialize as null instead of an empty array
   const [liked, setLiked] = useState(false);
+  const { user, setUser } = useAuth(); // Access user and setUser from context
+  // const { playEpisode, currentEpisode, isPlaying } = useAudio();
   const router = useRouter();
 
+  // Fetch episode data when component mounts
   useEffect(() => {
-    fetch(
-      `http://localhost:3000/podcast/${params.id}/episode/${params.episodeId}`
-    )
+    fetch(`http://localhost:3000/podcast/${id}/episode/${episodeId}`)
       .then((res) => res.json())
       .then((data) => {
         if (data) {
@@ -38,13 +37,32 @@ const EpisodeDetail = ({
         }
       })
       .catch((error) => {
-        console.error("Error fetching podcast:", error);
+        console.error("Error fetching episode:", error);
       });
-  }, [params.id, params.episodeId]);
+  }, [id, episodeId]);
+
+  useEffect(() => {
+    if (user && episode) {
+      // Check if the episode is in the user's likedEpisodes
+      setLiked(user.likedEpisodes.includes(episode._id));
+    }
+  }, [user, episode]); // Re-run when user or episode changes
 
   const handleLikeClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    setLiked(!liked);
+    event.stopPropagation(); // Prevent click event from propagating to the parent div
+    if (user && episode) {
+      // Update likedEpisodes in AuthContext
+      const updatedLikedEpisodes = liked
+        ? user.likedEpisodes.filter((id) => id !== episode._id) // Remove episode from likedEpisodes
+        : [...user.likedEpisodes, episode._id]; // Add episode to likedEpisodes
+
+      // Update the context with the new likedEpisodes list
+      setUser({
+        ...user,
+        likedEpisodes: updatedLikedEpisodes,
+      });
+    }
+    setLiked(!liked); // Toggle local liked state
   };
 
   const handleOnClick = () => {
@@ -56,7 +74,7 @@ const EpisodeDetail = ({
       <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full flex flex-col">
         {episode ? (
           <>
-            {/* episode Details */}
+            {/* Episode Details */}
             <div className="grid grid-cols-6 gap-4">
               <div className="col-span-1">
                 <img
@@ -84,10 +102,7 @@ const EpisodeDetail = ({
                 </div>
 
                 <p className="text-sm text-gray-400">
-                  <Link
-                    href={`/PodcastDetail/${episode.podcast._id}`}
-                    className="hover:underline"
-                  >
+                  <Link href={`/PodcastDetail/${episode.podcast._id}`} className="hover:underline">
                     {episode.podcast.podcastName}
                   </Link>
                 </p>
@@ -99,6 +114,7 @@ const EpisodeDetail = ({
               <hr style={{ color: "grey" }} />
             </div>
 
+            {/* Action Buttons */}
             <div className="flex flex-col gap-6">
               <p className="flex items-center gap-2 mt-4">
                 <MdOutlineAccessTime size={30} />
@@ -106,18 +122,28 @@ const EpisodeDetail = ({
               </p>
 
               <ActionButtons
-                episode={episode}
-                podcast={episode.podcast}
+                  episode={episode}
+                  podcast={episode.podcast}
                 isLiked={liked}
                 onLikeClick={handleLikeClick}
                 size="lg"
               />
             </div>
 
+            {/* Episode Description */}
+            <div className="mt-6">
+              <p className="text-2xl">Episode Description</p>
+              <p className="text-l text-gray-400 mt-4">{episode.episodeDescription}</p>
+            </div>
+
+            {/* See Episodes Button */}
             <div className="mt-20">
               <button
+               
                 className="bg-amber-50 text-black px-4 py-2 rounded-full hover:bg-gray-600 transition"
+               
                 onClick={handleOnClick}
+              
               >
                 See Episodes
               </button>

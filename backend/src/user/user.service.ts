@@ -56,6 +56,44 @@ export class UserService {
         .exec();
 }
 
+async getFavoritePodcasts(id: string) {
+  return this.UserModel.findById(id)
+    .select('firstName lastName') // Selecting only firstName and lastName from the User model
+    .populate({
+      path: 'favoritePodcasts', // Populating the 'favoritePodcasts' field
+      model: 'Podcast', // 'Podcast' model should be correctly defined
+      select: 'podcastName podcastDescription podcastImage categories creator',  populate: {
+        path: 'creator', // Get the creator of the podcast
+        model: 'User',
+        select: 'firstName lastName ',
+    }// Only select relevant fields for the podcasts
+    })
+    .exec(); // Execute the query and return the result
+}
+
+
+
+async getLikedEpisodes(id: string) {
+  return this.UserModel.findById(id)
+    .select('firstName lastName') // Use select to limit the user fields
+    .populate({
+      path: 'likedEpisodes', // Populate the likedEpisodes array
+      model: 'Episode', // Specify the model for likedEpisodes
+      select: 'episodeTitle audioUrl episodeDescription podcastId createdAt', // Select the necessary episode fields
+      populate: { // Nested populate to include podcast data
+        path: 'podcast', // Assuming you have a field called podcastId that references the Podcast model
+        model: 'Podcast', // The model for podcast
+        select: 'podcastImage podcastTitle creator',  populate: {
+          path: 'creator', // Get the creator of the podcast
+          model: 'User',
+          select: 'firstName lastName ',
+      } // Select the necessary podcast fields
+      },
+    })
+    .exec();
+}
+
+
 
   
 

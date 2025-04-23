@@ -9,6 +9,8 @@ import {
     Patch, 
     Post, 
     UseGuards,
+    UseInterceptors,
+    UploadedFile,
     Request 
 } from '@nestjs/common';
 import { PodcastService } from './podcast.service';
@@ -16,6 +18,9 @@ import { CreatePodcastDto } from './dto/create-podcast.dto';
 import { UpdatePodcastDto } from './dto/update-podcast.dto';
 import { Types } from 'mongoose';
 import { AuthGuard } from '../guards/auth.guard'; // Import the AuthGuard
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('podcast')
 export class PodcastController {
@@ -24,9 +29,39 @@ export class PodcastController {
     // Protect this route with the AuthGuard
     @UseGuards(AuthGuard)
     @Post()
-    async createPodcast(@Body() createPodcastDto: CreatePodcastDto ) {
+    @UseInterceptors(FileInterceptor('podcastImage', {
+        storage: diskStorage({
+            destination: './uploads/podcasts',
+            filename: (req, file, cb) => {
+                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+                cb(null, uniqueSuffix + extname(file.originalname));
+            },    
+        }),
+        fileFilter: (req, file, cb) => {
+            if (!file.mimetype.match(/\/(jpg|jpeg|png|webp)$/)) {
+              cb(new Error('Only image files are allowed!'), false);
+            } else {
+              cb(null, true);
+            }
+        },
+    }))
+    async createPodcast(
+        @UploadedFile() file: Express.Multer.File,
+        @Body() body: any
+    )   {
+            const createPodcastDto: CreatePodcastDto = {
+                podcastName: body.podcastName,
+                podcastDescription: body.podcastDescription,
+                creator: body.creator,
+                podcastImage: file?.filename ?? '', // Save only filename, or you can use the full URL
+                categories: Array.isArray(body.categories)
+                  ? body.categories
+                  : body.categories
+                  ? [body.categories]
+                  : [],
+            };
         return await this.podcastService.createPodcast(createPodcastDto);
-    }
+        }
 
     // This route can be public, so no need to protect it with AuthGuard
     @Get()
@@ -61,7 +96,7 @@ export class PodcastController {
     }
 
     // Protect this route with the AuthGuard
-    // @UseGuards(AuthGuard)
+    @UseGuards(AuthGuard)
     @Patch(':id')
     async updatePodcast(
         @Param('id') id: string, 

@@ -72,3 +72,55 @@ body::-webkit-scrollbar {
    /* Allow scrolling inside the main content */
   padding-bottom: 60px;  /* Ensure the bottom bar doesn't overlap */
 }
+
+
+/* Custom styles for the progress bar thumb */
+/* input[type="range"]::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #ffffff; 
+  border: none;
+  cursor: pointer;
+} */
+
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 0;
+  height: 0;
+  background: transparent;
+  transition: width 0.2s, height 0.2s, background 0.2s;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
+input[type="range"]:hover::-webkit-slider-thumb,
+input[type="range"]:active::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+  background: #ffffff;
+  cursor:pointer
+}
+
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  animation-name: marquee;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.no-play {
+  cursor: not-allowed; /* or you can use "cursor: url('path-to-your-x-cursor.png'), auto;" */
+}

@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as express from 'express';
 
 async function bootstrap() {
   // const app = await NestFactory.create(AppModule);
@@ -22,6 +23,10 @@ async function bootstrap() {
     forbidNonWhitelisted: true,
   }));
   app.useStaticAssets(join(__dirname, '..', 'public'));
+
+   // Servir les fichiers statiques
+   app.use('/uploads', express.static(join(__dirname, '../uploads')));
+
 
   const config = new DocumentBuilder()
     .setTitle('Cats example')

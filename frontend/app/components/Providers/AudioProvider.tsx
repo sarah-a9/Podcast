@@ -1,24 +1,25 @@
 "use client";
+import { Episode, Podcast } from "@/app/Types";
 import { usePathname } from "next/navigation";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 // Define the shape of an episode
-export interface Episode {
-  // podcast: Podcast;
-  _id: string;
-  episodeTitle: string;
-  episodeDescription: string;
-  audioUrl: string;
-  createdAt: string;
-}
+// export interface Episode {
+//   // podcast: Podcast;
+//   _id: string;
+//   episodeTitle: string;
+//   episodeDescription: string;
+//   audioUrl: string;
+//   createdAt: string;
+// }
 
 // Define the shape of a podcast
-export interface Podcast {
-  _id: string;
-  podcastName: string;
-  podcastImage: string;
-  episodes: Episode[]; // List of episodes within the podcast
-}
+// export interface Podcast {
+//   _id: string;
+//   podcastName: string;
+//   podcastImage: string;
+//   episodes: Episode[]; // List of episodes within the podcast
+// }
 
 // Define the type of the context
 interface AudioContextType {

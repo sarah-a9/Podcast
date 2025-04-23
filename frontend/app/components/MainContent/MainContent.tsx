@@ -67,14 +67,16 @@ const MainContent = () => {
   }, []);
 
   return (
-    <div className='scrollable-container scrollbar-hide'>
-      <h2 className='text-4xl pb-3'>Suggestions</h2>
-      <div className="container max-w-full overflow-hidden">
-      <div className="podcast-list overflow-x-auto overflow-y-hidden flex space-x-4 whitespace-nowrap flex-nowrap scrollbar-hide w-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div className='scrollable-container scrollbar-hide pl-4'>
+      <h2 className='text-2xl sm:text-3xl font-semibold pb-5 '>Suggestions</h2>
+      <div className="container max-w-full overflow-hidden ">
+      <div className="podcast-list overflow-x-auto overflow-y-hidden flex space-x-4 whitespace-nowrap flex-nowrap scrollbar-hide w-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden  ">
+     
       {podcasts.length > 0 ? (
             podcasts.map((podcast) => (
               <PodcastCard
                 key={podcast._id}
+                
                 podcastDescription={podcast.podcastDescription}
                 podcastName={podcast.podcastName}
                 creator={podcast.creator}
@@ -86,7 +88,7 @@ const MainContent = () => {
         </div>
       </div>
 
-      <h2 className='text-4xl   pb-3 pt-12'>Categories</h2>
+      <h2 className='text-2xl sm:text-3xl font-semibold pb-5 pt-12'>Categories</h2>
 
       <div className="category-list">
       <div className="container  w-full">
@@ -103,7 +105,7 @@ const MainContent = () => {
       </div>
       </div>
 
-      <h2 className="text-4xl pb-3 pt-12">Creators</h2>
+      <h2 className="text-2xl sm:text-3xl font-semibold pb-3 pt-12">Creators</h2>
       <div className="creator-list">
         <div className="container w-full">
           <div className="overflow-x-auto flex space-x-8">

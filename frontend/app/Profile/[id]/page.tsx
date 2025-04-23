@@ -7,13 +7,15 @@ import EditProfilePopup from "../../components/PopUps/EditProfilePopUp";
 import DeleteProfilePopup from "../../components/PopUps/deleteProfilePopUp";
 import CreatePodcastButton from "../../components/CreatePodcastButton/CreatePodcastButton";
 import PodcastCard from "../../components/PodcastCard/PodcastCard";
+import { useRouter } from "next/navigation";
 
 const Profile = () => {
   const { user, setUser } = useAuth();
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [myPodcasts, setMyPodcasts] = useState<any[]>([]);
-
+  const router = useRouter();
+  
   useEffect(() => {
     fetchMyPodcasts();
   }, [user]);
@@ -79,14 +81,21 @@ const Profile = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-
+  
       if (!res.ok) {
         const errData = await res.json();
         throw new Error(errData.message || "Delete failed");
       }
+  
       const result = await res.json();
       console.log("Profile successfully deleted.", result);
-      // Optionally log out or redirect here.
+  
+      // CLEAR everything
+      localStorage.removeItem("token");        // clear the token
+      setUser(null);                           // clear the user context
+      console.log("User and token cleared");
+  
+      router.push("/");                        // redirect to homepage
     } catch (error: any) {
       console.error("Delete failed:", error.message);
     }
