@@ -32,6 +32,15 @@ export class AuthController {
         return this.authService.refreshTokens(refreshTokenDto.refreshToken);
     }
 
+    
+    @UseGuards(AuthGuard)
+    @Post('logout')
+    async logout(@Request() req) {
+    // req.userId is populated by the AuthGuard upon token verification.
+    return this.authService.logout(req.userId);
+    }
+
+
     //POST Method for Changing Password 
     @UseGuards(AuthGuard)
     @Put('changePassword')

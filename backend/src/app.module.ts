@@ -12,9 +12,21 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import config from './config/config';
 import { SwaggerModule } from '@nestjs/swagger';
+import { MulterModule } from '@nestjs/platform-express';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    // 1) Charger ConfigModule en premier, pour que ConfigService soit dispo
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env', load: [config] }),
+
+    // 2) Multer pour les uploads
+    MulterModule.register({
+      dest: './uploads',
+    }),
+
+    ScheduleModule.forRoot(),
+
     // MongoDB connection with ConfigService for dynamic connection
     MongooseModule.forRootAsync({
       imports: [ConfigModule],

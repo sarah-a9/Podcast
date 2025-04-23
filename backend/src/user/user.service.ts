@@ -106,11 +106,11 @@ async getLikedEpisodes(id: string) {
       populate:{path:'episodes' ,model:'Episode' , select :'episodeName episodeDescription '}}).exec(); // 🔥 Populate podcasts for a single user
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto) {
     return this.UserModel.findByIdAndUpdate(id, updateUserDto, { new: true }).populate('podcasts');
   }
 
-  remove(id: string) {
+  async remove(id: string) {
     return this.UserModel.findByIdAndDelete(id);
   }
 }

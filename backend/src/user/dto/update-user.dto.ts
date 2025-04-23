@@ -14,10 +14,12 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
     
         @IsString()
         @IsNotEmpty()
+        @IsOptional()
         email: string;
     
         @IsString()
         @MinLength(6)
+        @IsOptional()
         password: string;
     
         @IsString()

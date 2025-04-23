@@ -11,7 +11,8 @@ export class CreatePodcastDto{
         podcastDescription: string;
     
         @IsString()
-        @IsNotEmpty()
+        // @IsNotEmpty()
+        @IsOptional()
         podcastImage: string;
 
 

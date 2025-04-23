@@ -1,33 +1,29 @@
-// app/components/DeleteProfilePopup.tsx
+// DeleteProfilePopup.tsx (refactored)
 'use client';
 
-interface DeleteProfilePopupProps {
-  onCancel: () => void;
-  onConfirm: () => void;
-}
+import { DeleteProfilePopupProps } from "../../Types";
+import Modal from "./Modal";
 
 export default function DeleteProfilePopup({ onCancel, onConfirm }: DeleteProfilePopupProps) {
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white text-black p-6 rounded-lg w-80">
-        <h2 className="text-lg font-semibold mb-4">
-          Are you sure you want to delete your profile?
-        </h2>
-        <div className="flex justify-end gap-2">
+    <Modal isOpen={true} onClose={onCancel} title="Confirm Deletion">
+      <div className="text-center">
+        <p>Are you sure you want to delete your profile?</p>
+        <div className="flex justify-end gap-2 mt-6">
           <button
             onClick={onCancel}
-            className="px-4 py-2 bg-gray-300 rounded"
+            className="px-4 py-2 bg-gray-400 text-black rounded"
           >
             Cancel
           </button>
-          <button
+           <button
             onClick={onConfirm}
-            className="px-4 py-2 bg-red-600 text-white rounded"
+            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded"
           >
             Confirm
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

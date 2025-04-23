@@ -42,7 +42,7 @@ export default function Login() {
 
       // Redirect to the home page or dashboard
       router.push('/');
-      console.log('userId', user.id);
+      console.log('userId', user.userId);
 
     } catch (err: any) {
       setError(err.message);

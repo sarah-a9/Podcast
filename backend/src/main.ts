@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as express from 'express';
 
 async function bootstrap() {
   // const app = await NestFactory.create(AppModule);
@@ -12,7 +13,7 @@ async function bootstrap() {
   // Enable CORS for your frontend URL
   app.enableCors({
     origin: 'http://localhost:3001', // Frontend URL (make sure this matches your frontend URL and port)
-    methods: 'GET, POST, PUT, DELETE', // Specify allowed HTTP methods (adjust as needed)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], // Specify allowed HTTP methods (adjust as needed)
     credentials: true, // Allow cookies if needed (set this to true if using cookies for authentication)
   });
 
@@ -22,6 +23,10 @@ async function bootstrap() {
     forbidNonWhitelisted: true,
   }));
   app.useStaticAssets(join(__dirname, '..', 'public'));
+
+   // Servir les fichiers statiques
+   app.use('/uploads', express.static(join(__dirname, '../uploads')));
+
 
   const config = new DocumentBuilder()
     .setTitle('Cats example')

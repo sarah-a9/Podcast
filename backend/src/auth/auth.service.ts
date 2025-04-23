@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, NotFoundException, UnauthorizedExcepti
 import { SignupDto } from './dto/signup.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../schemas/User.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -57,14 +57,29 @@ export class AuthService {
         }
 
         //generate JWT Tokens
-        const token = this.jwtService.sign({userId: user._id});
+        // Instead of userId, use 'sub'
+        const token = this.jwtService.sign({ sub: (user._id as Types.ObjectId).toString() });
         return {
             token,
             user: {
-                id: user._id, firstName: user.firstName, lastName: user.lastName, email: user.email, password: user.password, picture:user.profilePic, bio: user.bio,
+                userId: user._id,
+                firstName: user.firstName, 
+                lastName: user.lastName, 
+                email: user.email, 
+                password: user.password, 
+                picture:user.profilePic, 
+                bio: user.bio,
             },
         }
     }
+
+
+    async logout(userId: string): Promise<{ message: string }> {
+        // Invalidate refresh tokens by deleting them from the database
+        await this.RefreshTokenModel.deleteMany({ userId });
+        return { message: 'Logout successful' };
+    }
+  
 
     async changePassword(userId, oldPassword:string, newPassword:string){
         //find the user
@@ -128,7 +143,7 @@ export class AuthService {
     }
 
     async generateUserToken(userId){
-        const accessToken = this.jwtService.sign({userId}, {expiresIn: '1d'});
+        const accessToken = this.jwtService.sign({ sub: userId }, { expiresIn: '1d' });
         const refreshToken = uuidv4();
         await this.storeRefreshToken(refreshToken, userId)
         return {
