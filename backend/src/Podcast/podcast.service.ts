@@ -18,13 +18,10 @@ export class PodcastService {
     @InjectModel(Category.name) private CategoryModel: Model<CategoryDocument>,
   ) {}
 
-  
+
   async createPodcast(createPodcastDto: CreatePodcastDto) {
     const newPodcast = new this.PodcastModel(createPodcastDto);
     const savedPodcast = await newPodcast.save();
-
-    
-
      // Update the user's podcasts list
      await this.UserModel.findByIdAndUpdate(
       createPodcastDto.creator,  // User's ID
@@ -41,93 +38,64 @@ export class PodcastService {
   return savedPodcast;
   }
 
-
-
-
-
-
+  // 
+  
   async getAllPodcast() {
-    return await this.PodcastModel
-      .find()
-      .populate({
-        path: 'creator',  // Populate only the creator field
-        select: 'firstName lastName'  // Only the creator's firstName, not all user details
-        
-      })
-      .populate({path: 'episodes', model:"Episode"  ,match: {}}).populate({path: 'categories',
-        model:"Category" ,select:'categoryName' }).exec();
+    return this.PodcastModel.find()
+      .populate('creator', 'firstName lastName')
+      .populate('episodes')
+      .populate('categories', 'categoryName')
+      .exec();
   }
-
-
-
-
 
   async getPodcastById(id: string) {
     const podcast = await this.PodcastModel
       .findById(id)
       .populate({
-        path: 'creator',
-        select: 'firstName lastName'
-      })
-      .populate({
-        path: 'episodes',
-        model: 'Episode',
-        select: 'episodeTitle episodeDescription createdAt audioUrl status scheduledAt', 
-        populate: {
-          path: 'podcast',
-          model: 'Podcast',
-          select: 'podcastName podcastImage creator'
-        }
-      })
-      .populate({
-        path: 'categories',
-        model: 'Category',
-        select: 'categoryName'
-      })
-      .exec();
-  
-    if (!podcast) {
-      throw new NotFoundException("Podcast not found");
-    }
-    return podcast;
+        path: 'creator',  // Populate only the creator field
+        select: 'firstName'  // Only the creator's firstName, not all user details
+      }).populate({
+        path: 'episodes', // Populate episodes
+         model:"Episode",
+        select: 'episodeTitle episodeDescription  createdAt' // Specify which fields you want from the episodes
+      }).populate({path: 'categories', // Populate episodes
+        model:"Category" ,select:'categoryName'}).exec();
+
+      if (!podcast) {
+        throw new NotFoundException("Podcast not found");
+      }
+      
+     return podcast;
   }
 
 
   async getEpisodeByPodcastId(podcastId: string, episodeId: string) {
-    // Find the podcast by ID
-    const podcast = await this.PodcastModel.findById(podcastId)
-      .populate({
-        path: 'episodes',
-        model: 'Episode',
-        match: { _id: episodeId },  // Match the specific episode ID
-        select: 'episodeTitle episodeDescription audioUrl createdAt podcast likedByUsers',  // Fields to return from the episode
-        populate: {
-          path: 'podcast',  // Populate the 'podcast' field inside the Episode model
-          model: 'Podcast',
-          select:'podcastName podcastImage creator favoritedByUsers',
-          populate:{
-           path:'creator',
-           model:'User',
-           select:'firstName lastName'
-          },
-        },
-      })
-      .exec();
-
-    if (!podcast) {
-      throw new NotFoundException('Podcast not found');
+  const episode = await this.EpisodeModel.findOne({
+    _id: episodeId,
+    podcast: podcastId
+  })
+  .populate({
+    path: 'podcast',
+    select: 'podcastName podcastImage creator favoritedByUsers',
+    populate: {
+      path: 'creator',
+      select: 'firstName lastName',
+      model: 'User'
     }
+  })
+  .populate({
+    path: 'likedByUsers',
+    select: 'firstName lastName email', // or any other fields you want
+    model: 'User'
+  })
+  .exec();
 
-    // If the episode is not found in the podcast, throw an error
-    const episode = podcast.episodes.find((ep) => ep._id.toString() === episodeId);
-    if (!episode) {
-      throw new NotFoundException('Episode not found in this podcast');
-    }
-
-    return episode;
+  if (!episode) {
+    throw new NotFoundException('Episode not found');
   }
 
-
+  return episode;
+}
 
 
 
@@ -136,10 +104,6 @@ export class PodcastService {
 
     return updatedPodcast;
   }
-
-
-
-
 
 
   async deletePodcast(id: string) {

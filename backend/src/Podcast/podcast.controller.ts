@@ -98,24 +98,38 @@ export class PodcastController {
     // Protect this route with the AuthGuard
     @UseGuards(AuthGuard)
     @Patch(':id')
-    async updatePodcast(
-        @Param('id') id: string, 
-        @Body() updatePodcastDto: UpdatePodcastDto
-    ) {
-        if (!Types.ObjectId.isValid(id)) {
-            throw new HttpException('Invalid ID', HttpStatus.BAD_REQUEST);
-        }
-
-        const updatedPodcast = await this.podcastService.updatePodcast(id, updatePodcastDto);
-        if (!updatedPodcast) {
-            throw new HttpException('Podcast Not Found', HttpStatus.NOT_FOUND);
-        }
-
-        return updatedPodcast;
-    }
+    @UseInterceptors(FileInterceptor('podcastImage', {
+        storage: diskStorage({
+          destination: './uploads/podcasts',
+          filename: (_req, file, cb) => {
+            const name = Date.now() + extname(file.originalname);
+            cb(null, name);
+          },
+        }),
+        fileFilter: (_req, file, cb) => {
+          cb(null, !!file.mimetype.match(/\/(jpg|jpeg|png|webp)$/));
+        },
+      }))
+      async updatePodcast(
+        @Param('id') id: string,
+        @UploadedFile() file: Express.Multer.File,
+        @Body() body: any
+      ) {
+        const dto: UpdatePodcastDto = {
+          podcastName: body.podcastName,
+          podcastDescription: body.podcastDescription,
+          podcastImage: file ? file.filename : body.podcastImage,
+          categories: Array.isArray(body.categories)
+            ? body.categories
+            : body.categories
+            ? [body.categories]
+            : [],
+        };
+        return this.podcastService.updatePodcast(id, dto);
+      }
 
     // Protect this route with the AuthGuard
-    // @UseGuards(AuthGuard)
+    @UseGuards(AuthGuard)
     @Delete(':id')
     async deletePodcast(@Param('id') id: string) {
         if (!Types.ObjectId.isValid(id)) {
