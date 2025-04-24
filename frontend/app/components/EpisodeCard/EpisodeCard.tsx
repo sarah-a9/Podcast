@@ -25,6 +25,7 @@ const EpisodeCard = ({
   
 
   useEffect(() => {
+    console.log("episode test", episode.episodeTitle);
     if (user && user.likedEpisodes) {
       setLiked(user.likedEpisodes.includes(episode._id));
     }

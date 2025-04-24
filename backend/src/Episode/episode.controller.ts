@@ -4,10 +4,13 @@ import {
   Delete,
   Get,
   HttpException,
+  HttpStatus,
   Param,
   Patch,
   Post,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { EpisodeService } from './episode.service';
 import { CreateEpisodeDto } from './dto/create-episode.dto';
@@ -16,6 +19,9 @@ import { UpdateEpisodeDto } from './dto/update-episode.dto';
 import { AuthGuard } from '../guards/auth.guard'; // import the AuthGuard
 import { UserService } from '../user/user.service';
 import { Types } from 'mongoose'; // Import Types from Mongoose
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('episode')
 export class EpisodeController {
@@ -25,10 +31,41 @@ export class EpisodeController {
   ) {}
 
   // Protect the CreateEpisode route with AuthGuard
-  // @UseGuards(AuthGuard)
-  @Post()
-  createEpisode(@Body() createEpisodeDto: CreateEpisodeDto) {
-    return this.episodeService.createEpisode(createEpisodeDto);
+  @UseGuards(AuthGuard)
+  @Post('create')
+  @UseInterceptors(FileInterceptor('audioFile', {
+      storage: diskStorage({
+        destination: './uploads/episodes',
+        filename: (_req, file, cb) => {
+          const name = Date.now() + extname(file.originalname);
+          cb(null, name);
+        },
+      }),
+      fileFilter: (_req, file, cb) => {
+        cb(null, !!file.mimetype.match(/\/(mpeg|mp3|wav)$/));
+      },
+    }),
+  )
+  async createEpisode(
+    @UploadedFile() audioFile: Express.Multer.File,
+    @Body() body: any,
+  ) {
+    // Validate required fields:
+    if (!body.episodeTitle || !body.episodeDescription || !body.podcast || !body.creator) {
+      throw new HttpException('Missing required fields', HttpStatus.BAD_REQUEST);
+    }
+
+    const dto: CreateEpisodeDto = {
+      episodeTitle: body.episodeTitle,
+      episodeDescription: body.episodeDescription,
+      podcastImage: body.podcastImage,
+      podcast: body.podcast,
+      creator: body.creator,
+      status: body.status,
+      scheduledAt: body.scheduledAt,
+    };
+
+    return this.episodeService.createEpisode(dto, audioFile);
   }
 
   // Open to everyone, no guard needed
@@ -37,15 +74,17 @@ export class EpisodeController {
     return this.episodeService.getEpisodes();
   }
 
-  // Open to everyone, no guard needed
-//   @Get(':id')
-//   getEpisodeById(@Param('id') id: string) {
-//     const isValid = mongoose.Types.ObjectId.isValid(id);
-//     if (!isValid) throw new HttpException('Invalid ID', 400);
-//     const findEpisode = this.episodeService.getEpisodeById(id);
-//     if (!findEpisode) throw new HttpException('Episode Not Found', 404);
-//     return findEpisode;
-//   }
+  @Get(':id')
+async getEpisodeById(@Param('id') id: string) {
+  const isValid = mongoose.Types.ObjectId.isValid(id);
+  if (!isValid) throw new HttpException('Invalid ID', 400);
+
+  const episode = await this.episodeService.getEpisodeById(id);
+  if (!episode) throw new HttpException('Episode Not Found', 404);
+
+  return episode;
+}
+
 
 //    // Endpoint to like/unlike an episode
 //    @Post(':episodeId/like')
@@ -98,7 +137,7 @@ export class EpisodeController {
 //    }
 
   // Protect the update route with AuthGuard
-  // @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Patch(':id')
   updateEpisode(
     @Param('id') id: string,

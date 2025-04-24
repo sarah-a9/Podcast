@@ -2,6 +2,7 @@ import { CanActivate, ExecutionContext, Injectable, Logger, UnauthorizedExceptio
 import { JwtService } from "@nestjs/jwt";
 import { Observable } from "rxjs";
 import { Request } from "express"
+import mongoose from "mongoose";
 
 @Injectable()
 export class AuthGuard implements CanActivate{
@@ -18,8 +19,14 @@ constructor(private jwtService: JwtService){}
         }
 
         try{  
-            const payLoad = this.jwtService.verify(token)
-            request.userId = payLoad.userId
+            const payLoad = this.jwtService.verify(token);
+            console.log("Decoded token payload in AuthGuard:", payLoad); // Debug logging
+            // Retrieve the userId from the 'sub' property
+            const userId = payLoad.sub;
+            if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+                throw new UnauthorizedException('Invalid token payload');
+            }
+            request.userId = userId;
         }catch(e){
             Logger.error(e.message);
             throw new UnauthorizedException('Invalid Token')

@@ -5,10 +5,12 @@ import { useAuth } from "@/app/components/Providers/AuthContext/AuthContext"; //
 import { Podcast } from "@/app/Types";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+
+import React, { use, useEffect, useState } from "react";
 import { MdOutlineAccessTime } from "react-icons/md";
 
-const EpisodeDetail = ({ params }: { params: { id: string; episodeId: string } }) => {
+const EpisodeDetail = ({ params }: { params: Promise<{ id: string; episodeId: string }> }) => {
+  const { id, episodeId } = use(params);  
   const [episode, setEpisode] = useState<{
     _id: string;
     episodeTitle: string;
@@ -16,16 +18,18 @@ const EpisodeDetail = ({ params }: { params: { id: string; episodeId: string } }
     audioUrl: string;
     podcast: Podcast;
     likedByUsers: string[];
-    createdAt: string;
+    createdAt : string;
     categories: any[];
-  } | null>(null);
+    status: string;
+  } | null>(null); // Initialize as null instead of an empty array
   const [liked, setLiked] = useState(false);
   const { user, setUser } = useAuth(); // Access user and setUser from context
+  // const { playEpisode, currentEpisode, isPlaying } = useAudio();
   const router = useRouter();
 
   // Fetch episode data when component mounts
   useEffect(() => {
-    fetch(`http://localhost:3000/podcast/${params.id}/episode/${params.episodeId}`)
+    fetch(`http://localhost:3000/podcast/${id}/episode/${episodeId}`)
       .then((res) => res.json())
       .then((data) => {
         if (data) {
@@ -37,7 +41,7 @@ const EpisodeDetail = ({ params }: { params: { id: string; episodeId: string } }
       .catch((error) => {
         console.error("Error fetching episode:", error);
       });
-  }, [params.id, params.episodeId]);
+  }, [id, episodeId]);
 
   useEffect(() => {
     if (user && episode) {
@@ -82,14 +86,16 @@ const EpisodeDetail = ({ params }: { params: { id: string; episodeId: string } }
                 />
               </div>
               <div className="col-span-4">
-
-
-
-                
                 <h2 className="text-3xl font-bold mb-4">{episode.episodeTitle}</h2>
                 <p className="text-lg mb-4">
-                  Created by {episode.podcast.creator.firstName} {episode.podcast.creator.lastName}
+                  Created by {episode.podcast.creator.firstName} 
+                  {episode.podcast.creator.lastName}
                 </p>
+                <div className="text-sm text-gray-300 mb-4">
+                  <p className="text-gray-400 italic">
+                    {episode.episodeDescription}
+                  </p>
+                </div>
                 <p className="text-sm text-gray-400">
                   <Link href={`/PodcastDetail/${episode.podcast._id}`} className="hover:underline">
                     {episode.podcast.podcastName}
@@ -111,8 +117,8 @@ const EpisodeDetail = ({ params }: { params: { id: string; episodeId: string } }
               </p>
 
               <ActionButtons
-                episode={episode}
-                podcast={episode.podcast}
+                  episode={episode}
+                  podcast={episode.podcast}
                 isLiked={liked}
                 onLikeClick={handleLikeClick}
                 size="lg" showMenu={false} setShowMenu={function (value: React.SetStateAction<boolean>): void {
@@ -129,15 +135,18 @@ const EpisodeDetail = ({ params }: { params: { id: string; episodeId: string } }
             {/* See Episodes Button */}
             <div className="mt-20">
               <button
+               
                 className="bg-amber-50 text-black px-4 py-2 rounded-full hover:bg-gray-600 transition"
+               
                 onClick={handleOnClick}
+              
               >
                 See Episodes
               </button>
             </div>
           </>
         ) : (
-          <p className="text-xl text-gray-400">Episode not found.</p>
+          <p className="text-xl text-gray-400">episode not found.</p>
         )}
       </div>
     </div>

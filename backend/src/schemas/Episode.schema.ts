@@ -15,14 +15,17 @@ export enum Episodestatus{
 @Schema({timestamps: true})
 export class Episode extends Document{
 
-    @Prop({required:true , unique:true})
+    @Prop({required:true , unique:false, sparse:true})
     episodeTitle: string;
 
     @Prop({required:true})
     episodeDescription: string;
 
-    @Prop({required:true , unique:true})
-    audioUrl: string;
+    @Prop({required:false , unique:false, sparse:true})
+    audioUrl?: string;
+
+    @Prop({ type: Date, required: false })
+    scheduledAt?: Date;
 
     @Prop({type: Types.ObjectId, ref:'Podcast', required:true})
     podcast: Types.ObjectId;

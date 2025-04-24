@@ -23,6 +23,7 @@ export default function RootLayout({
       <body>
         {/* Wrap the entire layout with both providers */}
         <AuthProvider>
+
           <AudioProvider>
           <PlaylistProvider>
             <Toaster
@@ -40,8 +41,11 @@ export default function RootLayout({
                 {/* Sidebar */}
                 <Sidebar />
 
-                {/* Main Content */}
-                <div className="main-content pl-2 pr-2">{children}</div>
+
+                  {/* Main Content */}
+                  <div className="main-content pl-2 pr-2">{children}</div>
+                </div>
+                <AudioPlayerBar />
               </div>
               <AudioPlayerBar />
             </div>

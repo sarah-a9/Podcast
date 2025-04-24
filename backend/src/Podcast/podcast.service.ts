@@ -19,17 +19,9 @@ export class PodcastService {
   ) {}
 
 
-
-
-
-  
-
   async createPodcast(createPodcastDto: CreatePodcastDto) {
     const newPodcast = new this.PodcastModel(createPodcastDto);
     const savedPodcast = await newPodcast.save();
-
-    
-
      // Update the user's podcasts list
      await this.UserModel.findByIdAndUpdate(
       createPodcastDto.creator,  // User's ID
@@ -46,37 +38,26 @@ export class PodcastService {
   return savedPodcast;
   }
 
-
-
-
-
-
+  // 
+  
   async getAllPodcast() {
-    return await this.PodcastModel
-      .find()
-      .populate({
-        path: 'creator',  // Populate only the creator field
-        select: 'firstName lastName'  // Only the creator's firstName, not all user details
-        
-      })
-      .populate({path: 'episodes', model:"Episode"  ,match: {}}).populate({path: 'categories',
-        model:"Category" ,select:'categoryName' }).exec();
+    return this.PodcastModel.find()
+      .populate('creator', 'firstName lastName')
+      .populate('episodes')
+      .populate('categories', 'categoryName')
+      .exec();
   }
-
-
-
-
 
   async getPodcastById(id: string) {
     const podcast = await this.PodcastModel
       .findById(id)
       .populate({
         path: 'creator',  // Populate only the creator field
-        select: 'firstName lastName'  // Only the creator's firstName, not all user details
+        select: 'firstName'  // Only the creator's firstName, not all user details
       }).populate({
         path: 'episodes', // Populate episodes
          model:"Episode",
-        select: 'episodeTitle episodeDescription  createdAt audioUrl' // Specify which fields you want from the episodes
+        select: 'episodeTitle episodeDescription  createdAt' // Specify which fields you want from the episodes
       }).populate({path: 'categories', // Populate episodes
         model:"Category" ,select:'categoryName'}).exec();
 
@@ -124,17 +105,11 @@ export class PodcastService {
 
 
 
-
-
   async updatePodcast(id: string, updatePodcastDto: UpdatePodcastDto) {
     const updatedPodcast = await this.PodcastModel.findByIdAndUpdate(id,updatePodcastDto,{ new: true },);
 
     return updatedPodcast;
   }
-
-
-
-
 
 
   async deletePodcast(id: string) {
