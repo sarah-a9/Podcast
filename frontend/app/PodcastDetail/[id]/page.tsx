@@ -42,6 +42,7 @@ export default function PodcastDetails() {
       .then((res) => res.json())
       .then((data) => {
         setPodcast(data);
+        console.log( "podcast categories", podcast);
         if (user) {
           const favs = Array.isArray(user.favoritePodcasts)
             ? user.favoritePodcasts
@@ -51,6 +52,8 @@ export default function PodcastDetails() {
       })
       .catch(console.error);
   }, [podcastId, user]);
+
+  
 
   // Close menu on outside click
   useEffect(() => {

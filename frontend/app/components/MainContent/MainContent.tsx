@@ -96,7 +96,7 @@ const MainContent = () => {
 
         {categories.length > 0 ? (
           categories.map((category) => (
-            <CategoryButton key={category._id} categoryName={category.categoryName} id={category._id} />
+            <CategoryButton key={category._id} categoryName={category.categoryName} _id={category._id} />
           ))
         ) : (
           <p>No categories available.</p>

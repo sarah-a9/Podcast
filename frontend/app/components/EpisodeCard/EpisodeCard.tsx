@@ -11,6 +11,7 @@ const EpisodeCard = ({ episode, podcast }: { episode: Episode; podcast: Podcast 
   const [liked, setLiked] = useState(false);
 
   useEffect(() => {
+    console.log("episode test", episode.episodeTitle);
     if (user && user.likedEpisodes) {
       // Check if the episode is in the user's likedEpisodes
       setLiked(user.likedEpisodes.includes(episode._id));

@@ -19,6 +19,7 @@ const EpisodeDetail = ({ params }: { params: Promise<{ id: string; episodeId: st
     likedByUsers: string[];
     createdAt : string;
     categories: any[];
+    status: string;
   } | null>(null); // Initialize as null instead of an empty array
   const [liked, setLiked] = useState(false);
   const { user, setUser } = useAuth(); // Access user and setUser from context
