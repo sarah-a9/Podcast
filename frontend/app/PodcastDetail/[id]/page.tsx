@@ -84,8 +84,9 @@ export default function PodcastDetails() {
 
   return (
     <div className="h-screen text-white rounded-lg scrollable-container scrollbar-hide">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full flex flex-col">
 
+      <div className="bg-gray-900 p-8 rounded-lg shadow-lg w-full flex flex-col">
+        
         {/* Top bar: title + menu */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-3xl font-bold">{podcast.podcastName}</h2>
@@ -121,53 +122,49 @@ export default function PodcastDetails() {
                 </ul>
               )}
             </div>
-          )}
-        </div>
+        
+        {podcast ? (
+          <>
+            <div className="grid grid-cols-6 gap-4">
+              <div className="col-span-1">
+                <img
+                  className="rounded-lg"
+                  src={podcast.podcastImage}
+                  alt={podcast.podcastName}
+                />
+              </div>
+              <div className="col-span-4">
+                <h2 className="text-3xl font-bold mb-2 mt-8">{podcast.podcastName}</h2>
+                <p className="text-sm text-gray-400">
+                  Created by {podcast.creator.firstName} {podcast.creator.lastName}
+                </p>
 
-        {/* Main content */}
-        <div className="grid grid-cols-6 gap-4">
-          <div className="col-span-1">
-            <img
-              className="rounded-lg"
-              src={podcast.podcastImage}
-              alt={podcast.podcastName}
-            />
-          </div>
-
-          <div className="col-span-4">
-            <p className="text-sm text-gray-400 mb-2">
-              Created by {podcast.creator.firstName}{" "}
-              {podcast.creator.lastName}
-            </p>
-
-            <div className="flex gap-2 flex-wrap mb-4">
-              {podcast.categories.length > 0 ? (
-                podcast.categories.map((cat) => (
-                  <div
-                    key={cat._id}
-                    className="rounded-full shadow-md flex items-center justify-center border border-white text-white text-xs bg-transparent px-3 py-1"
-                  >
-                    {cat.categoryName}
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500">No categories available</p>
-              )}
+                   <div className="flex gap-2 flex-wrap">
+                {podcast && podcast.categories.length > 0 ? (
+                  podcast.categories.map((category) => (
+                    <div
+                      key={category._id}
+                      className="w-1/12 flex-shrink-0 h-10 rounded-full shadow-md flex items-center justify-center border-1 border-white  text-white font-bold text-xs bg-transparent  px-4 mt-2"
+                      >
+                      {category.categoryName}
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">No categories available</p>
+                )}
+              </div> 
+              </div>
+              <div className="col-span-1 content-center">
+                <FavoriteButton
+                  podcastId={podcast._id}
+                  isFavorite={isFavorite}
+                  onFavoriteClick={handleFavoriteClick}
+                  buttonSize={""}
+                  iconSize={50}
+                />
+              </div>
             </div>
-
-            <p className="text-lg italic">{podcast.podcastDescription}</p>
-          </div>
-
-          <div className="col-span-1 flex items-start justify-end">
-            <FavoriteButton
-              podcastId={podcast._id}
-              isFavorite={isFavorite}
-              onFavoriteClick={handleFavoriteClick}
-              buttonSize=""
-              iconSize={50}
-            />
-          </div>
-        </div>
+      <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full flex flex-col">
 
         <div className="mt-8 flex justify-between items-center">
           <h3 className="font-bold text-xl">All Episodes</h3>
@@ -184,7 +181,7 @@ export default function PodcastDetails() {
 
         <hr className="my-4 border-gray-600" />
 
-        <div className="space-y-4">
+        <div className="pr-2">
           {podcast.episodes.length > 0 ? (
             podcast.episodes.map((ep) => (
               <EpisodeCard

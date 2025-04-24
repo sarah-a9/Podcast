@@ -8,6 +8,7 @@ export interface User{
     profilePic:string;
     favoritePodcasts:string[];
     likedEpisodes:string[];
+    playlists:string[];
 }
 
 export interface Episode {
@@ -17,7 +18,9 @@ export interface Episode {
     audioUrl: string;
     createdAt: string;
     likedByUsers: string[];
+    podcast:Podcast;
     status: string;
+
   }
   
 
@@ -46,8 +49,12 @@ export interface Episode {
     _id:string;
     playlistName:string;
     playlistDescription:string;
-    playlistImage:string;
-    creator:User;
+    playlistImg?:string;
+    creator: {
+      firstName: string;
+      lastName: string;
+    };
+    episodes: Episode[];
   }
 
   export interface LikeButtonProps {
@@ -66,7 +73,6 @@ export interface Episode {
     iconSize:number;
   }
 
-  
   export interface AuthContextType {
     user: User | null;
     setUser: (user: User | null) => void;
@@ -110,4 +116,5 @@ export interface Episode {
     onClose: () => void;
     onPodcastCreated?: (podcast: any) => void;
   }
+
 

@@ -10,9 +10,9 @@ export class CreatePlaylistDto {
     @IsNotEmpty()
     playlistDescription : string;
 
-    @IsString()
-    @IsNotEmpty()
-    playlistImg : string ;
+    // @IsString()
+    // @IsNotEmpty()
+    // playlistImg : string ;
 
 
     @IsString()  // Add this to accept User ID

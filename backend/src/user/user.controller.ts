@@ -6,6 +6,7 @@ import mongoose, { Types } from 'mongoose';
 import { AuthGuard } from '../guards/auth.guard'; // Import AuthGuard
 import { PodcastService } from 'src/Podcast/podcast.service';
 import { EpisodeService } from 'src/Episode/episode.service';
+import { PlaylistService } from 'src/Playlist/playlist.service';
 
 @Controller('user')
 export class UserController {
@@ -13,6 +14,7 @@ export class UserController {
     private readonly userService: UserService,
     private readonly podcastService: PodcastService,
     private readonly episodeService: EpisodeService,
+    private readonly playlistService: PlaylistService
   ) {}
 
   // Public route to create a user (No authentication needed)
@@ -209,6 +211,26 @@ export class UserController {
       return { message: 'Episode unliked successfully' };
     }
   }
+
+
+
+
+  
+    // Get playlists by user
+    @UseGuards(AuthGuard)
+    @Get(':userId/playlists')
+    async getPlaylistsByUser(@Param('userId') userId: string) {
+      // Call the UserService to get the playlists by userId
+      try {
+        const playlists = await this.userService.getPlaylistsByUser(userId);
+        if (!playlists) {
+          throw new HttpException('Playlists not found', 404);
+        }
+        return playlists; // Return the playlists fetched by the UserService
+      } catch (error) {
+        throw new HttpException('User not found', 404); // Handle the case where the user is not found
+      }
+    }
   
 
 }

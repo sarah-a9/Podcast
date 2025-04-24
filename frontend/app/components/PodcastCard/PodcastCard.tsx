@@ -1,24 +1,4 @@
-// //
 
-// import React from 'react';
-
-// interface PodcastProps {
-//   podcastName: string;
-//   podcastDescription: string;
-//   podcastImage: string;
-// }
-
-// const PodcastCard: React.FC<PodcastProps> = ({ podcastName, podcastDescription, podcastImage }) => {
-//   return (
-//     <div className="podcast-card">
-//       <img src={podcastImage} alt={podcastName} />
-//       <h3>{podcastName}</h3>
-//       <p>{podcastDescription}</p>
-//     </div>
-//   );
-// };
-
-// export default PodcastCard;
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -53,7 +33,7 @@ const PodcastCard: React.FC<PodcastProps> = ({
   return (
     // flex-shrink-0 flex-flex-col w-1/7
     <div
-      className="w-42 flex-shrink-0 flex flex-col shadow-sm cursor-pointer hover:scale-95 transform transition-all duration-200 "
+      className="w-40 flex-shrink-0 flex flex-col shadow-sm cursor-pointer hover:scale-95 transform-origin transition-all duration-200 "
       onClick={handleViews}
     >
       <div className="flex flex-col">

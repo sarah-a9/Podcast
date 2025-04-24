@@ -2,6 +2,7 @@ import { FaStar, FaRegStar } from "react-icons/fa";
 import { useAuth } from "../Providers/AuthContext/AuthContext";
 import { FavoriteButtonProps } from "@/app/Types";
 import React from "react";
+import toast from "react-hot-toast";
 
 const FavoriteButton = ({
   podcastId,
@@ -10,28 +11,22 @@ const FavoriteButton = ({
   buttonSize,
   iconSize,
 }: FavoriteButtonProps) => {
-  const { user, setUser, token } = useAuth(); // Destructure token from useAuth
-
-  const [favoriteMessage, setFavoriteMessage] = React.useState("");
-  const [showToast, setShowToast] = React.useState(false);
+  const { user, setUser, token } = useAuth();
 
   const handleFavoriteClick = async (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent click event from propagating to the parent div
 
-    // Handle favorite/unfavorite logic
     if (user && token) {
-      const userId = user._id; // Assuming the user object has an _id field
-      console.log(userId, podcastId, isFavorite); // Log userId and podcastId for debugging
+      const userId = user._id;
 
       try {
-        // Make API request to favorite/unfavorite the podcast
         const response = await fetch(`http://localhost:3000/user/${userId}/favorite/${podcastId}`, {
-          method: 'POST', // Use POST for both actions
+          method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`, // Include the token in the Authorization header
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ isFavorite}), // Explicitly set isFavorite
+          body: JSON.stringify({ isFavorite }), 
         });
 
         if (!response.ok) {
@@ -40,54 +35,35 @@ const FavoriteButton = ({
 
         const data = await response.json();
 
-        // Update favorite podcasts in the AuthContext state based on favorite/unfavorite status
+        // Update favorite podcasts
         setUser({
           ...user,
           favoritePodcasts: !isFavorite
-            ? [...user.favoritePodcasts, podcastId] // Add to favorite podcasts
-            : user.favoritePodcasts.filter((id) => id !== podcastId), // Remove from favorite podcasts
+            ? [...user.favoritePodcasts, podcastId] 
+            : user.favoritePodcasts.filter((id) => id !== podcastId),
         });
 
-        // Show toast message
-        setFavoriteMessage(!isFavorite ? "Added to favorite Podcasts" : "Removed from favorite Podcasts");
-        setShowToast(true);
-
-        // Hide the toast after 3 seconds
-        setTimeout(() => {
-          setShowToast(false);
-          setFavoriteMessage("");
-        }, 3000);
-
-        console.log(data.message); // Success message (optional feedback)
+        // Show toast notification
+        toast.success(!isFavorite ? "Added to favorite Podcasts" : "Removed from favorite Podcasts");
 
       } catch (error) {
         console.error('Error favoriting/unfavoriting the podcast:', error);
+        toast.error("Something went wrong.");
       }
     }
 
     // Call the parent onFavoriteClick callback if needed
     if (onFavoriteClick) onFavoriteClick(e);
   };
-  console.log("userId", user?._id);
-console.log("podcastId", podcastId);
-    console.log("isFavorite", isFavorite);
-
-
 
   return (
-    <div className="relative">
+    <div className="">
       <button
         className={`${buttonSize}`}
         onClick={handleFavoriteClick}
       >
         {isFavorite ? <FaStar size={iconSize} /> : <FaRegStar size={iconSize} />}
       </button>
-
-      {showToast && (
-        <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 p-4 bg-white text-black rounded-md shadow-lg transition-all duration-300 opacity-100">
-          {favoriteMessage}
-        </div>
-      )}
     </div>
   );
 };

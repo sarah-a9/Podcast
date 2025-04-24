@@ -60,18 +60,30 @@ export class EpisodeService {
     
         podcast.episodes.push(saved._id as Types.ObjectId);
         await podcast.save();
-    
-        return saved;
-      }
-    
+      
+       return savedEpisode;
+  }
 
+ getEpisodes(){
+    return this.EpisodeModel.find().populate({
+        path:'podcast',
+        model:'Podcast',
+        select:'podcastImage podcastName podcastDescription creator',
+        populate: {
+            path: 'creator',
+            model: 'User',
+            select: 'firstName lastName',
+          },
+    });
+}
+
+ getEpisodeById(id: string) {
+      return this.EpisodeModel.findById(id).populate('podcast');
+    }
+    
+  
     getEpisodes(){
         return this.EpisodeModel.find();
-    }
-
-
-    getEpisodeById(id: string) {
-      return this.EpisodeModel.findById(id).populate('podcast');
     }
 
     updateEpisode(id: string , updateEpisodeDto : UpdateEpisodeDto){

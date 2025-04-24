@@ -86,23 +86,16 @@ const EpisodeDetail = ({ params }: { params: Promise<{ id: string; episodeId: st
                 />
               </div>
               <div className="col-span-4">
-                <h2 className="text-3xl font-bold mb-4">
-                  {episode.episodeTitle}
-                </h2>
-
+                <h2 className="text-3xl font-bold mb-4">{episode.episodeTitle}</h2>
+                <p className="text-lg mb-4">
+                  Created by {episode.podcast.creator.firstName} 
+                  {episode.podcast.creator.lastName}
+                </p>
                 <div className="text-sm text-gray-300 mb-4">
-                  <p className="mb-1">
-                    Created by{" "}
-                    <span className="text-white font-semibold">
-                      {episode.podcast.creator.firstName}{" "}
-                      {episode.podcast.creator.lastName}
-                    </span>
-                  </p>
                   <p className="text-gray-400 italic">
                     {episode.episodeDescription}
                   </p>
                 </div>
-
                 <p className="text-sm text-gray-400">
                   <Link href={`/PodcastDetail/${episode.podcast._id}`} className="hover:underline">
                     {episode.podcast.podcastName}
@@ -128,8 +121,9 @@ const EpisodeDetail = ({ params }: { params: Promise<{ id: string; episodeId: st
                   podcast={episode.podcast}
                 isLiked={liked}
                 onLikeClick={handleLikeClick}
-                size="lg"
-              />
+                size="lg" showMenu={false} setShowMenu={function (value: React.SetStateAction<boolean>): void {
+                  throw new Error("Function not implemented.");
+                } }              />
             </div>
 
             {/* Episode Description */}

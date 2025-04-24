@@ -30,33 +30,61 @@ export class PlaylistController {
     return this.playlistService.addEpisode(playlistId, episodeId);
   }
 
+  // @UseGuards(AuthGuard)
+  // @Post()
+  // @UseInterceptors(
+  //   FileInterceptor('image', {
+  //     storage: diskStorage({
+  //       destination: './uploads/playlists', // or wherever you want to store it
+  //       filename: (req, file, cb) => {
+  //         const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${extname(file.originalname)}`;
+  //         cb(null, uniqueName);
+  //       },
+  //     }),
+  //   }),
+  // )
+  // async create(
+  //   @Body() body: CreatePlaylistDto,
+  //   @UploadedFile() file: Express.Multer.File,
+  // ) {
+  //   return this.playlistService.createPlaylist({
+  //     ...body,
+  //     playlistImg: file?.filename || '', // Store file name or path
+  //   });
+  // }
   @UseGuards(AuthGuard)
   @Post()
   @UseInterceptors(
-    FileInterceptor('image', {
+    FileInterceptor('playlistImg', {
       storage: diskStorage({
-        destination: './uploads/playlists', // or wherever you want to store it
-        filename: (req, file, cb) => {
-          const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${extname(file.originalname)}`;
-          cb(null, uniqueName);
+        destination: './uploads/playlists', // your folder
+        filename: (req, file, callback) => {
+          const uniqueName =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          callback(null, `${uniqueName}${ext}`);
         },
       }),
     }),
   )
-  async create(
-    @Body() body: CreatePlaylistDto,
+  async createPlaylist(
     @UploadedFile() file: Express.Multer.File,
+    @Body() createPlaylistDto: CreatePlaylistDto,
   ) {
-    return this.playlistService.createPlaylist({
-      ...body,
-      playlistImg: file?.filename || '', // Store file name or path
-    });
+    const playlist = {
+      ...createPlaylistDto,
+      playlistImg: file?.filename || '', // add image to object manually
+    };
+
+    // pass it to service
+    return this.playlistService.createPlaylist(playlist);
   }
 
 
 
 
-  // Protect this route with AuthGuard (remove an episode from a playlist)
+
+  //  (remove an episode from a playlist)
   @UseGuards(AuthGuard)
   @Delete(':playlistId/episode/:episodeId')
   async removeEpisode(
@@ -64,6 +92,19 @@ export class PlaylistController {
     @Param('episodeId') episodeId: string,
   ) {
     return this.playlistService.removeEpisode(playlistId, episodeId);
+  }
+
+
+  //Delete a playlist and remove the episodes from the playlist without deleting the episodes
+  @UseGuards(AuthGuard)
+  @Delete(':id')
+  async deletePlaylist(@Param('id') id :string){
+    const deletePlaylist = await this.playlistService.deletePlaylist(id);
+    if (!deletePlaylist) {
+      throw new NotFoundException('Playlist not found');
+    }
+    return deletePlaylist;
+    
   }
 
   // This route can be public (get all playlists)
@@ -77,6 +118,7 @@ export class PlaylistController {
   }
 
   // This route can be public (get a playlist by ID)
+  
   @Get(':id')
   async getPlaylistById(@Param('id') id: string) {
     const playlist = await this.playlistService.getPlaylistById(id);
@@ -86,7 +128,7 @@ export class PlaylistController {
     return playlist;
   }
 
-  // This route can be public (find playlists by user)
+  // // This route can be public (find playlists by user)
   @Get('user/:userId')
   async getPlaylistsByUser(@Param('userId') userId: string) {
     return this.playlistService.findByUser(userId);
@@ -95,17 +137,30 @@ export class PlaylistController {
   // Protect this route with AuthGuard (update a playlist)
   @UseGuards(AuthGuard)
   @Patch(':id')
+  @UseInterceptors(
+    FileInterceptor('playlistImg', {
+      storage: diskStorage({
+        destination: './uploads/playlists', // same destination as for creation
+        filename: (req, file, callback) => {
+          const uniqueName =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          callback(null, `${uniqueName}${ext}`);
+        },
+      }),
+    }),
+  )
   async updatePlaylist(
     @Param('id') id: string,
-    @Body() updatePlaylistDto: UpdatePlaylistDto,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() updatePlaylistDto: any, // if you removed playlistImg from the DTO, use 'any' or create a type without it
   ) {
-    return this.playlistService.updatePlaylist(id, updatePlaylistDto);
+    const updatedData = {
+      ...updatePlaylistDto,
+      ...(file && { playlistImg: file.filename }), // only add playlistImg if a file is uploaded
+    };
+  
+    return this.playlistService.updatePlaylist(id, updatedData);
   }
-
-  // Protect this route with AuthGuard (delete a playlist)
-  @UseGuards(AuthGuard)
-  @Delete(':id')
-  async deletePlaylist(@Param('id') id: string) {
-    return this.playlistService.deletePlaylist(id);
-  }
+  
 }

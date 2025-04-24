@@ -67,7 +67,7 @@ const MainContent = () => {
   }, []);
 
   return (
-    <div className='scrollable-container scrollbar-hide pl-4'>
+    <div className='scrollable-container scrollbar-hide '>
       <h2 className='text-2xl sm:text-3xl font-semibold pb-5 '>Suggestions</h2>
       <div className="container max-w-full overflow-hidden ">
       <div className="podcast-list overflow-x-auto overflow-y-hidden flex space-x-4 whitespace-nowrap flex-nowrap scrollbar-hide w-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden  ">

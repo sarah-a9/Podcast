@@ -4,19 +4,50 @@ import ActionButtons from "../EpisodeActionButtons/EpisodeActionButtons";
 import { useAuth } from "../Providers/AuthContext/AuthContext"; // Import the useAuth hook
 import { Episode, Podcast } from "@/app/Types";
 
-const EpisodeCard = ({ episode, podcast }: { episode: Episode; podcast: Podcast }) => {
+const EpisodeCard = ({
+  episode,
+  podcast,
+  className = "",
+  imageClassName = "",
+  playlistId = null,   // 👈 added this
+}: {
+  episode: Episode;
+  podcast: Podcast;
+  className?: string;
+  imageClassName?: string;
+  playlistId?: string | null;
+}) => {
   const router = useRouter();
-  const { user, setUser } = useAuth(); // Access user and setUser from context
+  const { user, setUser , token } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
   const [liked, setLiked] = useState(false);
+  const [playlist, setPlaylist] = useState<Episode[]>([]);  // Assuming playlist is an array of episodes
+  
 
   useEffect(() => {
     console.log("episode test", episode.episodeTitle);
     if (user && user.likedEpisodes) {
-      // Check if the episode is in the user's likedEpisodes
       setLiked(user.likedEpisodes.includes(episode._id));
     }
-  }, [user, episode._id]); // Re-run when the user or episode changes
+  }, [user, episode._id]);
+
+  useEffect(() => {
+    // Assume you have a method to fetch the playlist for the given playlistId
+    if (playlistId) {
+      fetchPlaylistData();
+    }
+  }, [playlistId]);
+
+  const fetchPlaylistData = async () => {
+    // Example fetch call for playlist data (replace with actual API logic)
+    try {
+      const response = await fetch(`http://localhost:3000/playlist/${playlistId}`);
+      const data = await response.json();
+      setPlaylist(data.episodes);  // Assuming response contains an array of episodes
+    } catch (error) {
+      console.error("Error fetching playlist data:", error);
+    }
+  };
 
   const handleOnClick = () => {
     router.push(`/PodcastDetail/${podcast._id}/EpisodeDetail/${episode._id}`, {
@@ -25,38 +56,67 @@ const EpisodeCard = ({ episode, podcast }: { episode: Episode; podcast: Podcast 
   };
 
   const toggleMenu = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent triggering parent click event
+    e.stopPropagation();
     setShowMenu(!showMenu);
   };
 
-  // Handle like button click
   const handleLikeClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent click event from propagating to the parent div
+    e.stopPropagation();
     if (user && user.likedEpisodes) {
-      // Update the user's likedEpisodes list
       const updatedLikedEpisodes = liked
-        ? user.likedEpisodes.filter((id) => id !== episode._id) // Remove episode from likedEpisodes
-        : [...user.likedEpisodes, episode._id]; // Add episode to likedEpisodes
+        ? user.likedEpisodes.filter((id) => id !== episode._id)
+        : [...user.likedEpisodes, episode._id];
 
-      // Update AuthContext with the new likedEpisodes list
       setUser({
         ...user,
         likedEpisodes: updatedLikedEpisodes,
       });
     }
-    setLiked(!liked); // Toggle the liked state locally
+    setLiked(!liked);
   };
+
+  const handleRemoveFromPlaylist = async (episodeId: string) => {
+    // Step 1: Immediately update the state to reflect the removal in the UI
+    const updatedPlaylist = playlist.filter((ep) => ep._id !== episodeId);
+    setPlaylist(updatedPlaylist);
+  
+    // Step 2: Send the DELETE request to the server (to sync with the backend)
+    try {
+      const response = await fetch(`http://localhost:3000/playlist/${playlistId}/episode/${episodeId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (!response.ok) {
+        // If the request fails, you can undo the change or show an error
+        throw new Error("Failed to remove episode from playlist");
+      }
+  
+      // Optionally, handle a success message or any additional state updates here
+      console.log("Episode removed successfully from the playlist.");
+    } catch (error) {
+      // Step 3: Handle the error (e.g., show a notification or revert the state)
+      console.error("Error removing episode from playlist:", error);
+      
+      // Optionally, you could revert the state update if there's an error
+      // setPlaylist(playlist); // Uncomment to revert if needed
+    }
+  };
+  
 
   return (
     <div
       key={episode._id}
-      className="grid grid-cols-8 gap-4 cursor-pointer hover:bg-gray-700 rounded-2xl mt-6"
+      className="grid grid-cols-8 gap-4 cursor-pointer rounded-2xl hover:bg-black/50 transition duration-200"
       onClick={handleOnClick}
     >
       {/* Episode Image */}
       <div className="col-span-1">
         <img
-          className="rounded-lg"
+          className={`rounded-lg ${imageClassName}`}
           src={podcast.podcastImage}
           alt={episode.episodeTitle}
         />
@@ -75,7 +135,7 @@ const EpisodeCard = ({ episode, podcast }: { episode: Episode; podcast: Podcast 
         </p>
       </div>
 
-      {/* Duration (if available) */}
+      {/* Duration (empty for now) */}
       <div className="col-span-1">
         <p className="text-sm text-gray-400 mt-5"></p>
       </div>
@@ -87,11 +147,15 @@ const EpisodeCard = ({ episode, podcast }: { episode: Episode; podcast: Podcast 
           podcast={podcast}
           isLiked={liked}
           onLikeClick={handleLikeClick}
+          showMenu={showMenu} // Pass down showMenu as a prop
+          setShowMenu={setShowMenu} // Pass down setShowMenu to control it from here
+          playlistId={playlistId}  // Pass down playlistId to the ActionButtons component
+          onRemoveFromPlaylist={handleRemoveFromPlaylist} // Callback to remove episode from playlist
         />
       </div>
 
-      {/* Separator after each episode */}
-      <div className="col-span-8 mt-4">
+      {/* Optional Separator */}
+      <div className="col-span-8">
         <hr style={{ color: "grey" }} />
       </div>
     </div>
