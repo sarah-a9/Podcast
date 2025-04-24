@@ -61,7 +61,7 @@ export class EpisodeService {
         podcast.episodes.push(saved._id as Types.ObjectId);
         await podcast.save();
       
-       return savedEpisode;
+       return saved;
   }
 
  getEpisodes(){
@@ -82,9 +82,6 @@ export class EpisodeService {
     }
     
   
-    getEpisodes(){
-        return this.EpisodeModel.find();
-    }
 
     updateEpisode(id: string , updateEpisodeDto : UpdateEpisodeDto){
         return this.EpisodeModel.findByIdAndUpdate(id , updateEpisodeDto);

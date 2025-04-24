@@ -84,13 +84,12 @@ export default function PodcastDetails() {
 
   return (
     <div className="h-screen text-white rounded-lg scrollable-container scrollbar-hide">
-
       <div className="bg-gray-900 p-8 rounded-lg shadow-lg w-full flex flex-col">
         
         {/* Top bar: title + menu */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-3xl font-bold">{podcast.podcastName}</h2>
-
+  
           {isCreator && (
             <div className="relative" ref={menuRef}>
               <button
@@ -122,8 +121,10 @@ export default function PodcastDetails() {
                 </ul>
               )}
             </div>
-        
-        {podcast ? (
+          )}
+        </div>
+  
+        {podcast && (
           <>
             <div className="grid grid-cols-6 gap-4">
               <div className="col-span-1">
@@ -138,21 +139,20 @@ export default function PodcastDetails() {
                 <p className="text-sm text-gray-400">
                   Created by {podcast.creator.firstName} {podcast.creator.lastName}
                 </p>
-
-                   <div className="flex gap-2 flex-wrap">
-                {podcast && podcast.categories.length > 0 ? (
-                  podcast.categories.map((category) => (
-                    <div
-                      key={category._id}
-                      className="w-1/12 flex-shrink-0 h-10 rounded-full shadow-md flex items-center justify-center border-1 border-white  text-white font-bold text-xs bg-transparent  px-4 mt-2"
+                <div className="flex gap-2 flex-wrap">
+                  {podcast.categories.length > 0 ? (
+                    podcast.categories.map((category) => (
+                      <div
+                        key={category._id}
+                        className="w-1/12 flex-shrink-0 h-10 rounded-full shadow-md flex items-center justify-center border-1 border-white text-white font-bold text-xs bg-transparent px-4 mt-2"
                       >
-                      {category.categoryName}
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500">No categories available</p>
-                )}
-              </div> 
+                        {category.categoryName}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-500">No categories available</p>
+                  )}
+                </div>
               </div>
               <div className="col-span-1 content-center">
                 <FavoriteButton
@@ -164,60 +164,58 @@ export default function PodcastDetails() {
                 />
               </div>
             </div>
-      <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full flex flex-col">
-
-        <div className="mt-8 flex justify-between items-center">
-          <h3 className="font-bold text-xl">All Episodes</h3>
-          {isCreator && (
-            <button
-              onClick={() => setOpen(true)}
-              className="flex items-center space-x-2 text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-4 py-2 rounded-xl shadow-md hover:scale-105 transition-transform"
-            >
-              <PlusCircle size={18} />
-              <span>Add Episode</span>
-            </button>
-          )}
-        </div>
-
-        <hr className="my-4 border-gray-600" />
-
-        <div className="pr-2">
-          {podcast.episodes.length > 0 ? (
-            podcast.episodes.map((ep) => (
-              <EpisodeCard
-                key={ep._id}
-                episode={ep}
-                podcast={podcast}
+  
+            <div className="bg-gray-900 p-8 rounded-lg shadow-lg w-full flex flex-col">
+              <div className="mt-8 flex justify-between items-center">
+                <h3 className="font-bold text-xl">All Episodes</h3>
+                {isCreator && (
+                  <button
+                    onClick={() => setOpen(true)}
+                    className="flex items-center space-x-2 text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-4 py-2 rounded-xl shadow-md hover:scale-105 transition-transform"
+                  >
+                    <PlusCircle size={18} />
+                    <span>Add Episode</span>
+                  </button>
+                )}
+              </div>
+  
+              <hr className="my-4 border-gray-600" />
+  
+              <div className="pr-2">
+                {podcast.episodes.length > 0 ? (
+                  podcast.episodes.map((ep) => (
+                    <EpisodeCard key={ep._id} episode={ep} podcast={podcast} />
+                  ))
+                ) : (
+                  <p className="text-gray-500">No episodes available</p>
+                )}
+              </div>
+  
+              {/* Popups */}
+              <CreateEpisodePopup
+                isOpen={open}
+                onClose={() => setOpen(false)}
+                podcastId={podcast._id}
+                creatorId={podcast.creator._id}
+                podcastImage={podcast.podcastImage}
               />
-            ))
-          ) : (
-            <p className="text-gray-500">No episodes available</p>
-          )}
-        </div>
-
-        {/* Popups */}
-        <CreateEpisodePopup
-          isOpen={open}
-          onClose={() => setOpen(false)}
-          podcastId={podcast._id}
-          creatorId={podcast.creator._id}
-          podcastImage={podcast.podcastImage}
-        />
-
-        <EditPodcastPopup
-          isOpen={showEdit}
-          onClose={() => setShowEdit(false)}
-          podcast={podcast}
-          onUpdated={(upd) => setPodcast(upd)}
-        />
-
-        <DeletePodcastPopup
-          isOpen={showDelete}
-          onClose={() => setShowDelete(false)}
-          podcastId={podcast._id}
-          onDeleted={() => router.push("/")}
-        />
-
+  
+              <EditPodcastPopup
+                isOpen={showEdit}
+                onClose={() => setShowEdit(false)}
+                podcast={podcast}
+                onUpdated={(upd) => setPodcast(upd)}
+              />
+  
+              <DeletePodcastPopup
+                isOpen={showDelete}
+                onClose={() => setShowDelete(false)}
+                podcastId={podcast._id}
+                onDeleted={() => router.push("/")}
+              />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

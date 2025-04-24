@@ -30,7 +30,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="bg-black sticky top-0 text-white z-50">
+    <div className="bg-black sticky top-0 text-white ">
       <nav className="flex items-center justify-between p-4">
         {/* Left Column */}
         <div className="w-1/3"></div>
