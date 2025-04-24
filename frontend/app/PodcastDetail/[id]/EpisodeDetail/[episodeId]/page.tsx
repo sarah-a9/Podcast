@@ -10,7 +10,8 @@ import React, { use, useEffect, useState } from "react";
 import { MdOutlineAccessTime } from "react-icons/md";
 
 const EpisodeDetail = ({ params }: { params: Promise<{ id: string; episodeId: string }> }) => {
-  const { id, episodeId } = use(params);  const [episode, setEpisode] = useState<{
+  const { id, episodeId } = use(params);  
+  const [episode, setEpisode] = useState<{
     _id: string;
     episodeTitle: string;
     episodeDescription: string;

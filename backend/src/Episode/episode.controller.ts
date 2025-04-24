@@ -74,15 +74,17 @@ export class EpisodeController {
     return this.episodeService.getEpisodes();
   }
 
-  // Open to everyone, no guard needed
-//   @Get(':id')
-//   getEpisodeById(@Param('id') id: string) {
-//     const isValid = mongoose.Types.ObjectId.isValid(id);
-//     if (!isValid) throw new HttpException('Invalid ID', 400);
-//     const findEpisode = this.episodeService.getEpisodeById(id);
-//     if (!findEpisode) throw new HttpException('Episode Not Found', 404);
-//     return findEpisode;
-//   }
+  @Get(':id')
+async getEpisodeById(@Param('id') id: string) {
+  const isValid = mongoose.Types.ObjectId.isValid(id);
+  if (!isValid) throw new HttpException('Invalid ID', 400);
+
+  const episode = await this.episodeService.getEpisodeById(id);
+  if (!episode) throw new HttpException('Episode Not Found', 404);
+
+  return episode;
+}
+
 
 //    // Endpoint to like/unlike an episode
 //    @Post(':episodeId/like')

@@ -70,9 +70,8 @@ export class EpisodeService {
     }
 
 
-    getEpisodeById(id : string){
-        return this.EpisodeModel.findById(id);
-        
+    getEpisodeById(id: string) {
+      return this.EpisodeModel.findById(id).populate('podcast');
     }
 
     updateEpisode(id: string , updateEpisodeDto : UpdateEpisodeDto){
