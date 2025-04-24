@@ -12,6 +12,7 @@ import EpisodeCard from "@/app/components/EpisodeCard/EpisodeCard";
 import EpisodeSearchCard from "@/app/components/EpisodeSearchCard/EpisodeSearchCard";
 import { MoreVertical } from "lucide-react";
 import EditPlaylistModal from "@/app/components/PopUps/EditPlaylistModal";
+import DeletePlaylistModal from "@/app/components/PopUps/DeletePlaylistModal";
 
 interface PlaylistDetailResponse extends Playlist {
   episodes: Episode[];
@@ -29,7 +30,13 @@ const PlaylistDetailPage = ({ params }: { params: { PlaylistId: string } }) => {
   const [feedbackMsg, setFeedbackMsg] = useState<string | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showMenu, setShowMenu] = useState(false); // To control menu visibility
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+
+
+
+
+  
   const fetchPlaylistDetail = async () => {
     if (!user || !token) return;
     try {
@@ -78,14 +85,8 @@ const PlaylistDetailPage = ({ params }: { params: { PlaylistId: string } }) => {
     }
   };
 
-  const handleEditPlaylist = (updatedPlaylist: PlaylistDetailResponse) => {
-    setPlaylist(updatedPlaylist);
-    setShowEditModal(false); // Close the modal
-  };
-
   const handleAddToPlaylist = async (episodeId: string) => {
     if (!token) return;
-
 
     try {
       const res = await fetch(
@@ -148,33 +149,19 @@ const PlaylistDetailPage = ({ params }: { params: { PlaylistId: string } }) => {
     setShowEditModal(false);
   };
 
-  const handleDeletePlaylist = async () => {
-    if (!token || !playlist) return;
-
-    try {
-      const res = await fetch(
-        `http://localhost:3000/playlist/${params.PlaylistId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!res.ok) throw new Error("Failed to delete playlist");
-      toast.success("Playlist deleted successfully!");
-      router.push("/playlists"); // Redirect to playlists page after deletion
-    } catch (err) {
-      console.error("Error deleting playlist:", err);
-      toast.error("Oops! Couldn't delete the playlist.");
-    }
+  const handleOpenDeleteModal = () => {
+    setShowDeleteModal(true);
+    setShowMenu(false);
   };
+
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+  };
+
+  
 
   if (!playlist) return <p>Loading...</p>;
   console.log("Episodes:", playlist.episodes);
-
 
   return (
     <div
@@ -195,7 +182,7 @@ const PlaylistDetailPage = ({ params }: { params: { PlaylistId: string } }) => {
 
         <div className="flex flex-col justify-center w-2/3 ">
           <div className="flex justify-between items-start">
-            <h1 className="text-6xl font-extrabold mt-9 text-white">
+            <h1 className="text-6xl font-bold mt-9 text-white">
               {playlist.playlistName}
             </h1>
             <div className="relative">
@@ -205,24 +192,24 @@ const PlaylistDetailPage = ({ params }: { params: { PlaylistId: string } }) => {
                 onClick={() => setShowMenu((prev) => !prev)} // Toggle menu visibility
               />
               {showMenu && (
-                <div className="absolute top-0 right-0 bg-white text-black p-2 rounded-lg shadow-lg">
+                <div className="absolute mt-2 right-0 bg-gray-700 text-white w-48 rounded-lg shadow-lg z-50 cursor-pointer">
                   <button
                     onClick={handleOpenEditModal}
-                    className="block w-full text-left px-4 py-2"
+                    className="block w-full text-left px-4 py-3 hover:bg-gray-600 transition-colors rounded-t-lg cursor-pointer"
                   >
-                    Edit
+                    Edit Playlist
                   </button>
                   <button
-                    onClick={handleDeletePlaylist}
-                    className="block w-full text-left px-4 py-2 text-red-600"
+                    onClick={handleOpenDeleteModal}
+                    className="block w-full text-left px-4 py-3 text-red-400 hover:bg-gray-600 transition-colors rounded-b-lg cursor-pointer"
                   >
-                    Delete
+                     Delete Playlist
                   </button>
                 </div>
               )}
             </div>
           </div>
-          <p className="text-white/80 text-lg mb-2 font-medium leading-relaxed">
+          <p className="text-white/80 text-lg mb-2 mt-1 font-medium leading-relaxed">
             {playlist.playlistDescription}
           </p>
           <p className="text-sm text-white italic">
@@ -236,7 +223,7 @@ const PlaylistDetailPage = ({ params }: { params: { PlaylistId: string } }) => {
       <div className="border-t-2 my-4"></div>
 
       <h2 className="text-white text-2xl font-semibold mb-3 mt-2">
-        Your Playlist Episodes
+        Your Episodes
       </h2>
       <div className="space-y-4 mb-6">
         {playlist.episodes.length === 0 ? (
@@ -245,11 +232,13 @@ const PlaylistDetailPage = ({ params }: { params: { PlaylistId: string } }) => {
           playlist.episodes?.map((episode) =>
             episode?._id ? (
               <EpisodeCard
-              key={episode._id}
-              episode={episode}
-              podcast={episode.podcast}
-              className="text-sm gap-2"
-              imageClassName="w-16 h-16 object-cover mt-2"
+                key={episode._id}
+                episode={episode}
+                podcast={episode.podcast}
+                className="text-sm gap-2"
+                imageClassName="w-16 h-16 object-cover mt-2"
+                playlistId={playlist._id} 
+
               />
             ) : null
           )
@@ -271,6 +260,8 @@ const PlaylistDetailPage = ({ params }: { params: { PlaylistId: string } }) => {
           {feedbackMsg}
         </div>
       )}
+
+      
 
       {searchQuery && (
         <div className="flex-1">
@@ -297,12 +288,22 @@ const PlaylistDetailPage = ({ params }: { params: { PlaylistId: string } }) => {
           playlist={playlist}
           onClose={handleCloseEditModal}
           onEdit={(updatedPlaylist) => {
-            console.log('Updated Playlist:', updatedPlaylist);
+            console.log("Updated Playlist:", updatedPlaylist);
             fetchPlaylistDetail();
             setPlaylist(updatedPlaylist);
             handleCloseEditModal();
           }}
-          
+        />
+      )}
+
+      {showDeleteModal && (
+        <DeletePlaylistModal
+          onClose={handleCloseDeleteModal}
+          onDelete={() => {
+            router.push("/");
+          }}
+          playlistName={playlist.playlistName}
+          playlistId={playlist._id}
         />
       )}
     </div>

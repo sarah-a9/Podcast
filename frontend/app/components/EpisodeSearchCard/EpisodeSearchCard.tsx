@@ -36,7 +36,7 @@ const EpisodeSearchCard = ({
             disabled
             className="text-xs text-gray-400 border border-gray-400 rounded-md px-3 py-1 cursor-not-allowed"
           >
-            Already in Playlist
+            Added
           </button>
         ) : (
           <button

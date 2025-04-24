@@ -54,20 +54,21 @@ export class PlaylistService {
       .populate({
         path: 'episodes',
         model: 'Episode',
-        select: 'episodeTitle episodeDescription audioUrl createdAt likedByUsers podcast',
+        select: 'episodeTitle episodeDescription audioUrl createdAt likedByUsers podcast creator',
         populate: {
           path: 'podcast',
           model: 'Podcast',
           select: 'podcastImage',
+          populate: {
+            path: 'creator', // Now populate the creator inside the podcast
+            model: 'User',
+            select: 'firstName lastName', 
+          },
         },
-      })
-      .populate({
-        path: 'creator',
-        model: 'User',
-        select: 'firstName',
       })
       .exec();
   }
+  
   
 
   // Add an episode to the playlist (without duplicates)
@@ -184,6 +185,12 @@ async removeEpisode(playlistId: string, episodeId: string) {
       playlistId,
       { $set: { episodes: [] } }, // Clear the episodes array without deleting actual episodes
       { new: true },
+    );
+
+    //Remove playlists references from the episode
+    await this.EpisodeModel.updateMany(
+      { playlists: playlistId },
+      { $pull: { playlists: playlistId } }, // Remove the playlist reference from each episode
     );
 
     // Delete the playlist

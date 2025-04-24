@@ -6,6 +6,7 @@ import { AudioProvider } from "./components/Providers/AudioProvider";
 import AudioPlayerBar from "./components/AudioPlayerBar/AudioPlayerBar";
 import { AuthProvider } from "./components/Providers/AuthContext/AuthContext";
 import { Toaster } from "react-hot-toast";
+import { PlaylistProvider } from "./components/Providers/PlaylistContext";
 
 // export const metadata: Metadata = {
 //   title: "Podcast",
@@ -23,7 +24,7 @@ export default function RootLayout({
         {/* Wrap the entire layout with both providers */}
         <AuthProvider>
           <AudioProvider>
-            
+          <PlaylistProvider>
             <Toaster
               position="bottom-center"
               reverseOrder={true}
@@ -44,6 +45,7 @@ export default function RootLayout({
               </div>
               <AudioPlayerBar />
             </div>
+          </PlaylistProvider>
           </AudioProvider>
         </AuthProvider>
       </body>

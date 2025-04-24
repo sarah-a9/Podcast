@@ -84,7 +84,7 @@ export class PlaylistController {
 
 
 
-  // Protect this route with AuthGuard (remove an episode from a playlist)
+  //  (remove an episode from a playlist)
   @UseGuards(AuthGuard)
   @Delete(':playlistId/episode/:episodeId')
   async removeEpisode(
@@ -92,6 +92,19 @@ export class PlaylistController {
     @Param('episodeId') episodeId: string,
   ) {
     return this.playlistService.removeEpisode(playlistId, episodeId);
+  }
+
+
+  //Delete a playlist and remove the episodes from the playlist without deleting the episodes
+  @UseGuards(AuthGuard)
+  @Delete(':id')
+  async deletePlaylist(@Param('id') id :string){
+    const deletePlaylist = await this.playlistService.deletePlaylist(id);
+    if (!deletePlaylist) {
+      throw new NotFoundException('Playlist not found');
+    }
+    return deletePlaylist;
+    
   }
 
   // This route can be public (get all playlists)

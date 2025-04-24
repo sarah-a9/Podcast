@@ -115,8 +115,9 @@ const EpisodeDetail = ({ params }: { params: { id: string; episodeId: string } }
                 podcast={episode.podcast}
                 isLiked={liked}
                 onLikeClick={handleLikeClick}
-                size="lg"
-              />
+                size="lg" showMenu={false} setShowMenu={function (value: React.SetStateAction<boolean>): void {
+                  throw new Error("Function not implemented.");
+                } }              />
             </div>
 
             {/* Episode Description */}

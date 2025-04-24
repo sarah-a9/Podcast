@@ -14,12 +14,14 @@ import {
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import CreatePlaylistModal from "../PopUps/CreatePlaylistModal/CreatePlaylistModal";
+import { usePlaylist } from "../Providers/PlaylistContext";
 
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [playlists, setPlaylists] = useState<any[]>([]); // Add this line to define the playlists state
   const pathname = usePathname();
+  const { addPlaylist } = usePlaylist(); 
 
   // Hide Sidebar on auth pages
   if (pathname.startsWith("/auth")) return null;
@@ -124,7 +126,7 @@ const Sidebar = () => {
       {isModalOpen && (
         <CreatePlaylistModal onClose={() => setIsModalOpen(false)} 
         onCreate={(newPlaylist) => {
-          setPlaylists((prev) => [...prev, newPlaylist]);
+          addPlaylist(newPlaylist);
         }}
         />
       )}
