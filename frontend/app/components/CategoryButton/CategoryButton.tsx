@@ -4,16 +4,16 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 
 
-const CategoryButton: React.FC<Category> = ({ categoryName  , id}) => {
-  console.log("CategoryButton received id:", id); // ✅ Debugging
+const CategoryButton: React.FC<Category> = ({ categoryName  ,_id}) => {
+  console.log("CategoryButton received id:", _id); // ✅ Debugging
   const router = useRouter();
    const handleViews = () => {
-    if (!id) {
+    if (!_id) {
       console.error("Category ID is undefined!");
       return;
     }
-    console.log('Navigating to category:', id);
-    router.push(`/categoryFeed/${id}`);
+    console.log('Navigating to category:', _id);
+    router.push(`/categoryFeed/${_id}`);
     
     
   };
