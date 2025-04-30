@@ -14,6 +14,7 @@ import config from './config/config';
 import { SwaggerModule } from '@nestjs/swagger';
 import { MulterModule } from '@nestjs/platform-express';
 import { ScheduleModule } from '@nestjs/schedule';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -58,7 +59,8 @@ import { ScheduleModule } from '@nestjs/schedule';
     CategoryModule,
     PlaylistModule,
     AuthModule,
-    SwaggerModule
+    SwaggerModule,
+    EmailModule
   ],
   controllers: [AppController],
   providers: [AppService],

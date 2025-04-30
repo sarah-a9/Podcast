@@ -10,7 +10,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   bio, 
   profilePic, 
   onEdit, 
-  onDelete 
+  onDelete,
+  onChangePassword 
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -87,6 +88,15 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer"
               >
                 Delete Profile
+              </li>
+              <li
+                onClick={() => {
+                  onChangePassword?.(); // ✅ Only call if provided
+                  setShowMenu(false);
+                }}
+                className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer"
+              >
+                Change Password
               </li>
             </ul>
           </div>

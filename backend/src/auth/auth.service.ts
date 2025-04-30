@@ -9,6 +9,9 @@ import { JwtService } from '@nestjs/jwt';
 import { RefreshToken } from '../schemas/refresh-token.schema';
 import { v4 as uuidv4 } from 'uuid';
 import { nanoid } from 'nanoid';
+import { EmailService } from '../email/email.service';
+import { randomBytes } from 'crypto';
+import { ResetToken } from '../schemas/reset-token.schema';
 // import { ResetToken } from '../schemas/reset-token.schema';
 
 @Injectable()
@@ -16,9 +19,11 @@ export class AuthService {
     constructor(
         @InjectModel(User.name) private UserModel: Model<User>,
         @InjectModel(RefreshToken.name) private RefreshTokenModel: Model<RefreshToken>,
-        // @InjectModel(ResetToken.name) private ResetTokenModel : Model<ResetToken>,
-
-        private jwtService: JwtService){}
+        @InjectModel(ResetToken.name) private ResetTokenModel: Model<ResetToken>,
+        
+        private jwtService: JwtService,
+        private emailService: EmailService
+    ){}
 
     async signup(signupData: SignupDto){
         const {firstName, lastName, email, password} = signupData;
@@ -31,6 +36,7 @@ export class AuthService {
 
         //hash password
         const hashedPassword = await bcrypt.hash(password, 10);
+        const emailVerificationToken = randomBytes(32).toString('hex'); // ou nanoid()
 
         //create user document and save in mongodb
         await this.UserModel.create({
@@ -38,7 +44,17 @@ export class AuthService {
             lastName,
             email,
             password : hashedPassword, 
-        })
+            emailVerificationToken,
+        });
+
+        // const verificationUrl = `http://localhost:3000/auth/verify-email?token=${emailVerificationToken}`;
+        await this.emailService.sendVerificationEmail({ 
+            to: email, 
+            token: emailVerificationToken });
+
+        
+          return { message: 'User created, verification email sent.' };
+        
     }
 
     async login(credentials: LoginDto){
@@ -79,6 +95,26 @@ export class AuthService {
         await this.RefreshTokenModel.deleteMany({ userId });
         return { message: 'Logout successful' };
     }
+
+
+    async verifyEmail(token: string) {
+        const user = await this.UserModel.findOne({ emailVerificationToken: token });
+      
+        if (!user) {
+          throw new NotFoundException('Token de vérification invalide ou expiré');
+        }
+      
+        if (user.isEmailVerified) {
+          return { message: 'Adresse email déjà vérifiée' };
+        }
+      
+        user.isEmailVerified = true;
+        user.emailVerificationToken = ""; // ou supprimer le champ
+        const savedUser = await user.save();
+        console.log(savedUser);
+        return { message: 'Adresse email vérifiée avec succès' };
+    }
+      
   
 
     async changePassword(userId, oldPassword:string, newPassword:string){
@@ -100,24 +136,44 @@ export class AuthService {
         await user.save() 
     }
 
-    // async forgotPassword(email: string){
-    //     //check that user exists
-    //     const user = await this.UserModel.findOne({email})
-    //     if(user){
-    //         const expiryDate = new Date()
-    //         expiryDate.setHours(expiryDate.getHours() + 1)
-    //         //if user exists, generate password reset link
-    //         const resetToken = nanoid(64)
-    //         await this.ResetTokenModel.create({
-    //             token: resetToken,
-    //             userId: user._id,
-    //             expiryDate
-    //         })
-    //         //send the link to the user by email
+    async forgotPassword(email: string) {
+        const user = await this.UserModel.findOne({ email });
+        if (!user) return { message: 'If this user exists, an email will be sent.' };
+      
+        const token = uuidv4();
+        const expiryDate = new Date();
+        expiryDate.setHours(expiryDate.getHours() + 1); // 1 heure valide
+      
+        await this.ResetTokenModel.create({
+          token,
+          userId: user._id,
+          expiryDate,
+        });
+      
+        await this.emailService.sendResetPasswordEmail({ to: email, token });
+        return { message: 'Reset password email sent' };
+      }
+      
 
-    //     }
-    //     return {Message: "if this user exists, they will recieve an email"}
-    // }
+      async resetPassword(token: string, newPassword: string) {
+        const resetToken = await this.ResetTokenModel.findOne({ token });
+        if (!resetToken || resetToken.expiryDate < new Date()) {
+          throw new BadRequestException('Token is invalid or expired');
+        }
+      
+        const user = await this.UserModel.findById(resetToken.userId);
+        if (!user) {
+          throw new NotFoundException('User not found');
+        }
+      
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+        await user.save();
+      
+        await this.ResetTokenModel.deleteOne({ _id: resetToken._id }); // facultatif
+        return { message: 'Password has been reset' };
+      }
+      
 
     async refreshTokens(refreshToken: string){
         const token = await this.RefreshTokenModel.findOneAndDelete({

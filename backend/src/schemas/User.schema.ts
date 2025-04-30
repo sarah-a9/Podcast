@@ -24,6 +24,12 @@ export class User extends Document {
     @Prop({ default: '' })
     profilePic: string;
 
+    @Prop({ default: false })
+    isEmailVerified: boolean;
+
+    @Prop()
+    emailVerificationToken: string;
+
     @Prop({ type: [{ type: Types.ObjectId, ref: "Podcast" }], default: [] })
     podcasts: Types.ObjectId[]; // 🔥 Reference to podcasts
 

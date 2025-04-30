@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../components/Providers/AuthContext/AuthContext';
+import Image from "next/image";
 
 export default function Login() {
   const router = useRouter();
@@ -52,8 +53,26 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <div className="bg-gray-800 rounded-xl p-8 shadow-2xl w-full max-w-md">
+   <div className="min-h-screen flex flex-row-reverse" style={{ backgroundColor: '#060a0d' }}>
+
+    {/* {Image */}
+    <div className="w-1/2 hidden md:block" >
+      <div className="relative w-full h-screen">
+        <Image
+          src="/images/auth.png"
+          alt="Login visual"
+          layout="fill"
+          className="object-contain"
+        />
+      </div>
+    </div>
+
+    {/* form*/}
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 w-full md:w-1/2" style={{ backgroundColor: '#060a0d' }}>
+    <div
+    className="rounded-xl p-8 shadow-2xl w-full max-w-md"
+    style={{ backgroundColor: 'rgba(12, 13, 21, 0.5)' }} // semi-transparent dark background
+    >
         <h2 className="text-3xl font-semibold text-center text-gray-100 mb-6">Login</h2>
         {error && <p className="text-red-400 text-center mb-4">{error}</p>}
         <form onSubmit={handleSubmit}>
@@ -92,15 +111,15 @@ export default function Login() {
               Create an account
             </Link>
             {' '}or{' '}
-            <a
-              href="/forgot-password"
-              className="text-blue-400 hover:underline"
-            >
-              Forgot password?
-            </a>
+            <Link href="/auth/forgotPassword" className="text-blue-400 hover:underline" >
+              Forgot Password?
+            </Link>
           </p>
         </div>
       </div>
     </div>
+    
+    
+   </div>
   );
 }

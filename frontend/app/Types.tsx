@@ -109,6 +109,7 @@ export interface Episode {
     profilePic: string;
     onEdit: () => void;
     onDelete: () => void;
+    onChangePassword: () => void;
   }
 
   export interface CreatePodcastPopupProps {

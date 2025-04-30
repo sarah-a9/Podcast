@@ -2,6 +2,7 @@
 
 import { User } from '@/app/Types';
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { useRouter, usePathname } from 'next/navigation'; // Use useRouter and usePathname from next/navigation
 
 interface AuthContextType {
   user: User | null;
@@ -16,8 +17,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);  // Add loading state
+  const router = useRouter(); // Use useRouter from next/navigation for client-side routing
   
-
+  // List of public routes that don't require authentication
+  const isPublicRoute = (pathname: string): boolean => {
+    const publicPatterns = [
+      /^\/$/, // homepage
+      /^\/auth\/(login|signup|pending|verify-email|forgotPassword|resetPassword)$/,
+      /^\/PodcastDetail\/[^/]+$/, // matches /PodcastDetail/123
+      /^\/PodcastDetail\/[^/]+\/EpisodeDetail\/[^/]+$/, // matches /PodcastDetail/123/episode/456
+      /^\/categoryFeed\/[^/]+$/, // matches /categoryFeed/12
+    ];
+  
+    return publicPatterns.some((regex) => regex.test(pathname));
+  };
+  
   // Function to load user data and token from localStorage
   const loadUserData = () => {
     const savedToken = localStorage.getItem('token');
@@ -69,6 +83,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       fetchUserData();  // Fetch user data when token is set
     }
   }, [token]);  // Run only when token is updated
+
+  // Redirect logic for protected routes
+  const pathname = usePathname(); // Get the current pathname
+  useEffect(() => {
+    if (!loading && !isPublicRoute(pathname) && !token) {
+      router.push('/auth/login');  // Redirect to login page if no token and on a protected route
+    }
+  }, [token, loading, pathname]);  // Updated dependencies to include `pathname`
 
   // If loading, show nothing or a loading spinner
   if (loading) {
