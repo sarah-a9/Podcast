@@ -8,11 +8,13 @@ import DeleteProfilePopup from "../../components/PopUps/deleteProfilePopUp";
 import CreatePodcastButton from "../../components/CreatePodcastButton/CreatePodcastButton";
 import PodcastCard from "../../components/PodcastCard/PodcastCard";
 import { useRouter } from "next/navigation";
+import ChangePasswordPopup from "../../components/PopUps/ChangePasswordPopUp";
 
 const Profile = () => {
   const { user, setUser } = useAuth();
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [showChangePasswordPopup, setShowChangePasswordPopup] = useState(false);
   const [myPodcasts, setMyPodcasts] = useState<any[]>([]);
   const router = useRouter();
   
@@ -110,6 +112,7 @@ const Profile = () => {
         bio={user.bio}
         onEdit={() => setShowEditPopup(true)}
         onDelete={() => setShowDeletePopup(true)}
+        onChangePassword={() => setShowChangePasswordPopup(true)}
       />
 
       {/* Create Podcast Button placed right after the profile header */}
@@ -155,6 +158,11 @@ const Profile = () => {
           onConfirm={handleDeleteConfirm}
         />
       )}
+
+      {showChangePasswordPopup && (
+        <ChangePasswordPopup onClose={() => setShowChangePasswordPopup(false)} />
+      )}
+
     </div>
   );
 };

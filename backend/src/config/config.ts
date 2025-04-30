@@ -4,5 +4,8 @@ export default () => ({
     },
     database: {
         connectionString: process.env.MONGO_URL,
+    },
+    resend: {
+        apiKey: process.env.RESEND_API_KEY,
     }
 });

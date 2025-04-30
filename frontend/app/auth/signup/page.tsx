@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import Image from "next/image";
 
 export default function Signup() {
   const router = useRouter();
@@ -40,7 +41,7 @@ export default function Signup() {
         }
       }
       setSuccess("Signup successful! Redirecting...");
-      setTimeout(() => router.push("../../auth/login"), 2000); // Redirect to homepage after successful signup
+      setTimeout(() => router.push("../../auth/pending"), 2000); // 
       // router.push("/"); // Redirect to homepage after successful signup
     } catch (error: any) {
       setError(error.message);
@@ -48,10 +49,28 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4">
-      <div className="bg-gray-800 rounded-xl p-8 shadow-2xl w-full max-w-md">
+    <div className="min-h-screen flex flex-row-reverse" style={{ backgroundColor: '#060a0d' }}>
+    
+        {/* {Image */}
+        <div className="w-1/2 hidden md:block" >
+          <div className="relative w-full h-screen">
+            <Image
+              src="/images/auth.png"
+              alt="Login visual"
+              layout="fill"
+              className="object-contain"
+            />
+          </div>
+        </div>
+    
+        {/* form*/}
+        <div className="min-h-screen bg-black flex items-center justify-center p-4 w-full md:w-1/2" style={{ backgroundColor: '#060a0d' }}>
+        <div
+        className="rounded-xl p-8 shadow-2xl w-full max-w-md"
+        style={{ backgroundColor: 'rgba(12, 13, 21, 0.5)' }} // semi-transparent dark background
+        >        
         <h2 className="text-3xl font-semibold text-center text-gray-100 mb-6">
-          Sign Up to continue
+          Sign Up
         </h2>
         {error && <p className="text-red-400 text-center mb-4">{error}</p>}
         {success && <p className="text-green-400 text-center mb-4">{success}</p>}
@@ -114,6 +133,7 @@ export default function Signup() {
           </p>
         </div>
       </div>
+    </div>
     </div>
   );
 }
