@@ -160,23 +160,29 @@ const AudioProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (currentEpisode && audioRef.current) {
       const audio = audioRef.current;
-
+  
+      if (!currentEpisode.audioUrl) {
+        console.error("No audio URL found for this episode.");
+        return;
+      }
+  
       if (audio.src !== currentEpisode.audioUrl) {
         audio.pause();
         audio.src = currentEpisode.audioUrl;
         audio.load();
       }
-
+  
       audio
         .play()
         .then(() => setIsPlaying(true))
         .catch((error) => console.error("Playback error:", error));
-
+  
       return () => {
-        audio.pause(); // Ensure audio stops when switching episodes
+        audio.pause();
       };
     }
   }, [currentEpisode]);
+  
 
   // Reset the audio when navigating to "/create-podcast"
   // useEffect(() => {

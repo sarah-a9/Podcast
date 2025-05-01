@@ -119,3 +119,4 @@ export interface Episode {
   }
 
 
+  export type SearchResult = Podcast | Episode | User | Category;
