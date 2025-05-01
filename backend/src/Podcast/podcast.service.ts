@@ -57,7 +57,7 @@ export class PodcastService {
       }).populate({
         path: 'episodes', // Populate episodes
          model:"Episode",
-        select: 'episodeTitle episodeDescription  createdAt' // Specify which fields you want from the episodes
+        select: 'episodeTitle episodeDescription  createdAt audioUrl' // Specify which fields you want from the episodes
       }).populate({path: 'categories', // Populate episodes
         model:"Category" ,select:'categoryName'}).exec();
 

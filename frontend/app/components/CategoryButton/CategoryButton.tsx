@@ -20,7 +20,7 @@ const CategoryButton: React.FC<Category> = ({ categoryName  ,_id}) => {
   
   return (
     <div
-      className={` w-1/11 flex-shrink-0 h-11 rounded-full shadow-md flex items-center justify-center cursor-pointer text-white font-light text-s bg-gray-800`}
+      className={` w-24 flex-shrink-0 h-11 rounded-full shadow-md flex items-center justify-center cursor-pointer text-white font-light text-s bg-gray-800`}
       onClick={handleViews}>
       {categoryName}
     </div>  );

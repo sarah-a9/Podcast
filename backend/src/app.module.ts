@@ -15,6 +15,9 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { MulterModule } from '@nestjs/platform-express';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EmailModule } from './email/email.module';
+import { SearchController } from './search/search.controller';
+import { SearchService } from './search/search.service';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -60,9 +63,10 @@ import { EmailModule } from './email/email.module';
     PlaylistModule,
     AuthModule,
     SwaggerModule,
-    EmailModule
+    EmailModule,
+    SearchModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, SearchController],
+  providers: [AppService, SearchService],
 })
 export class AppModule {}

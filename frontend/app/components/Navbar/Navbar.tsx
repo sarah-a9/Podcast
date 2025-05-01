@@ -6,11 +6,13 @@ import { GoHome } from "react-icons/go";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "../../components/Providers/AuthContext/AuthContext";
-import LogoutPopup from "../PopUps/LogoutPopUp" // Import LogoutPopup
+import LogoutPopup from "../PopUps/LogoutPopUp";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchFilter, setSearchFilter] = useState("podcast");
 
   const pathname = usePathname();
   const router = useRouter();
@@ -20,55 +22,84 @@ const Navbar = () => {
   if (pathname.startsWith("/auth")) return null;
 
   const handleLogout = () => {
-    setShowLogoutModal(false); // Close the modal
-    // Clear auth info
+    setShowLogoutModal(false);
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setUser(null);
     setToken(null);
-    router.push("/"); // Redirect to homepage
+    router.push("/");
   };
 
+  const handleSearch = () => {
+    if (searchQuery.length > 0) {
+      // Redirect to the SearchPage with query and filter as URL parameters
+      router.push(`/Search?q=${searchQuery}&filter=${searchFilter}`);
+    }
+  };
+
+  console.log("Search Query:", searchQuery);
+  console.log("Search Filter:", searchFilter);
+
   return (
-    <div className="bg-black sticky top-0 text-white ">
+    <div className="bg-black sticky top-0 text-white">
       <nav className="flex items-center justify-between p-4">
-        {/* Left Column */}
         <div className="w-1/3"></div>
 
-        {/* Center Column */}
-        <div className="relative w-1/3 flex items-center justify-center space-x-4">
-
-          {/* Home Icon */}
+        <div className="relative w-1/3 flex items-center justify-center space-x-2 ">
           <Link
             href="/"
-            className="text-gray-400 hover:text-white bg-gray-800 rounded-full p-3"
+            className="text-gray-400 hover:text-purple-500  bg-gray-800 rounded-full p-3  "
           >
             <GoHome size={25} />
           </Link>
 
-          <div className="relative w-full">
-            <input
+          <div className="relative w-full flex gap-2">
+            {/* <input
               type="text"
-              placeholder="Search podcasts..."
-              className="w-full p-3 pl-10 bg-gray-800 text-white rounded-4xl focus:outline-none "
-            />
-            <Search
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              size={20}
-            />
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              placeholder="Rechercher..."
+              className="w-full p-3 pl-10 bg-gray-800 text-white rounded-4xl focus:outline-none"
+            /> */}
+            <div className="relative w-full flex gap-2 items-center">
+              <div className="relative flex flex-1">
+                <Search
+                  onClick={handleSearch}
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 cursor-pointer hover:text-purple-500 transition"
+                  size={20}
+                />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  placeholder="Search podcasts, episodes, creators..."
+                  className="w-full pl-10 pr-32 py-3 bg-gray-800 text-white rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder-gray-400 transition"
+                />
+                <select
+                  value={searchFilter}
+                  onChange={(e) => setSearchFilter(e.target.value)}
+                  className="absolute right-1 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white rounded-full px-4 py-1.5 text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer hover:bg-gray-700 transition"
+                >
+                 
+                  {/* This is the default "Filter" label */}
+                  <option value="podcast">Podcast</option>
+                  <option value="episode">Episode</option>
+                  <option value="creator">Creator</option>
+                  <option value="category">Category</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Right Column */}
         <div className="w-1/3 flex items-center justify-end gap-4">
-
-          {/* Theme Toggle */}
           <button className="p-3 rounded-lg hover:bg-gray-800">
             <Sun size={20} />
           </button>
-          
+
           {user ? (
-            // Authenticated Dropdown
             <div className="relative">
               <button
                 onClick={() => setMenuOpen(!menuOpen)}
@@ -87,20 +118,26 @@ const Navbar = () => {
                 )}
               </button>
 
-
               {menuOpen && (
                 <div className="absolute right-0 mt-2 w-32 bg-gray-900 text-white rounded-lg shadow-lg">
                   <ul>
                     <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">
-                      <Link href={`/Profile/me`} onClick={() => setMenuOpen(false)} >Profile</Link>
+                      <Link
+                        href={`/Profile/me`}
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        Profile
+                      </Link>
                     </li>
                     <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">
-                      <Link href="/settings" onClick={() => setMenuOpen(false)} >Settings</Link>
+                      <Link href="/settings" onClick={() => setMenuOpen(false)}>
+                        Settings
+                      </Link>
                     </li>
                     <li
                       onClick={() => {
                         setMenuOpen(false);
-                        setShowLogoutModal(true); // Show the logout confirmation modal
+                        setShowLogoutModal(true);
                       }}
                       className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer"
                     >
@@ -111,7 +148,6 @@ const Navbar = () => {
               )}
             </div>
           ) : (
-            // Not Authenticated → Login button + Signup link
             <div className="flex items-center gap-3">
               <Link
                 href="/auth/login"
@@ -130,7 +166,6 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Logout Confirmation Modal */}
       <LogoutPopup
         isOpen={showLogoutModal}
         onClose={() => setShowLogoutModal(false)}
