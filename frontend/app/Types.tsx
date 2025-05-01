@@ -118,5 +118,10 @@ export interface Episode {
     onPodcastCreated?: (podcast: any) => void;
   }
 
+ export interface SeeMoreButtonProps {
+    label: string;
+    onClick: () => void;
+  }
+
 
   export type SearchResult = Podcast | Episode | User | Category;

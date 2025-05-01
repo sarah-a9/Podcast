@@ -81,7 +81,8 @@ const EpisodeDetail = ({ params }: { params: Promise<{ id: string; episodeId: st
               <div className="col-span-1">
                 <img
                   className="rounded-2xl"
-                  src={episode.podcast.podcastImage}
+                  // src={episode.podcast.podcastImage}
+                  src={`http://localhost:3000/uploads/podcasts/${episode.podcast.podcastImage}`}
                   alt={episode.podcast.podcastName}
                 />
               </div>

@@ -102,9 +102,10 @@ const Profile = () => {
       console.error("Delete failed:", error.message);
     }
   };
+  // console.log("profile pic",`http://localhost:3000/uploads/podcasts/${Podcast.podcastImage}`);
 
   return (
-    <div className="p-6 min-h-screen bg-gray-900 text-white">
+    <div className="p-6 h-screen bg-gray-900 text-white rounded-lg  scrollable-container scrollbar-hide">
       <ProfileHeader
         firstName={user.firstName}
         lastName={user.lastName}
@@ -123,16 +124,17 @@ const Profile = () => {
         <h2 className="text-2xl font-semibold mb-4">My Podcasts</h2>
         {myPodcasts.length > 0 ? (
           <div className="flex overflow-x-auto gap-4">
-            {myPodcasts.map((podcast) => (
-              <PodcastCard
-                key={podcast._id}
-                id={podcast._id}
-                podcastName={podcast.podcastName}
-                podcastDescription={podcast.podcastDescription}
-                podcastImage={podcast.podcastImage}
-                creator={podcast.creator}
-              />
-            ))}
+           {myPodcasts.map((podcast) => (
+  <PodcastCard
+    key={podcast._id}
+    id={podcast._id}
+    podcastName={podcast.podcastName}
+    podcastDescription={podcast.podcastDescription}
+    podcastImage={`http://localhost:3000/uploads/podcasts/${podcast.podcastImage}`} // Concatenate the image path with the server URL
+    creator={podcast.creator}
+  />
+))}
+
           </div>
         ) : (
           <p>No podcasts to show yet...</p>

@@ -27,41 +27,86 @@ export class PodcastController {
     constructor(private readonly podcastService: PodcastService) {}
 
     // Protect this route with the AuthGuard
+    // @UseGuards(AuthGuard)
+    // @Post()
+    // @UseInterceptors(FileInterceptor('podcastImage', {
+    //     storage: diskStorage({
+    //         destination: './uploads/podcasts',
+    //         filename: (req, file, cb) => {
+    //             const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    //             cb(null, uniqueSuffix + extname(file.originalname));
+    //         },    
+    //     }),
+    //     fileFilter: (req, file, cb) => {
+    //         if (!file.mimetype.match(/\/(jpg|jpeg|png|webp)$/)) {
+    //           cb(new Error('Only image files are allowed!'), false);
+    //         } else {
+    //           cb(null, true);
+    //         }
+    //     },
+    // }))
+    // async createPodcast(
+    //     @UploadedFile() file: Express.Multer.File,
+    //     @Body() body: any
+    // )   {
+    //         const createPodcastDto: CreatePodcastDto = {
+    //             podcastName: body.podcastName,
+    //             podcastDescription: body.podcastDescription,
+    //             creator: body.creator,
+    //             podcastImage: file?.filename ?? '', // Save only filename, or you can use the full URL
+    //             categories: Array.isArray(body.categories)
+    //               ? body.categories
+    //               : body.categories
+    //               ? [body.categories]
+    //               : [],
+    //         };
+    //     return await this.podcastService.createPodcast(createPodcastDto);
+    //     }
+
+
+
+
+
+
     @UseGuards(AuthGuard)
-    @Post()
-    @UseInterceptors(FileInterceptor('podcastImage', {
-        storage: diskStorage({
-            destination: './uploads/podcasts',
-            filename: (req, file, cb) => {
-                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-                cb(null, uniqueSuffix + extname(file.originalname));
-            },    
-        }),
-        fileFilter: (req, file, cb) => {
-            if (!file.mimetype.match(/\/(jpg|jpeg|png|webp)$/)) {
-              cb(new Error('Only image files are allowed!'), false);
-            } else {
-              cb(null, true);
-            }
-        },
-    }))
-    async createPodcast(
-        @UploadedFile() file: Express.Multer.File,
-        @Body() body: any
-    )   {
-            const createPodcastDto: CreatePodcastDto = {
-                podcastName: body.podcastName,
-                podcastDescription: body.podcastDescription,
-                creator: body.creator,
-                podcastImage: file?.filename ?? '', // Save only filename, or you can use the full URL
-                categories: Array.isArray(body.categories)
-                  ? body.categories
-                  : body.categories
-                  ? [body.categories]
-                  : [],
-            };
-        return await this.podcastService.createPodcast(createPodcastDto);
-        }
+@Post()
+@UseInterceptors(
+  FileInterceptor('podcastImage', {
+    storage: diskStorage({
+      destination: './uploads/podcasts', // your folder
+      filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, uniqueSuffix + extname(file.originalname)); // generate unique filename
+      },
+    }),
+    fileFilter: (req, file, cb) => {
+      if (!file.mimetype.match(/\/(jpg|jpeg|png|webp)$/)) {
+        cb(new Error('Only image files are allowed!'), false); // reject non-image files
+      } else {
+        cb(null, true); // accept valid image files
+      }
+    },
+  })
+)
+async createPodcast(
+  @UploadedFile() file: Express.Multer.File,
+  @Body() body: any
+) {
+  const createPodcastDto: CreatePodcastDto = {
+    podcastName: body.podcastName,
+    podcastDescription: body.podcastDescription,
+    creator: body.creator,
+    podcastImage: file?.filename ?? '', // Save the filename, not the full path
+    categories: Array.isArray(body.categories)
+      ? body.categories
+      : body.categories
+      ? [body.categories]
+      : [], // Ensure categories is always an array
+  };
+
+  // Call service to create the podcast
+  return await this.podcastService.createPodcast(createPodcastDto);
+}
 
     // This route can be public, so no need to protect it with AuthGuard
     @Get()
