@@ -10,7 +10,7 @@ import { UserModule } from '../user/user.module';
 @Module({
   imports:[
     MongooseModule.forFeature([{ name: Episode.name, schema: EpisodeSchema }]),
-    forwardRef(() => PodcastModule),
+    forwardRef(() => PodcastModule),forwardRef(() => UserModule)
   ],
   providers: [EpisodeService],
   controllers: [EpisodeController],

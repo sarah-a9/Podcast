@@ -1,13 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../schemas/User.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
+import { Episode, EpisodeDocument } from 'src/schemas/Episode.schema';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private UserModel: Model<User>){}; //
+  constructor(@InjectModel(User.name) private UserModel: Model<User>,
+@InjectModel(Episode.name) private EpisodeModel: Model<EpisodeDocument>){}; //
 
 
   async create(createUserDto: CreateUserDto) {
@@ -143,4 +145,70 @@ async getLikedEpisodes(id: string) {
   async remove(id: string) {
     return this.UserModel.findByIdAndDelete(id);
   }
+
+
+
+  async rateEpisode(userId: string, episodeId: string, value: number) {
+    // 1. Check if episode exists
+    const episode = await this.EpisodeModel.findById(episodeId);
+    if (!episode) {
+      throw new NotFoundException('Episode not found');
+    }
+  
+    // 2. Fetch the user
+    const user = await this.UserModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+  
+    // 3. Update or add the rating in User document
+    const existingUserRatingIndex = user.ratings.findIndex(
+      (r) => r.episode.toString() === episodeId
+    );
+  
+    if (existingUserRatingIndex !== -1) {
+      // If already rated, update
+      user.ratings[existingUserRatingIndex].value = value;
+    } else {
+      // Else, push new
+      user.ratings.push({
+        episode: new Types.ObjectId(episodeId),
+        value,
+      });
+    }
+    await user.save();
+  
+    // 4. Update or add the user's rating in Episode document
+    const existingEpisodeRatingIndex = episode.ratings.findIndex(
+      (r) => r.user.toString() === userId
+    );
+  
+    if (existingEpisodeRatingIndex !== -1) {
+      // If already rated, update
+      episode.ratings[existingEpisodeRatingIndex].value = value;
+    } else {
+      // Else, push new
+      episode.ratings.push({
+        user: new Types.ObjectId(userId),
+        value,
+      });
+    }
+  
+    // 5. Calculate the new average rating for the episode
+    const averageRating = episode.ratings.reduce((acc, cur) => acc + cur.value, 0) / episode.ratings.length;
+  
+    // 6. Update the episode's average rating
+    episode.averageRating = averageRating; // Assuming you have an 'averageRating' field in the Episode schema
+    await episode.save();
+  
+    return {
+      message: 'Rating submitted successfully',
+      averageRating,
+      userRating: user.ratings.find((r) => r.episode.toString() === episodeId) // return user’s individual rating
+    };
+    
+  }
+  
+  
+  
 }

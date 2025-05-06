@@ -5,6 +5,7 @@ import MenuButton from '../../components/MenuButton/MenuButton';
 import { ProfileHeaderProps } from '../../Types';
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({ 
+  id: string, //yasmine added this
   firstName,
   lastName,
   bio, 

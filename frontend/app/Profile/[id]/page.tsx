@@ -40,39 +40,76 @@ const Profile = () => {
 
   if (!user) return <div>Loading user profile...</div>;
 
-  
 
-  const handleEditSave = async (data: {
-    firstName: string;
-    lastName: string;
-    bio: string;
-    profilePic: string;
-  }) => {
-    setShowEditPopup(false);
 
-    try {
-      const res = await fetch("http://localhost:3000/user/updateProfile", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(data),
-      });
 
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.message || "Update failed");
-      }
 
-      const updatedProfile = await res.json();
-      setUser(updatedProfile);
-      console.log("Profile successfully updated!", updatedProfile);
-    } catch (error: any) {
-      console.error("Update failed:", error.message);
-      alert(`Profile update failed: ${error.message}`);
+const handleEditSave = async (data: {
+  firstName: string;
+  lastName: string;
+  bio: string;
+  profilePic: string;
+}) => {
+  setShowEditPopup(false);
+
+  try {
+    const res = await fetch("http://localhost:3000/user/updateProfile", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify(data), // No userId here
+    });
+
+    if (!res.ok) {
+      const errData = await res.json();
+      console.log("data", data);
+      throw new Error(errData.message || "Update failed");
     }
-  };
+
+    const updatedProfile = await res.json();
+    setUser(updatedProfile);
+    console.log("Profile successfully updated!", updatedProfile);
+  } catch (error: any) {
+    console.error("Update failed:", error.message);
+    alert(`Profile update failed: ${error.message}`);
+  }
+};
+
+
+  // const handleEditSave = async (data: {
+  //   firstName: string;
+  //   lastName: string;
+  //   bio: string;
+  //   profilePic: string;
+  // }) => {
+  //   setShowEditPopup(false);
+
+  //   try {
+  //     const res = await fetch("http://localhost:3000/user/updateProfile", {
+  //       method: "PATCH",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //       },
+  //       body: JSON.stringify(data),
+  //     });
+
+  //     if (!res.ok) {
+  //       const errData = await res.json();
+  //       console.log("data", data);
+  //       throw new Error(errData.message || "Update failed");
+  //     }
+
+  //     const updatedProfile = await res.json();
+  //     setUser(updatedProfile);
+  //     console.log("Profile successfully updated!", updatedProfile);
+  //   } catch (error: any) {
+  //     console.error("Update failed:", error.message);
+  //     alert(`Profile update failed: ${error.message}`);
+  //   }
+  // };
 
   const handleDeleteConfirm = async () => {
     setShowDeletePopup(false);
@@ -103,10 +140,12 @@ const Profile = () => {
     }
   };
   // console.log("profile pic",`http://localhost:3000/uploads/podcasts/${Podcast.podcastImage}`);
+  console.log("user", user._id);
 
   return (
     <div className="p-6 h-screen bg-gray-900 text-white rounded-lg  scrollable-container scrollbar-hide">
       <ProfileHeader
+      id={user._id}
         firstName={user.firstName}
         lastName={user.lastName}
         profilePic={user.profilePic}
@@ -144,6 +183,7 @@ const Profile = () => {
       {showEditPopup && (
         <EditProfilePopup
           user={{
+            _id:user._id,
             firstName: user.firstName,
             lastName: user.lastName,
             bio: user.bio,

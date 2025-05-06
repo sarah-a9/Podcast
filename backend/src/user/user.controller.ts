@@ -30,7 +30,7 @@ export class UserController {
   }
 
   // Protect this route with AuthGuard (get a user by ID, needs authentication)
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const isValid = mongoose.Types.ObjectId.isValid(id);
@@ -98,6 +98,26 @@ export class UserController {
 
     return updatedUser;
   }
+
+
+    // @UseGuards(AuthGuard)
+    // @Patch('testUpdateProfile')
+    // async testUpdate(@Body() updateUserDto: UpdateUserDto) {
+    //   const userId = "67c9a714df38d2f10adf2e52"; // Valid userId from your DB
+    
+    //   if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+    //     throw new HttpException("Invalid or missing user ID", 400);
+    //   }
+    
+    //   const updatedUser = await this.userService.update(userId, updateUserDto);
+    
+    //   if (!updatedUser) {
+    //     throw new HttpException("User Not Found", 404);
+    //   }
+    
+    //   return updatedUser;
+    // }
+    
 
   @UseGuards(AuthGuard)
   @Delete('profile')
@@ -231,6 +251,30 @@ export class UserController {
         throw new HttpException('User not found', 404); // Handle the case where the user is not found
       }
     }
+
+
+    @UseGuards(AuthGuard)
+@Post('rateEpisode')
+async rateEpisode(
+  @Req() req,
+  @Body('episodeId') episodeId: string,
+  @Body('value') value: number
+) {
+  const userId = req.userId; // from JWT payload
+  return this.userService.rateEpisode(userId, episodeId, value);
+}
+
+// @Post('rateEpisode')
+// async rateEpisode(
+//   @Body('episodeId') episodeId: string,
+//   @Body('value') value: number
+// ) {
+//   const userId = '67c9a714df38d2f10adf2e52'; // your test user's ObjectId
+//   return this.userService.rateEpisode(userId, episodeId, value);
+  
+// }
+
+
   
 
 }

@@ -127,3 +127,25 @@ input[type="range"]:active::-webkit-slider-thumb {
 .no-play {
   cursor: not-allowed; /* or you can use "cursor: url('path-to-your-x-cursor.png'), auto;" */
 }
+
+.star-rating {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+}
+
+.star {
+  font-size: 30px;
+  color: gray;
+  transition: color 0.3s ease;
+}
+
+.star.filled {
+  color: gold;
+}
+
+.rating-text {
+  margin-left: 10px;
+  font-size: 16px;
+  color: #ffffff;
+}

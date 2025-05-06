@@ -46,6 +46,21 @@ export class User extends Document {
       // Array of Podcasts that the user has put to favorite
      @Prop({type : [{type : Types.ObjectId , ref:"Podcast"}], defaults:[]})
      favoritePodcasts:Types.ObjectId[];  // Reference to favorite podcasts
+
+
+
+      // ⭐️ Array of ratings the user has given: { episode, value }
+  @Prop({
+    type: [
+      {
+        episode: { type: Types.ObjectId, ref: 'Episode' },
+        value: { type: Number, min: 1, max: 5 },
+      },
+    ],
+    default: [],
+  })
+  ratings: { episode: Types.ObjectId; value: number }[];
+  
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

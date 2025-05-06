@@ -20,7 +20,7 @@ export interface Episode {
     likedByUsers: string[];
     podcast:Podcast;
     status: string;
-
+    averageRating: number;
   }
   
 
@@ -82,6 +82,7 @@ export interface Episode {
 
   export interface EditProfilePopupProps {
     user: {
+      _id: string;//yasmine added this
       firstName: string;
       lastName: string;
       bio?: string;
@@ -103,6 +104,7 @@ export interface Episode {
   }
 
   export interface ProfileHeaderProps {
+    id:string; //yasmine added this
     firstName: string;
     lastName: string;
     bio: string;
@@ -125,3 +127,11 @@ export interface Episode {
 
 
   export type SearchResult = Podcast | Episode | User | Category;
+
+  export interface StarRatingProps {
+    value: number; // Current rating value (user's rating or average)
+    onRate: (value: number) => void; // Function to send rating to backend
+    maxStars: number; // Max stars (usually 5)
+    isEditable: boolean; // Whether the user can change their rating
+    episodeId: string; // The episode ID to send to the backend
+  }
