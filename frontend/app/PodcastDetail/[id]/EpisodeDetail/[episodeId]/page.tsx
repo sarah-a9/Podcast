@@ -2,6 +2,7 @@
 
 import ActionButtons from "@/app/components/EpisodeActionButtons/EpisodeActionButtons";
 import { useAuth } from "@/app/components/Providers/AuthContext/AuthContext"; // Import the useAuth hook
+import StarRating from "@/app/components/StarRating/StarRating";
 import { Podcast } from "@/app/Types";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -10,143 +11,160 @@ import React, { use, useEffect, useState } from "react";
 import { MdOutlineAccessTime } from "react-icons/md";
 
 const EpisodeDetail = ({ params }: { params: Promise<{ id: string; episodeId: string }> }) => {
-  const { id, episodeId } = use(params);  
-  const [episode, setEpisode] = useState<{
-    _id: string;
-    episodeTitle: string;
-    episodeDescription: string;
-    audioUrl: string;
-    podcast: Podcast;
-    likedByUsers: string[];
-    createdAt : string;
-    categories: any[];
-    status: string;
-  } | null>(null); // Initialize as null instead of an empty array
+  const { id, episodeId } = use(params);
+  const [episode, setEpisode] = useState<any>(null);
   const [liked, setLiked] = useState(false);
-  const { user, setUser } = useAuth(); // Access user and setUser from context
-  // const { playEpisode, currentEpisode, isPlaying } = useAudio();
+  const [userRating, setUserRating] = useState<number>(0);
+  const { user, setUser, token } = useAuth();
   const router = useRouter();
 
-  // Fetch episode data when component mounts
+  // Fetch episode details
+  const fetchEpisode = async () => {
+    try {
+      const res = await fetch(`http://localhost:3000/podcast/${id}/episode/${episodeId}`);
+      const data = await res.json();
+      setEpisode(data);
+    } catch (error) {
+      console.error("Error fetching episode:", error);
+    }
+  };
+
+  const fetchUserRating = async () => {
+    if (user) {
+      try {
+        const res = await fetch(`http://localhost:3000/user/${user._id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await res.json();
+        console.log("user data", data);
+
+        const episodeRating = data.ratings.find(
+          (r: any) => String(r.episode) === String(episodeId)
+        );
+
+        console.log("user rating", episodeRating);
+
+        const roundedRating = episodeRating ? Math.round(episodeRating.value) : 0;
+        setUserRating(roundedRating);
+      } catch (error) {
+        console.error("Error fetching user rating:", error);
+      }
+    }
+  };
+
   useEffect(() => {
-    fetch(`http://localhost:3000/podcast/${id}/episode/${episodeId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data) {
-          setEpisode(data);
-        } else {
-          console.error("No data received:", data);
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching episode:", error);
-      });
+    fetchEpisode();
   }, [id, episodeId]);
 
   useEffect(() => {
     if (user && episode) {
-      // Check if the episode is in the user's likedEpisodes
       setLiked(user.likedEpisodes.includes(episode._id));
+      fetchUserRating();
     }
-  }, [user, episode]); // Re-run when user or episode changes
+  }, [user, episode]);
 
   const handleLikeClick = (event: React.MouseEvent) => {
-    event.stopPropagation(); // Prevent click event from propagating to the parent div
+    event.stopPropagation();
     if (user && episode) {
-      // Update likedEpisodes in AuthContext
       const updatedLikedEpisodes = liked
-        ? user.likedEpisodes.filter((id) => id !== episode._id) // Remove episode from likedEpisodes
-        : [...user.likedEpisodes, episode._id]; // Add episode to likedEpisodes
-
-      // Update the context with the new likedEpisodes list
-      setUser({
-        ...user,
-        likedEpisodes: updatedLikedEpisodes,
-      });
+        ? user.likedEpisodes.filter((id) => id !== episode._id)
+        : [...user.likedEpisodes, episode._id];
+      setUser({ ...user, likedEpisodes: updatedLikedEpisodes });
     }
-    setLiked(!liked); // Toggle local liked state
+    setLiked(!liked);
   };
 
   const handleOnClick = () => {
     router.push(`/PodcastDetail/${episode?.podcast._id}`);
   };
 
+  // 
+  const handleRating = (newAverageRating: number) => {
+    // Only update average rating or fetch episode if needed
+    fetchEpisode();
+  };
+  
+
   return (
-    <div className="scrollable-container scrollbar-hide h-full text-white rounded-lg">
+    <div className="scrollable-container scrollbar-hide h-screen text-white rounded-lg">
       <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full flex flex-col">
         {episode ? (
           <>
-            {/* Episode Details */}
             <div className="grid grid-cols-6 gap-4">
               <div className="col-span-1">
                 <img
                   className="rounded-2xl"
-                  src={episode.podcast.podcastImage}
+                  src={`http://localhost:3000/uploads/podcasts/${episode.podcast.podcastImage}`}
                   alt={episode.podcast.podcastName}
                 />
               </div>
-              <div className="col-span-4">
-                <h2 className="text-3xl font-bold mb-4">{episode.episodeTitle}</h2>
-                <p className="text-lg mb-4">
-                  Created by {episode.podcast.creator.firstName} 
-                  {episode.podcast.creator.lastName}
-                </p>
-                <div className="text-sm text-gray-300 mb-4">
-                  <p className="text-gray-400 italic">
-                    {episode.episodeDescription}
-                  </p>
+              <div className="col-span-5">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-1">
+                    <h2 className="text-3xl font-bold">{episode.episodeTitle}</h2>
+                    <p className="text-lg mb-4">
+                      Created by {episode.podcast.creator.firstName} {episode.podcast.creator.lastName}
+                    </p>
+                    <div className="text-sm text-gray-300 mb-4">
+                      <p className="text-gray-400 italic">{episode.episodeDescription}</p>
+                    </div>
+                    <p className="text-sm text-gray-400">
+                      <Link href={`/PodcastDetail/${episode.podcast._id}`} className="hover:underline">
+                        {episode.podcast.podcastName}
+                      </Link>
+                    </p>
+                  </div>
+                  <div className="col-span-1 flex justify-end items-start mt-16 mr-16">
+                    <StarRating
+                      value={userRating}
+                      maxStars={5}
+                      onRate={handleRating}
+                      isEditable={!!user}
+                      episodeId={episode._id}
+                    />
+                  </div>
                 </div>
-                <p className="text-sm text-gray-400">
-                  <Link href={`/PodcastDetail/${episode.podcast._id}`} className="hover:underline">
-                    {episode.podcast.podcastName}
-                  </Link>
-                </p>
               </div>
             </div>
 
-            {/* Separator */}
             <div className="mt-4 mb-4">
               <hr style={{ color: "grey" }} />
             </div>
 
-            {/* Action Buttons */}
             <div className="flex flex-col gap-6">
               <p className="flex items-center gap-2 mt-4">
                 <MdOutlineAccessTime size={30} />
                 Duration
               </p>
-
               <ActionButtons
-                  episode={episode}
-                  podcast={episode.podcast}
+                episode={episode}
+                podcast={episode.podcast}
                 isLiked={liked}
                 onLikeClick={handleLikeClick}
-                size="lg" showMenu={false} setShowMenu={function (value: React.SetStateAction<boolean>): void {
-                  throw new Error("Function not implemented.");
-                } }              />
+                size="lg"
+                showMenu={false}
+                setShowMenu={() => {}}
+              />
             </div>
 
-            {/* Episode Description */}
-            <div className="mt-6">
+            <div className="mt-4">
               <p className="text-2xl">Episode Description</p>
               <p className="text-l text-gray-400 mt-4">{episode.episodeDescription}</p>
             </div>
 
-            {/* See Episodes Button */}
-            <div className="mt-20">
+            <div className="mt-9 flex justify-end">
               <button
-               
-                className="bg-amber-50 text-black px-4 py-2 rounded-full hover:bg-gray-600 transition"
-               
+                className="bg-amber-50 text-black px-4 py-2 rounded-full hover:bg-gray-600 transition cursor-pointer"
                 onClick={handleOnClick}
-              
               >
                 See Episodes
               </button>
             </div>
           </>
         ) : (
-          <p className="text-xl text-gray-400">episode not found.</p>
+          <p className="text-xl text-gray-400">Episode not found.</p>
         )}
       </div>
     </div>

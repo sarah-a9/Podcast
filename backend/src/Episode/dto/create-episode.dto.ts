@@ -1,6 +1,5 @@
-import { IsEnum, IsMongoId, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from "class-validator";
 import { Episodestatus } from "../../schemas/Episode.schema";
-import { Prop } from "@nestjs/mongoose";
 
 export class CreateEpisodeDto{
 
@@ -38,5 +37,6 @@ export class CreateEpisodeDto{
     @IsString()
     scheduledAt?: Date;
 
+    
 
 }

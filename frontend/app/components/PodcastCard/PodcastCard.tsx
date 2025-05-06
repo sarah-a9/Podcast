@@ -39,6 +39,7 @@ const PodcastCard: React.FC<PodcastProps> = ({
       <div className="flex flex-col">
         <img
           className="rounded-lg w-full h-40 object-cover bg-gray-300"
+          // src={`http://localhost:3000/uploads/podcasts/${podcastImage}`} 
           src={podcastImage}
           alt={podcastName}
         />

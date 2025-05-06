@@ -81,14 +81,14 @@ export default function PodcastDetails() {
   if (!podcast) {
     return <p className="text-gray-400">Loading…</p>;
   }
-
+console.log("image",`http://localhost:3000/uploads/${podcast.podcastImage}`);
   return (
     <div className="h-screen text-white rounded-lg scrollable-container scrollbar-hide">
       <div className="bg-gray-900 p-8 rounded-lg shadow-lg w-full flex flex-col">
         
         {/* Top bar: title + menu */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-3xl font-bold">{podcast.podcastName}</h2>
+          {/* <h2 className="text-3xl font-bold">{podcast.podcastName}</h2> */}
   
           {isCreator && (
             <div className="relative" ref={menuRef}>
@@ -130,7 +130,8 @@ export default function PodcastDetails() {
               <div className="col-span-1">
                 <img
                   className="rounded-lg"
-                  src={podcast.podcastImage}
+                  src={`http://localhost:3000/uploads/podcasts/${podcast.podcastImage}`} 
+                  // src={podcast.podcastImage}
                   alt={podcast.podcastName}
                 />
               </div>

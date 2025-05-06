@@ -27,7 +27,6 @@ export default function CreatePodcastPopup({
   const [selectedCategory, setSelectedCategory] = useState("");
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -70,28 +69,23 @@ export default function CreatePodcastPopup({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (!user || !user._id || !token) {
       alert("User not logged in");
       return;
     }
-  
+
     const creator = user._id;
     const formData = new FormData();
     formData.append("podcastName", form.podcastName);
     formData.append("podcastDescription", form.podcastDescription);
     formData.append("creator", creator);
-  
+
     // Append selected category (even though it's one, format it like an array)
     formData.append("categories", form.category); // If supporting only one category
-  
-    // OR if you plan to support multiple in the future:
-    // form.category.split(',').forEach((catId) => {
-    //   formData.append("categories", catId.trim());
-    // });
-  
+
     if (imageFile) formData.append("podcastImage", imageFile);
-  
+
     try {
       const res = await fetch("http://localhost:3000/podcast", {
         method: "POST",
@@ -101,12 +95,12 @@ export default function CreatePodcastPopup({
         },
         body: formData,
       });
-  
+
       if (!res.ok) {
         const errData = await res.json();
         throw new Error(errData.message || "Failed to create podcast.");
       }
-  
+
       const newPodcast = await res.json();
       alert("Podcast created successfully!");
       onClose();
@@ -131,7 +125,7 @@ export default function CreatePodcastPopup({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Create Your Podcast">
       <form
@@ -224,13 +218,13 @@ export default function CreatePodcastPopup({
           </div>
 
           <div className="flex justify-end gap-2 mt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-400 text-black rounded"
-          >
-            Cancel
-          </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-400 text-black rounded"
+            >
+              Cancel
+            </button>
             <button
               type="submit"
               className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white"

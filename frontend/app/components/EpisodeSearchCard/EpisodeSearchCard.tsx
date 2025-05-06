@@ -17,7 +17,7 @@ const EpisodeSearchCard = ({
       {/* Image */}
       <div className="col-span-2">
         <img
-          src={podcast.podcastImage}
+          src={`http://localhost:3000/uploads/podcasts/${podcast.podcastImage}`}
           alt={episode.episodeTitle}
           className="w-12 h-12 object-cover rounded-md"
         />

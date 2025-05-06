@@ -126,7 +126,7 @@ const AudioPlayerBar = () => {
       <div className="flex items-center space-x-4 p-2 w-1/3">
         {currentPodcast?.podcastImage ? (
           <img
-            src={currentPodcast.podcastImage}
+            src={`http://localhost:3000/uploads/podcasts/${currentPodcast.podcastImage}`}
             alt={currentEpisode?.episodeTitle || "Episode"}
             className="w-14 h-14 rounded-sm object-cover transition-transform duration-200 hover:scale-105"
           />

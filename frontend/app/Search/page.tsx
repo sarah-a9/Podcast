@@ -154,7 +154,8 @@ const SearchPage = () => {
                       key={index}
                       id={result._id}
                       podcastName={result.podcastName}
-                      podcastImage={result.podcastImage}
+                      podcastImage={`http://localhost:3000/uploads/podcasts/${result.podcastImage}`}
+                      // podcastImage={result.podcastImage}
                       podcastDescription={result.podcastDescription}
                       creator={{
                         firstName: result.creator?.firstName || "",

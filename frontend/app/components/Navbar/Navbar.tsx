@@ -121,19 +121,23 @@ const Navbar = () => {
               {menuOpen && (
                 <div className="absolute right-0 mt-2 w-32 bg-gray-900 text-white rounded-lg shadow-lg">
                   <ul>
-                    <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">
-                      <Link
+                  <Link
                         href={`/Profile/me`}
                         onClick={() => setMenuOpen(false)}
                       >
-                        Profile
-                      </Link>
-                    </li>
                     <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">
-                      <Link href="/settings" onClick={() => setMenuOpen(false)}>
-                        Settings
-                      </Link>
+                      
+                        Profile
+                      
                     </li>
+                    </Link>
+                    <Link href="/settings" onClick={() => setMenuOpen(false)}>
+                    <li className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer">
+                     
+                        Settings
+                     
+                    </li>
+                    </Link>
                     <li
                       onClick={() => {
                         setMenuOpen(false);
