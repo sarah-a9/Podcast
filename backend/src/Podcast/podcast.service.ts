@@ -129,5 +129,50 @@ export class PodcastService {
     // Delete the podcast itself
     return await this.PodcastModel.findByIdAndDelete(id);
   }
+
+
+  async findByCreator(creatorId: string) {
+    return this.PodcastModel.find({ creator: creatorId }).populate('categories', 'categoryName').exec();
+  }
+
+
+  
+  async getEpisodesByPodcastId(podcastId: string) {
+    const podcast = await this.PodcastModel.findById(podcastId);
+  
+    if (!podcast) {
+      throw new NotFoundException('Podcast not found');
+    }
+  
+    const episodes = await this.EpisodeModel.find({ _id: { $in: podcast.episodes } })
+      .select('episodeTitle episodeDescription createdAt audioUrl podcast likedByUsers ratings averageRating status listens')
+      .populate({
+        path: 'podcast',
+        select: 'podcastName podcastImage creator favoritedByUsers categories',
+        populate: [
+          {
+            path: 'creator',
+            select: 'firstName lastName',
+          },
+          {
+            path: 'categories',
+            model: 'Category',
+            select: 'categoryName',
+          },
+        ],
+      })
+      .exec();
+  
+    return episodes;
+  }
+  
+
+  async getPodcastByCategoryId(categoryId: string) {
+    return this.PodcastModel.find({ categories: categoryId })
+      .populate('categories', 'categoryName')
+      .populate('creator', 'firstName lastName')
+      .exec();
+  }
+  
   
 }

@@ -27,6 +27,7 @@ export default function PodcastDetails() {
     episodes: Episode[];
     favoritedByUsers: string[];
     categories: any[];
+    createdAt: string;
   } | null>(null);
 
   const [open, setOpen] = useState(false);

@@ -45,6 +45,7 @@ const Profile = () => {
 
 
 const handleEditSave = async (data: {
+  _id: string ; 
   firstName: string;
   lastName: string;
   bio: string;
@@ -53,18 +54,21 @@ const handleEditSave = async (data: {
   setShowEditPopup(false);
 
   try {
-    const res = await fetch("http://localhost:3000/user/updateProfile", {
+    const res = await fetch("http://localhost:3000/user/updateProfile?userId="+user._id, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
-      body: JSON.stringify(data), // No userId here
+      body: JSON.stringify(data), 
     });
 
     if (!res.ok) {
+      
       const errData = await res.json();
+      
       console.log("data", data);
+
       throw new Error(errData.message || "Update failed");
     }
 
@@ -155,7 +159,7 @@ const handleEditSave = async (data: {
         onChangePassword={() => setShowChangePasswordPopup(true)}
       />
 
-      {/* Create Podcast Button placed right after the profile header */}
+      
       <CreatePodcastButton />
 
       {/* My Podcasts Section */}

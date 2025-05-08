@@ -177,10 +177,12 @@ export class EpisodeController {
     return deletedEpisode;
   }
 
-  // @UseGuards(AuthGuard)
-  // @Post('rate')
-  // async rateEpisode(@Req() req, @Body() rateEpisodeDto: RateEpisodeDto) {
-  //   const userId = req.user.userId; // adapt this if different
-  //   return this.episodeService.rateEpisode(userId, rateEpisodeDto);
-  // }
+
+  @Patch(':id/play')
+async incrementListens(@Param('id') id: string) {
+  return this.episodeService.incrementListens(id);
+}
+
+
+ 
 }

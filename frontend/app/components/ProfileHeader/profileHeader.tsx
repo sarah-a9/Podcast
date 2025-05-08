@@ -92,7 +92,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               </li>
               <li
                 onClick={() => {
-                  onChangePassword?.(); // ✅ Only call if provided
+                  onChangePassword?.(); 
                   setShowMenu(false);
                 }}
                 className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer"

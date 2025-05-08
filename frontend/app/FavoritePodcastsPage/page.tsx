@@ -75,7 +75,7 @@ export default function FavoritePodcastPage() {
         key={podcast._id}
         id={podcast._id}
         podcastName={podcast.podcastName}
-        podcastImage={podcast.podcastImage}
+        podcastImage={`http://localhost:3000/uploads/podcasts/${podcast.podcastImage}`} 
         podcastDescription={podcast.podcastDescription}
         creator={{
           firstName: podcast.creator.firstName,

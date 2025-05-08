@@ -83,7 +83,7 @@ const MainContent = () => {
                 podcastDescription={podcast.podcastDescription}
                 podcastName={podcast.podcastName}
                 creator={podcast.creator}
-                podcastImage={podcast.podcastImage}
+                podcastImage={`http://localhost:3000/uploads/podcasts/${podcast.podcastImage}`} 
                 id={podcast._id}
               />
             ))
