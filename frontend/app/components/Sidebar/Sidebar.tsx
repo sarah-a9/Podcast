@@ -6,11 +6,10 @@ import {
   Plus,
   ChevronLeft,
   ChevronRight,
-  Star,
-  Heart,
-  Download,
-  Folder,
 } from "lucide-react";
+import { MdFavorite, MdPlaylistPlay, MdDashboard } from "react-icons/md";
+import { FaHeart, FaStar } from "react-icons/fa";
+import { HiFolderDownload } from "react-icons/hi";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import CreatePlaylistModal from "../PopUps/CreatePlaylistModal/CreatePlaylistModal";
@@ -19,24 +18,40 @@ import { usePlaylist } from "../Providers/PlaylistContext";
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [playlists, setPlaylists] = useState<any[]>([]); // Add this line to define the playlists state
   const pathname = usePathname();
-  const { addPlaylist } = usePlaylist(); 
+  const { addPlaylist } = usePlaylist();
 
-  // Hide Sidebar on auth pages
   if (pathname.startsWith("/auth")) return null;
 
-  const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
-  };
+  const toggleSidebar = () => setIsCollapsed(!isCollapsed);
+  const toggleModal = () => setIsModalOpen(!isModalOpen);
 
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
+  const menuItems = [
+    {
+      name: "Favourites Podcasts",
+      href: "/FavoritePodcastsPage",
+      icon: <FaStar size={20} className="text-yellow-400" />,
+    },
+    {
+      name: "Liked Episodes",
+      href: "/LikedEpisodesPage",
+      icon: <FaHeart size={20} className="text-pink-500" />,
+    },
+    {
+      name: "My Playlists",
+      href: "/AllPlaylistsPage",
+      icon: <HiFolderDownload size={20} className="text-blue-400" />,
+    },
+    {
+      name: "Dashboard",
+      href: "/DashboardUserPage",
+      icon: <MdDashboard size={20} className="text-green-500" />,
+    },
+  ];
 
   return (
     <div
-      className={`sticky h-screen height bg-gray-900 text-white p-4 transition-all duration-300 ${
+      className={`sticky h-screen   height bg-gray-900 text-white p-4 transition-all duration-300 ${
         isCollapsed ? "w-16" : "w-64"
       } rounded-lg shadow-lg flex flex-col relative`}
     >
@@ -48,17 +63,11 @@ const Sidebar = () => {
         {!isCollapsed && (
           <span className="text-lg font-semibold">Your Library</span>
         )}
-
         {/* Plus Button with Tooltip */}
-
-
         <div className="relative group inline-block">
-
-
           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap px-2 py-1 rounded bg-gray-700 text-white text-sm font-mono opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-[9999] shadow-lg">
             Create a playlist
           </div>
-
           <button
             onClick={toggleModal}
             className="text-gray-400 text-sm cursor-pointer hover:text-white rounded-full p-2 bg-gray-700 hover:bg-gray-600"
@@ -70,48 +79,22 @@ const Sidebar = () => {
 
       {/* Menu Items */}
       <div className="mt-6 space-y-6">
-        <div className="flex items-center space-x-2">
+        {menuItems.map((item) => (
           <Link
-            href="/FavoritePodcastsPage"
-            className="flex items-center space-x-2"
+            key={item.href}
+            href={item.href}
+            className={`flex items-center space-x-3 px-2 py-2 rounded-lg transition-all duration-200 ${
+              pathname === item.href
+                ? "bg-gray-700 text-white font-semibold"
+                : "text-gray-300 hover:bg-gray-800 hover:text-white"
+            }`}
           >
-            <Star size={24} />
-            {!isCollapsed && <span>Favourites Podcasts</span>}
+            <div className="p-2 bg-gray-800 rounded-lg flex items-center justify-center">
+              {item.icon}
+            </div>
+            {!isCollapsed && <span>{item.name}</span>}
           </Link>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Link
-            href="/LikedEpisodesPage"
-            className="flex items-center space-x-2"
-          >
-            <Heart size={24} />
-            {!isCollapsed && <span>Liked Episodes</span>}
-          </Link>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Download size={24} />
-          {!isCollapsed && <span>Downloads</span>}
-        </div>
-
-
-
-        <div className="flex items-center space-x-2">
-
-        <Link
-            href="/AllPlaylistsPage"
-            className="flex items-center space-x-2"
-          >
-          <Folder size={24} />
-          {!isCollapsed && <span>My Playlists</span>}
-
-          </Link>
-        </div>
-
-
-
-
+        ))}
       </div>
 
       {/* Toggle Button */}
@@ -124,10 +107,9 @@ const Sidebar = () => {
 
       {/* Modal Component */}
       {isModalOpen && (
-        <CreatePlaylistModal onClose={() => setIsModalOpen(false)} 
-        onCreate={(newPlaylist) => {
-          addPlaylist(newPlaylist);
-        }}
+        <CreatePlaylistModal
+          onClose={() => setIsModalOpen(false)}
+          onCreate={(newPlaylist) => addPlaylist(newPlaylist)}
         />
       )}
     </div>

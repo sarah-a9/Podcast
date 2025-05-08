@@ -83,7 +83,7 @@ export class UserController {
   @UseGuards(AuthGuard)
   @Patch('updateProfile')
   async updateCurrentUser(@Body() updateUserDto: UpdateUserDto, @Req() req) {
-    console.log("userId in controller:", req.userId); // 👈
+    console.log("userId in controller:", req.userId); 
     const userId = req.userId;
 
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {

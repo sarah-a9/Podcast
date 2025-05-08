@@ -27,7 +27,7 @@ export default function EditProfilePopup({ onClose, onSave, user }: EditProfileP
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({ firstName, lastName, bio, profilePic: image });
+    onSave({ firstName, lastName, bio, profilePic: image , _id: user._id}); // Pass the updated
   };
 
   return (

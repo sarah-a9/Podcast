@@ -21,6 +21,7 @@ export interface Episode {
     podcast:Podcast;
     status: string;
     averageRating: number;
+    listens: number;
   }
   
 
@@ -36,6 +37,8 @@ export interface Episode {
     };
     episodes:Episode[];
     favoritedByUsers:string[];
+    createdAt: string;
+    categories: string[];
   }
 
 
@@ -90,6 +93,7 @@ export interface Episode {
     };
     onClose: () => void;
     onSave: (data: {
+      _id: string; //yasmine added this
       firstName: string;
       lastName: string;
       bio: string;
