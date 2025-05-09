@@ -10,11 +10,11 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
 
   return (
-    <div className="flex flex-col min-h-screen pb-[278px]">
+    <div className="flex flex-col  ">
       <Navbar />
       <div className="flex flex-1 pl-2">
         {user && user.role === 0 ? <AdminSidebar /> : <Sidebar />}
-        <div className="main-content pl-2 pr-2 w-full overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
+        <div className="main-content pl-2 pr-2 w-full h-full overflow-y-auto scrollbar-hide [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {children}
         </div>
       </div>
