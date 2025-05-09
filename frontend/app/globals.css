@@ -27,6 +27,8 @@ body {
   /* overflow-x: hidden; */
   /* overflow: hidden;  Prevent the entire page from scrolling */
   overflow-y: hidden;
+  /* overflow-x: hidden; */
+ 
   
 }
 

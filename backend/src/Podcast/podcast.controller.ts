@@ -11,7 +11,8 @@ import {
     UseGuards,
     UseInterceptors,
     UploadedFile,
-    Request 
+    Request, 
+    NotFoundException
 } from '@nestjs/common';
 import { PodcastService } from './podcast.service';
 import { CreatePodcastDto } from './dto/create-podcast.dto';
@@ -185,4 +186,32 @@ async createPodcast(
 
         return deletedPodcast;
     }
+
+
+
+    @Get('creator/:creatorId')
+findByCreator(@Param('creatorId') creatorId: string) {
+  return this.podcastService.findByCreator(creatorId);
+}
+
+
+ // Get all episodes for a specific podcast
+ @Get(':podcastId/episodes')
+ async getEpisodesByPodcastId(@Param('podcastId') podcastId: string) {
+   try {
+     const episodes = await this.podcastService.getEpisodesByPodcastId(podcastId);
+     return episodes;
+   } catch (error) {
+     throw new NotFoundException(error.message);
+   }
+ }
+
+@Get('category/:categoryId')
+async getPodcastByCategoryId(@Param('categoryId') categoryId: string) {
+    const podcasts = await this.podcastService.getPodcastByCategoryId(categoryId);
+    if (!podcasts) {
+        throw new NotFoundException('No podcasts found for this category');
+    }
+    return podcasts;
+  }
 }

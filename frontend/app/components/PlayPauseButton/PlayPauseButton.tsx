@@ -15,11 +15,11 @@ const PlayPauseButton = ({
 }) => {
   const { currentEpisode, currentPodcast, isPlaying, playEpisode, togglePlayPause } = useAudio();
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     // Return early if episode or podcast is not provided.
     if (!episode || !podcast) return;
-
+  
     // Check if the current playing episode and podcast match
     if (
       currentEpisode?._id === episode._id &&
@@ -27,9 +27,19 @@ const PlayPauseButton = ({
     ) {
       togglePlayPause();
     } else {
+      // Increment listens before playing new episode
+      try {
+        await fetch(`http://localhost:3000/episode/${episode._id}/play`, {
+          method: 'PATCH',
+        });
+      } catch (error) {
+        console.error("Failed to increment listens:", error);
+      }
+  
       playEpisode(episode, podcast);
     }
   };
+  
 
   return (
     <button

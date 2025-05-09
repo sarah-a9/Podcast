@@ -106,6 +106,15 @@ export class EpisodeService {
   }
 
 
+  async incrementListens(id: string) {
+    const episode = await this.EpisodeModel.findByIdAndUpdate(
+      id,
+      { $inc: { listens: 1 } },
+      { new: true }
+    );
+    return episode;
+  }
+  
 
 
   // async rateEpisode(userId: string, rateEpisodeDto: RateEpisodeDto) {
