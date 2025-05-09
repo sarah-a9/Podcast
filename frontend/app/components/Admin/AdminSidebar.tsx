@@ -22,13 +22,13 @@ const navLinks = [
     color: "text-pink-400",
   },
   {
-    href: "/admin/podcasts",
+    href: "../../Admin/podcasts",
     label: "Podcasts",
     icon: Podcast,
     color: "text-blue-400",
   },
   {
-    href: "/admin/episodes",
+    href: "../../Admin/episodes",
     label: "Episodes",
     icon: ListMusic,
     color: "text-green-400",
