@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../components/Providers/AuthContext/AuthContext";
 import ProfileHeader from "../../components/ProfileHeader/profileHeader";
 import EditProfilePopup from "../../components/PopUps/EditProfilePopUp";
-import DeleteProfilePopup from "../../components/PopUps/deleteProfilePopUp";
+import DeleteProfilePopup from "../../components/PopUps/DeleteProfilePopUp";
 import CreatePodcastButton from "../../components/CreatePodcastButton/CreatePodcastButton";
 import PodcastCard from "../../components/PodcastCard/PodcastCard";
 import { useRouter } from "next/navigation";

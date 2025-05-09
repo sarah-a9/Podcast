@@ -211,8 +211,7 @@ const SearchPage = () => {
                       password={result.password}
                       favoritePodcasts={result.favoritePodcasts}
                       likedEpisodes={result.likedEpisodes}
-                      playlists={result.playlists}
-                    />
+                      playlists={result.playlists} role={0} createdAt={""} updatedAt={""}                    />
                   ))}
               </div>
             )}

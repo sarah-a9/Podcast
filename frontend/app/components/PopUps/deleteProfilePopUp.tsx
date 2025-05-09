@@ -1,6 +1,7 @@
 // DeleteProfilePopup.tsx (refactored)
 'use client';
 
+import React from "react";
 import { DeleteProfilePopupProps } from "../../Types";
 import Modal from "./Modal";
 

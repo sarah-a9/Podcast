@@ -33,8 +33,10 @@ export class UserService {
             path: 'podcasts',
             model: "Podcast",
             select: 'podcastName podcastDescription podcastImage categories',
-            populate: { path: 'categories', model: 'Category', select: 'categoryName' },
-        })
+            populate: [
+              { path: 'categories', model: 'Category', select: 'categoryName' },
+              { path: 'episodes', model: 'Episode', select: 'episodeName' } // ⬅️ Add this
+            ],        })
         .populate({
             path: 'playlists',
             model: 'Playlist',
@@ -125,18 +127,22 @@ async getLikedEpisodes(id: string) {
     .exec();
 }
 
-
-
-  
-
-  async findOne(id: string) {
-    return this.UserModel.findById(id).populate({
+async findOne(id: string) {
+  return this.UserModel.findById(id)
+    .populate({
       path: 'podcasts',
-      select: 'podcastName podcastDescription podcastImage categories',  // Select only the needed podcast fields
-      populate:{path:'categories', model:'Category' , select:'categoryName'}}).
-      populate({path:'playlists', model:'Playlist' , select:'playlistName playlistDescription playlistImg' , 
-      populate:{path:'episodes' ,model:'Episode' , select :'episodeName episodeDescription '}}).exec(); // 🔥 Populate podcasts for a single user
-  }
+      select: 'podcastName podcastDescription podcastImage categories',
+      populate: { path: 'categories', model: 'Category', select: 'categoryName' },
+    })
+    .populate({
+      path: 'playlists',
+      model: 'Playlist',
+      select: 'playlistName playlistDescription playlistImg',
+      populate: { path: 'episodes', model: 'Episode', select: 'episodeName episodeDescription' },
+    })
+    .exec();
+}
+
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     return this.UserModel.findByIdAndUpdate(id, updateUserDto, { new: true }).populate('podcasts');

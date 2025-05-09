@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Navbar from "./components/Navbar/Navbar";
-import Sidebar from "./components/Sidebar/Sidebar";
 import { AudioProvider } from "./components/Providers/AudioProvider";
-import AudioPlayerBar from "./components/AudioPlayerBar/AudioPlayerBar";
 import { AuthProvider } from "./components/Providers/AuthContext/AuthContext";
-import { Toaster } from "react-hot-toast";
 import { PlaylistProvider } from "./components/Providers/PlaylistContext";
+import { Toaster } from "react-hot-toast";
+import LayoutContent from "./layoutContent";
 
 export const metadata: Metadata = {
   title: "Podcast",
@@ -15,9 +13,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <body>
@@ -28,19 +26,10 @@ export default function RootLayout({
                 position="bottom-center"
                 reverseOrder={true}
                 toastOptions={{
-                  style: {
-                    marginBottom: "60px", // Pushes it up from the bottom
-                  },
+                  style: { marginBottom: "60px" },
                 }}
               />
-              <div className="flex flex-col pb-[278px]">
-                <Navbar />
-                <div className="flex flex-shrink-0 pl-2 flex-1">
-                  <Sidebar />
-                  <div className="main-content pl-2 pr-2">{children}</div>
-                </div>
-                <AudioPlayerBar />
-              </div>
+              <LayoutContent>{children}</LayoutContent>
             </PlaylistProvider>
           </AudioProvider>
         </AuthProvider>

@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
-import { IsString, IsNotEmpty, IsOptional, MinLength } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, MinLength, IsEnum } from 'class-validator';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {
 
@@ -30,6 +30,10 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
         @IsOptional()
         profilePic?: string;
     
-        
-        
+        @IsOptional()
+        @IsEnum([0, 1]) // Restrict values to 0 (admin) or 1 (user)
+        role?: number;
+
 }
+
+
