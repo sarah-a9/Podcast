@@ -116,7 +116,7 @@ const MainContent = () => {
           <SeeMoreButton label="See More Creators" onClick={() => handleSeeMore('Creators')} />
         </div>
         <div className="container w-full">
-          <div className="overflow-x-auto flex space-x-8">
+          <div className="overflow-x-auto flex space-x-8 scrollbar-hide [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {users.length > 0 ? (
               users.map((user) => (
                 <CreatorCard
