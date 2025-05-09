@@ -1,5 +1,6 @@
 export interface User{
     _id:string;
+    role:number;
     firstName:string;
     lastName:string ;
     bio:string;
@@ -9,6 +10,11 @@ export interface User{
     favoritePodcasts:string[];
     likedEpisodes:string[];
     playlists:string[];
+    podcasts?: {
+      episodes?: any[];
+    }[];
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface Episode {

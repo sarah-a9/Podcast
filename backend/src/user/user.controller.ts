@@ -7,6 +7,8 @@ import { AuthGuard } from '../guards/auth.guard'; // Import AuthGuard
 import { PodcastService } from 'src/Podcast/podcast.service';
 import { EpisodeService } from 'src/Episode/episode.service';
 import { PlaylistService } from 'src/Playlist/playlist.service';
+import { RolesGuard } from '../guards/roles.guard';
+import { Roles } from '../decorators/roles.decorator';
 
 @Controller('user')
 export class UserController {
@@ -46,7 +48,7 @@ export class UserController {
   @Get(':id/favoritePodcasts')
   async getFavoritePodcasts(@Param('id') id:string){
     const isValid = mongoose.Types.ObjectId.isValid(id);
-    if (!isValid) throw new HttpException('Usee Not Found', 404);
+    if (!isValid) throw new HttpException('User Not Found', 404);
     const favoritePodcasts = await this.userService.getFavoritePodcasts(id);
     if (!favoritePodcasts) throw new HttpException("User Not Found", 404);
     return favoritePodcasts;
@@ -70,7 +72,8 @@ export class UserController {
 
 
   // Protect this route with AuthGuard (update a user by ID, needs authentication)
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
+  // @UseGuards(RolesGuard)
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     const isValid = mongoose.Types.ObjectId.isValid(id);
@@ -80,10 +83,11 @@ export class UserController {
     return updateUser;
   }
 
+
   @UseGuards(AuthGuard)
   @Patch('updateProfile')
   async updateCurrentUser(@Body() updateUserDto: UpdateUserDto, @Req() req) {
-    console.log("userId in controller:", req.userId); // 👈
+    console.log("userId in controller:", req.userId); // 
     const userId = req.userId;
 
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
@@ -136,7 +140,9 @@ export class UserController {
 
 
   // Protect this route with AuthGuard (delete a user by ID, needs authentication)
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
+  // @UseGuards(RolesGuard) // if not applied globally
+  // @Roles(0) 
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const isValid = mongoose.Types.ObjectId.isValid(id);
