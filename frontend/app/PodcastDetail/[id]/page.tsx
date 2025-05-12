@@ -1,10 +1,8 @@
-'use client';
+"use client";
 
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { CiCalendar } from "react-icons/ci";
-import { MdOutlineAccessTime } from "react-icons/md";
-import { MoreHorizontal, MoreVertical, PlusCircle } from "lucide-react";
+import { MoreHorizontal, PlusCircle } from "lucide-react";
 import EpisodeCard from "@/app/components/EpisodeCard/EpisodeCard";
 import CreateEpisodePopup from "../../components/PopUps/CreateEpisodePopUp";
 import FavoriteButton from "../../components/FavoriteButton/FavoriteButton";
@@ -18,6 +16,9 @@ export default function PodcastDetails() {
   const router = useRouter();
   const { user, setUser } = useAuth();
 
+  // ────────────────────────────────────────────────────────────────────────────────
+  //  ░░ State
+  // ────────────────────────────────────────────────────────────────────────────────
   const [podcast, setPodcast] = useState<{
     creator: any;
     _id: string;
@@ -30,194 +31,236 @@ export default function PodcastDetails() {
     createdAt: string;
   } | null>(null);
 
-  const [open, setOpen] = useState(false);
+  const [openCreateEpisode, setOpenCreateEpisode] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
+  const [showCreatorMenu, setShowCreatorMenu] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Fetch podcast
+  // ────────────────────────────────────────────────────────────────────────────────
+  //  ░░ Derived role‑based booleans
+  // ────────────────────────────────────────────────────────────────────────────────
+  const isCreator = user?._id === podcast?.creator._id;
+  const isAdmin = user?.role === 0;
+  const isRegularUser = user?.role === 1 && !isCreator;
+
+  // ────────────────────────────────────────────────────────────────────────────────
+  //  ░░ Fetch podcast   ░░
+  // ────────────────────────────────────────────────────────────────────────────────
   useEffect(() => {
     fetch(`http://localhost:3000/podcast/${podcastId}`)
-      .then((res) => res.json())
-      .then((data) => {
+      .then(res => res.json())
+      .then(data => {
         setPodcast(data);
-        console.log( "podcast categories", podcast);
-        if (user) {
-          const favs = Array.isArray(user.favoritePodcasts)
-            ? user.favoritePodcasts
-            : [];
+
+        // favourite state for regular users only
+        if (user && data) {
+          const favs = Array.isArray(user.favoritePodcasts) ? user.favoritePodcasts : [];
           setIsFavorite(favs.includes(data._id));
         }
       })
       .catch(console.error);
   }, [podcastId, user]);
 
-  
-
-  // Close menu on outside click
+  // ────────────────────────────────────────────────────────────────────────────────
+  //  ░░ Close creator menu on outside click ░░
+  // ────────────────────────────────────────────────────────────────────────────────
   useEffect(() => {
-    const onClick = (e: MouseEvent) => {
+    const handleClickOutside = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setShowMenu(false);
+        setShowCreatorMenu(false);
       }
     };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // ────────────────────────────────────────────────────────────────────────────────
+  //  ░░ Favourite toggle handler (regular users only) ░░
+  // ────────────────────────────────────────────────────────────────────────────────
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!user || !podcast) return;
-    const updated = isFavorite
+    if (!user || !podcast || !isRegularUser) return;
+
+    const updatedFavs = isFavorite
       ? user.favoritePodcasts.filter((x: string) => x !== podcast._id)
       : [...user.favoritePodcasts, podcast._id];
-    setUser({ ...user, favoritePodcasts: updated });
+
+    setUser({ ...user, favoritePodcasts: updatedFavs });
     setIsFavorite(!isFavorite);
   };
 
-  const isCreator = user?._id === podcast?.creator._id;
+  if (!podcast) return <p className="text-gray-400">Loading…</p>;
 
-  if (!podcast) {
-    return <p className="text-gray-400">Loading…</p>;
-  }
-console.log("image",`http://localhost:3000/uploads/${podcast.podcastImage}`);
+  // ────────────────────────────────────────────────────────────────────────────────
+  //  ░░ JSX ░░
+  // ────────────────────────────────────────────────────────────────────────────────
   return (
-    <div className="h-screen text-white rounded-lg scrollable-container scrollbar-hide">
-      <div className="bg-gray-900 p-8 rounded-lg shadow-lg w-full flex flex-col">
+  <div className="h-screen text-white scrollable-container scrollbar-hide">
+    <div className="bg-gradient-to-b from-[#1e1e1e] to-black p-8 rounded-lg shadow-xl w-full flex flex-col">
+      {/* ── Header Row ── */}
+      <div className="flex justify-between items-start mb-8">
         
-        {/* Top bar: title + menu */}
+
+        {/* Creator menu – Creator only */}
+        {isCreator && (
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={() => setShowCreatorMenu(prev => !prev)}
+              className="p-2 rounded-full hover:bg-white/10 transition"
+            >
+              <MoreHorizontal size={24} />
+            </button>
+            {showCreatorMenu && (
+              <ul className="absolute right-0 mt-2 bg-black/80 backdrop-blur-md border border-white/10 rounded-lg shadow-lg z-10">
+                <li
+                  onClick={() => {
+                    setShowEdit(true);
+                    setShowCreatorMenu(false);
+                  }}
+                  className="px-4 py-2 hover:bg-white/10 cursor-pointer"
+                >
+                  Edit Podcast
+                </li>
+                <li
+                  onClick={() => {
+                    setShowDelete(true);
+                    setShowCreatorMenu(false);
+                  }}
+                  className="px-4 py-2 hover:bg-white/10 cursor-pointer"
+                >
+                  Delete Podcast
+                </li>
+              </ul>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Admin buttons */}
+      {isAdmin && (
+        <div className="flex gap-4 mb-4 self-end">
+          <button
+            onClick={() => setShowEdit(true)}
+            className="px-4 py-2 bg-purple-600 hover:bg-purple-800 rounded transition-colors"
+          >
+            Update Podcast
+          </button>
+
+          <button
+            onClick={() => setShowDelete(true)}
+            className="px-4 py-2 bg-rose-500 hover:bg-rose-700 rounded transition-colors"
+          >
+            Delete Podcast
+          </button>
+        </div>
+      )}
+
+      {/* ── Podcast Info Section ── */}
+      <div className="grid grid-cols-6 gap-6 bg-white/5 p-6 rounded-2xl backdrop-blur-md shadow-md">
+        {/* Image */}
+        <div className="col-span-1">
+          <img
+            className="rounded-xl w-full h-auto object-cover shadow-lg"
+            src={`http://localhost:3000/uploads/podcasts/${podcast.podcastImage}`}
+            alt={podcast.podcastName}
+          />
+        </div>
+
+        {/* Info */}
+        <div className="col-span-4 space-y-6">
+          {/* Title */}
+        <h2 className="text-4xl font-extrabold truncate max-w-[70%] drop-shadow-lg">
+          {podcast.podcastName}
+        </h2>
+          <p className="text-lg text-gray-300">{podcast.podcastDescription}</p>
+          <p className="text-md text-gray-400">
+            Created by <span className="font-semibold text-white">{podcast.creator.firstName} {podcast.creator.lastName}</span>
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {podcast.categories.length > 0 ? (
+              podcast.categories.map(category => (
+                <span
+                  key={category._id}
+                  className="rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-xs px-4 py-1 font-medium shadow-sm"
+                >
+                  {category.categoryName}
+                </span>
+              ))
+            ) : (
+              <p className="text-gray-500">No categories available</p>
+            )}
+          </div>
+        </div>
+
+        {/* Favorite Button */}
+        {isRegularUser && (
+          <div className="col-span-1 content-center">
+            <FavoriteButton
+              podcastId={podcast._id}
+              isFavorite={isFavorite}
+              onFavoriteClick={handleFavoriteClick}
+              buttonSize=""
+              iconSize={50}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* ── Episodes Section ── */}
+      <div className="bg-black/60 p-6 mt-10 rounded-2xl shadow-xl backdrop-blur-md border border-white/10">
         <div className="flex justify-between items-center mb-4">
-          {/* <h2 className="text-3xl font-bold">{podcast.podcastName}</h2> */}
-  
-          {isCreator && (
-            <div className="relative" ref={menuRef}>
-              <button
-                onClick={() => setShowMenu(!showMenu)}
-                className="p-2 rounded hover:bg-gray-700"
-              >
-                <MoreHorizontal size={24} />
-              </button>
-              {showMenu && (
-                <ul className="absolute right-0 mt-1 bg-gray-700 rounded shadow-lg z-10">
-                  <li
-                    onClick={() => {
-                      setShowEdit(true);
-                      setShowMenu(false);
-                    }}
-                    className="px-15 py-1 hover:bg-gray-600 cursor-pointer"
-                  >
-                    Edit Podcast
-                  </li>
-                  <li
-                    onClick={() => {
-                      setShowDelete(true);
-                      setShowMenu(false);
-                    }}
-                    className="px-15 py-1 hover:bg-gray-600 cursor-pointer"
-                  >
-                    Delete Podcast
-                  </li>
-                </ul>
-              )}
-            </div>
+          <h3 className="text-2xl font-bold text-white">All Episodes</h3>
+
+          {(isCreator || isAdmin) && (
+            <button
+              onClick={() => setOpenCreateEpisode(true)}
+              className="flex items-center space-x-2 text-white bg-gradient-to-r from-purple-600 via-pink-600 to-rose-500 px-4 py-2 rounded-xl shadow-md hover:scale-105 transition-transform"
+            >
+              <PlusCircle size={18} />
+              <span>Add Episode</span>
+            </button>
           )}
         </div>
-  
-        {podcast && (
-          <>
-            <div className="grid grid-cols-6 gap-4">
-              <div className="col-span-1">
-                <img
-                  className="rounded-lg"
-                  src={`http://localhost:3000/uploads/podcasts/${podcast.podcastImage}`} 
-                  // src={podcast.podcastImage}
-                  alt={podcast.podcastName}
-                />
-              </div>
-              <div className="col-span-4">
-                <h2 className="text-3xl font-bold mb-2 mt-8">{podcast.podcastName}</h2>
-                <p className="text-sm text-gray-400">
-                  Created by {podcast.creator.firstName} {podcast.creator.lastName}
-                </p>
-                <div className="flex gap-2 flex-wrap">
-                  {podcast.categories.length > 0 ? (
-                    podcast.categories.map((category) => (
-                      <div
-                        key={category._id}
-                        className="w-1/12 flex-shrink-0 h-10 rounded-full shadow-md flex items-center justify-center border-1 border-white text-white font-bold text-xs bg-transparent px-4 mt-2"
-                      >
-                        {category.categoryName}
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-500">No categories available</p>
-                  )}
-                </div>
-              </div>
-              <div className="col-span-1 content-center">
-                <FavoriteButton
-                  podcastId={podcast._id}
-                  isFavorite={isFavorite}
-                  onFavoriteClick={handleFavoriteClick}
-                  buttonSize={""}
-                  iconSize={50}
-                />
-              </div>
-            </div>
-  
-            <div className="bg-gray-900 p-8 rounded-lg shadow-lg w-full flex flex-col">
-              <div className="mt-8 flex justify-between items-center">
-                <h3 className="font-bold text-xl">All Episodes</h3>
-                {isCreator && (
-                  <button
-                    onClick={() => setOpen(true)}
-                    className="flex items-center space-x-2 text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-4 py-2 rounded-xl shadow-md hover:scale-105 transition-transform"
-                  >
-                    <PlusCircle size={18} />
-                    <span>Add Episode</span>
-                  </button>
-                )}
-              </div>
-  
-              <hr className="my-4 border-gray-600" />
-  
-              <div className="pr-2">
-                {podcast.episodes.length > 0 ? (
-                  podcast.episodes.map((ep) => (
-                    <EpisodeCard key={ep._id} episode={ep} podcast={podcast} />
-                  ))
-                ) : (
-                  <p className="text-gray-500">No episodes available</p>
-                )}
-              </div>
-  
-              {/* Popups */}
-              <CreateEpisodePopup
-                isOpen={open}
-                onClose={() => setOpen(false)}
-                podcastId={podcast._id}
-                creatorId={podcast.creator._id}
-                podcastImage={podcast.podcastImage}
-              />
-  
-              <EditPodcastPopup
-                isOpen={showEdit}
-                onClose={() => setShowEdit(false)}
-                podcast={podcast}
-                onUpdated={(upd) => setPodcast(upd)}
-              />
-  
-              <DeletePodcastPopup
-                isOpen={showDelete}
-                onClose={() => setShowDelete(false)}
-                podcastId={podcast._id}
-                onDeleted={() => router.push("/")}
-              />
-            </div>
-          </>
-        )}
+
+        <hr className="mb-4 border-gray-700" />
+
+        <div className="pr-2">
+          {podcast.episodes.length > 0 ? (
+            podcast.episodes.map(ep => (
+              <EpisodeCard key={ep._id} episode={ep} podcast={podcast} />
+            ))
+          ) : (
+            <p className="text-gray-400">No episodes available</p>
+          )}
+        </div>
+      </div>
+
+
+        {/* ── Pop‑ups ── */}
+        <CreateEpisodePopup
+          isOpen={openCreateEpisode}
+          onClose={() => setOpenCreateEpisode(false)}
+          podcastId={podcast._id}
+          creatorId={podcast.creator._id}
+          podcastImage={podcast.podcastImage}
+        />
+
+        <EditPodcastPopup
+          isOpen={showEdit}
+          onClose={() => setShowEdit(false)}
+          podcast={podcast}
+          onUpdated={updated => setPodcast(updated)}
+        />
+
+        <DeletePodcastPopup
+          isOpen={showDelete}
+          onClose={() => setShowDelete(false)}
+          podcastId={podcast._id}
+          onDeleted={() => router.push("/")}
+        />
       </div>
     </div>
   );

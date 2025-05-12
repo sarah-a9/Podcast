@@ -128,6 +128,8 @@ export interface Episode {
     isOpen: boolean;
     onClose: () => void;
     onPodcastCreated?: (podcast: any) => void;
+    isAdmin: boolean;
+    creatorOptions?: User[]; // Optional prop for creator options for the admin to select
   }
 
  export interface SeeMoreButtonProps {
