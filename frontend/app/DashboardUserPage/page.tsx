@@ -281,7 +281,7 @@ export default function Dashboard() {
   
 
   return (
-    <div className="p-6 space-y-8 scrollable-container scrollbar-hide ">
+    <div className="p-6 space-y-8 scrollable-container scrollbar-hide bg-gray-900 rounded-lg">
       {podcasts.length > 0 ? (
         <>
           <h1 className="text-3xl font-bold">Welcome, {user?.firstName}</h1>

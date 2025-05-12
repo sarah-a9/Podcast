@@ -52,7 +52,7 @@ const Sidebar = () => {
   return (
     <div
       className={`sticky h-screen   height bg-gray-900 text-white p-4 transition-all duration-300 ${
-        isCollapsed ? "w-16" : "w-64"
+        isCollapsed ? "w-20" : "w-64"
       } rounded-lg shadow-lg flex flex-col relative`}
     >
       {/* Header */}

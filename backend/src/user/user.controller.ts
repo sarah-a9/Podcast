@@ -74,36 +74,34 @@ export class UserController {
   // Protect this route with AuthGuard (update a user by ID, needs authentication)
   // @UseGuards(AuthGuard)
   // @UseGuards(RolesGuard)
-  @Patch(':id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    const isValid = mongoose.Types.ObjectId.isValid(id);
-    if (!isValid) throw new HttpException("Invalid ID", 400);
-    const updateUser = await this.userService.update(id, updateUserDto);
-    if (!updateUser) throw new HttpException('User Not Found', 404);
-    return updateUser;
-  }
+  // @Patch(':id')
+  // async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  //   const isValid = mongoose.Types.ObjectId.isValid(id);
+  //   if (!isValid) throw new HttpException("Invalid ID", 400);
+  //   const updateUser = await this.userService.update(id, updateUserDto);
+  //   if (!updateUser) throw new HttpException('User Not Found', 404);
+  //   return updateUser;
+  // }
 
 
-  @UseGuards(AuthGuard)
-  @Patch('updateProfile')
-  async updateCurrentUser(@Body() updateUserDto: UpdateUserDto, @Req() req) {
+    @UseGuards(AuthGuard)
+    @Patch('updateProfile')
+    async updateCurrentUser(@Body() updateUserDto: UpdateUserDto, @Req() req) {
 
-    console.log("userId in controller:", req.userId); 
+      const userId = req.userId;
 
-    const userId = req.userId;
+      if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+        throw new HttpException("Invalid or missing user ID "+ userId, 400);
+      }
 
-    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-      throw new HttpException("Invalid or missing user ID", 400);
+      const updatedUser = await this.userService.update(userId, updateUserDto);
+
+      if (!updatedUser) {
+        throw new HttpException("User Not Found", 404);
+      } 
+
+      return updatedUser;
     }
-
-    const updatedUser = await this.userService.update(userId, updateUserDto);
-
-    if (!updatedUser) {
-      throw new HttpException("User Not Found", 404);
-    }
-
-    return updatedUser;
-  }
 
 
     // @UseGuards(AuthGuard)

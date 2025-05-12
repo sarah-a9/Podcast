@@ -45,7 +45,6 @@ const Profile = () => {
 
 
 const handleEditSave = async (data: {
-  _id: string ; 
   firstName: string;
   lastName: string;
   bio: string;
@@ -53,22 +52,22 @@ const handleEditSave = async (data: {
 }) => {
   setShowEditPopup(false);
 
+  const { _id, ...cleanData } = data as any;
+
   try {
-    const res = await fetch("http://localhost:3000/user/updateProfile?userId="+user._id, {
+    const res = await fetch("http://localhost:3000/user/updateProfile", {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
-      body: JSON.stringify(data), 
+      body: JSON.stringify(cleanData),
     });
 
     if (!res.ok) {
-      
+      console.log("data", res.status);
       const errData = await res.json();
-      
-      console.log("data", data);
-
+      console.log("data", cleanData);
       throw new Error(errData.message || "Update failed");
     }
 
@@ -80,6 +79,8 @@ const handleEditSave = async (data: {
     alert(`Profile update failed: ${error.message}`);
   }
 };
+console.log("JWT Token:", localStorage.getItem("token"));
+
 
 
   // const handleEditSave = async (data: {
@@ -149,7 +150,7 @@ const handleEditSave = async (data: {
   return (
     <div className="p-6 h-screen bg-gray-900 text-white rounded-lg  scrollable-container scrollbar-hide">
       <ProfileHeader
-      id={user._id}
+      // id={user._id}
         firstName={user.firstName}
         lastName={user.lastName}
         profilePic={user.profilePic}
@@ -187,7 +188,7 @@ const handleEditSave = async (data: {
       {showEditPopup && (
         <EditProfilePopup
           user={{
-            _id:user._id,
+            //_id:user._id,
             firstName: user.firstName,
             lastName: user.lastName,
             bio: user.bio,

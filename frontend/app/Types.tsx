@@ -91,7 +91,7 @@ export interface Episode {
 
   export interface EditProfilePopupProps {
     user: {
-      _id: string;//yasmine added this
+      //_id: string;//yasmine added this
       firstName: string;
       lastName: string;
       bio?: string;
@@ -99,7 +99,7 @@ export interface Episode {
     };
     onClose: () => void;
     onSave: (data: {
-      _id: string; //yasmine added this
+     // _id: string; //yasmine added this
       firstName: string;
       lastName: string;
       bio: string;
@@ -114,7 +114,7 @@ export interface Episode {
   }
 
   export interface ProfileHeaderProps {
-    id:string; //yasmine added this
+    // id:string; //yasmine added this
     firstName: string;
     lastName: string;
     bio: string;

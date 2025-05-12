@@ -3,7 +3,7 @@ import { SeeMoreButtonProps } from "@/app/Types";
 const SeeMoreButton: React.FC<SeeMoreButtonProps> = ({ label, onClick }) => (
   <button
     onClick={onClick}
-    className="mt-1 text-sm text-blue-600 hover:text-blue-500 transition duration-200 cursor-pointer pr-6"
+    className="mt-1 text-sm text-purple-600 hover:text-blue-500 transition duration-200 cursor-pointer pr-6"
   >
     {label}
     <svg
