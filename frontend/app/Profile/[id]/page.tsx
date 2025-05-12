@@ -169,15 +169,15 @@ console.log("JWT Token:", localStorage.getItem("token"));
         {myPodcasts.length > 0 ? (
           <div className="flex overflow-x-auto gap-4">
            {myPodcasts.map((podcast) => (
-  <PodcastCard
-    key={podcast._id}
-    id={podcast._id}
-    podcastName={podcast.podcastName}
-    podcastDescription={podcast.podcastDescription}
-    podcastImage={`http://localhost:3000/uploads/podcasts/${podcast.podcastImage}`} // Concatenate the image path with the server URL
-    creator={podcast.creator}
-  />
-))}
+            <PodcastCard
+              key={podcast._id}
+              id={podcast._id}
+              podcastName={podcast.podcastName}
+              podcastDescription={podcast.podcastDescription}
+              podcastImage={`http://localhost:3000/uploads/podcasts/${podcast.podcastImage}`} // Concatenate the image path with the server URL
+              creator={podcast.creator}
+            />
+        ))}
 
           </div>
         ) : (

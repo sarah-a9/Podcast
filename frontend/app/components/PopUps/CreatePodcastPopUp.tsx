@@ -26,6 +26,8 @@ export default function CreatePodcastPopup({
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -40,6 +42,19 @@ export default function CreatePodcastPopup({
     };
     fetchCategories();
   }, []);
+
+  const [users, setUsers] = useState<{ _id: string; email: string }[]>([]);
+  const [selectedUser, setSelectedUser] = useState("");
+
+  useEffect(() => {
+    if (user?.role === 0) {
+      fetch("http://localhost:3000/user?role=1")
+        .then(res => res.json())
+        .then(data => setUsers(data))
+        .catch(console.error);
+    }
+  }, [user]);
+
 
   const handleImageClick = () => {
     if (fileInputRef.current) fileInputRef.current.click();
@@ -74,8 +89,8 @@ export default function CreatePodcastPopup({
       alert("User not logged in");
       return;
     }
-
-    const creator = user._id;
+    const creator = user?.role === 0 && selectedUser ? selectedUser : user._id;
+    // const creator = user._id;
     const formData = new FormData();
     formData.append("podcastName", form.podcastName);
     formData.append("podcastDescription", form.podcastDescription);
@@ -215,6 +230,50 @@ export default function CreatePodcastPopup({
                 ))}
               </ul>
             )}
+
+            {user?.role === 0 && (
+                <div className="relative mt-4">
+                  <div
+                    onClick={() => setShowUserDropdown((prev) => !prev)}
+                    className="w-full p-2 bg-gray-700 text-white rounded border border-gray-600 cursor-pointer flex justify-between items-center"
+                  >
+                    <span>
+                      {selectedUser
+                        ? users.find((u: any) => u._id === selectedUser && u.role === 1)?.email
+                        : "Select Creator"}
+                    </span>
+
+                    <span
+                      className={`transition-transform duration-300 ${
+                        showUserDropdown ? 'rotate-180' : 'rotate-0'
+                      }`}
+                    >
+                      ▾
+                    </span>
+
+                  </div>
+
+                  {showUserDropdown && (
+                    <ul className="absolute z-10 w-full max-h-20 overflow-y-auto bg-gray-700 border border-gray-600 rounded mt-1 shadow-lg">
+                      {users
+                        .filter((u: any) => u.role === 1) // ✅ Only show users with role 1
+                        .map((u: any) => (
+                          <li
+                            key={u._id}
+                            onClick={() => {
+                              setSelectedUser(u._id);
+                              setShowUserDropdown(false);
+                            }}
+                            className="p-2 hover:bg-gray-600 text-white cursor-pointer"
+                          >
+                            {u.email}
+                          </li>
+                        ))}
+                    </ul>
+                  )}
+
+                </div>
+              )}
           </div>
 
           <div className="flex justify-end gap-2 mt-2">
