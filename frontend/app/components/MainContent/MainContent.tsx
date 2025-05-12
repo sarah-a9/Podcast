@@ -69,8 +69,8 @@ const MainContent = () => {
   };
 
   return (
-    <div className="scrollable-container scrollbar-hide pl-6">
-      <h2 className="text-2xl sm:text-3xl font-semibold ">Suggestions</h2>
+    <div className="scrollable-container scrollbar-hide bg-gray-900 rounded-lg pl-6">
+      <h2 className="text-2xl sm:text-3xl font-semibold mt-4 ">Suggestions</h2>
       <div className="container max-w-full overflow-hidden">
         <div className="flex justify-end mb-4">
           <SeeMoreButton label="See More Podcasts" onClick={() => handleSeeMore('Podcasts')} />
@@ -130,8 +130,7 @@ const MainContent = () => {
                   password={user.password}
                   favoritePodcasts={user.favoritePodcasts}
                   likedEpisodes={user.likedEpisodes}
-                  playlists={user.playlists}
-                />
+                  playlists={user.playlists} role={0} createdAt={''} updatedAt={''}                />
               ))
             ) : (
               <p>No creators available.</p>

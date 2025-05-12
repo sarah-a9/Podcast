@@ -39,7 +39,7 @@ const Navbar = () => {
 
   console.log("Search Query:", searchQuery);
   console.log("Search Filter:", searchFilter);
-
+console.log("User:", user?.profilePic);
   return (
     <div className="bg-black sticky top-0 text-white">
       <nav className="flex items-center justify-between p-4">
