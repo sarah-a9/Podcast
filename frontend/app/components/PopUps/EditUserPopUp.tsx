@@ -33,7 +33,7 @@ const EditUserPopup: React.FC<EditUserPopupProps> = ({ isOpen, onClose, user }) 
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:3000/user/${user._id}`, {
+      const res = await fetch(`http://localhost:3000/user/admin/${user._id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
