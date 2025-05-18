@@ -17,6 +17,7 @@ import { Podcast, PodcastDocument } from 'src/schemas/Podcast.schema';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { User, UserDocument } from 'src/schemas/User.schema';
 import { RateEpisodeDto } from './dto/rate-episode.dto';
+import { title } from 'process';
 
 @Injectable()
 export class EpisodeService {
@@ -97,6 +98,8 @@ export class EpisodeService {
     return this.EpisodeModel.findById(id).populate('podcast');
   }
 
+  
+
   updateEpisode(id: string, updateEpisodeDto: UpdateEpisodeDto) {
     return this.EpisodeModel.findByIdAndUpdate(id, updateEpisodeDto);
   }
@@ -114,7 +117,69 @@ export class EpisodeService {
     );
     return episode;
   }
-  
+
+  async getTopListenedEpisodes(limit = 5) {
+    return this.EpisodeModel.find({ episodeTitle: { $exists: true, $ne: null } })
+      .sort({ listens: -1 }) 
+      .limit(limit)
+      .select('episodeTitle listens'); 
+  }
+
+
+  async getMostLikedEpisodes(limit = 10) {
+    const docs = await this.EpisodeModel
+    .find()
+    .sort({ 'likedByUsers.length': -1 })
+    .limit(limit)
+    .select('episodeTitle likedByUsers')    // ← récupère episodeTitle, pas `title`
+    .lean()
+    .exec();
+
+
+    return docs.map(doc => ({
+      title: doc.episodeTitle,               // ← ici c’est episodeTitle, pas title
+      likeCount: Array.isArray(doc.likedByUsers)
+        ? doc.likedByUsers.length
+        : 0,
+    }));
+
+
+  }
+
+  async getTopRatedEpisodes(limit = 10) {
+    const agg = await this.EpisodeModel.aggregate([
+      // unwind the ratings array, preserve episodes with no ratings
+      { $unwind: { path: '$ratings', preserveNullAndEmptyArrays: true } },
+      // group back to one doc per episode, computing count & average
+      {
+        $group: {
+          _id: '$_id',
+          title:      { $first: '$episodeTitle' },
+          reviewCount:{ $sum: { $cond: [{ $ifNull: ['$ratings', false] }, 1, 0] } },
+          averageRating: { $avg: '$ratings.value' },
+        },
+      },
+      // ensure a rating of 0 if no reviews
+      {
+        $project: {
+          _id:           0,
+          title:         1,
+          reviewCount:   1,
+          averageRating: { $ifNull: ['$averageRating', 0] },
+        },
+      },
+      { $sort: { averageRating: -1 } },
+      { $limit: limit },
+    ]);
+
+    // Return shape { title, rating, reviewCount }
+    return agg.map(doc => ({
+      title:  doc.title,
+      rating: Number(doc.averageRating.toFixed(2)),  // round to 2 decimals
+      reviewCount: doc.reviewCount,
+    }));
+  }
+
 
 
   // async rateEpisode(userId: string, rateEpisodeDto: RateEpisodeDto) {

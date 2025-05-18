@@ -12,7 +12,8 @@ import {
     UseInterceptors,
     UploadedFile,
     Request, 
-    NotFoundException
+    NotFoundException,
+    Query
 } from '@nestjs/common';
 import { PodcastService } from './podcast.service';
 import { CreatePodcastDto } from './dto/create-podcast.dto';
@@ -214,4 +215,15 @@ async getPodcastByCategoryId(@Param('categoryId') categoryId: string) {
     }
     return podcasts;
   }
+
+  @Get('stats/created-over-time')
+  getPodcastCreationStats() {
+    return this.podcastService.getPodcastCreationStats();
+  }
+
+  @Get('stats/top-creators')
+  getTopCreators(@Query('limit') limit: number) {
+    return this.podcastService.getTopCreatorsByPodcastCount(Number(limit) || 10);
+  }
+
 }

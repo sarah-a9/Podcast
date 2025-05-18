@@ -18,6 +18,7 @@ import { EmailModule } from './email/email.module';
 import { SearchController } from './search/search.controller';
 import { SearchService } from './search/search.service';
 import { SearchModule } from './search/search.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { SearchModule } from './search/search.module';
     SwaggerModule,
     EmailModule,
     SearchModule,
+    AdminModule,
   ],
   controllers: [AppController, SearchController],
   providers: [AppService, SearchService],

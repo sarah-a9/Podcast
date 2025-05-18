@@ -46,7 +46,7 @@ export default function PodcastDetails() {
   const isRegularUser = user?.role === 1 && !isCreator;
 
   // ────────────────────────────────────────────────────────────────────────────────
-  //  ░░ Fetch podcast   ░░
+  //  ░░ Fetch podcast  
   // ────────────────────────────────────────────────────────────────────────────────
   useEffect(() => {
     fetch(`http://localhost:3000/podcast/${podcastId}`)
@@ -98,8 +98,8 @@ export default function PodcastDetails() {
   //  ░░ JSX ░░
   // ────────────────────────────────────────────────────────────────────────────────
   return (
-  <div className="h-screen text-white bg-gray-900 scrollable-container scrollbar-hide">
-    <div className="bg-gradient-to-b from-[#1e1e1e] to-black p-8 rounded-lg shadow-xl w-full flex flex-col">
+  <div className="h-screen text-white scrollable-container scrollbar-hide">
+    <div className="bg-gradient-to-b from-gray-900 to-black p-8 rounded-lg shadow-xl w-full flex flex-col">
       {/* ── Header Row ── */}
       <div className="flex justify-between items-start mb-8">
         

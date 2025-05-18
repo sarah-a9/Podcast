@@ -34,13 +34,13 @@ const navLinks = [
     color: "text-green-400",
   },
   {
-    href: "/admin/categories",
+    href: "../../AllCategories",
     label: "Categories",
     icon: FolderKanban,
     color: "text-purple-400",
   },
   {
-    href: "/admin/analytics",
+    href: "../../DashboardAdminPage",
     label: "Analytics",
     icon: BarChart3,
     color: "text-red-400",
@@ -71,13 +71,13 @@ const AdminSidebar = () => {
           </Link>
         ))}
 
-        <Link
+        {/* <Link
           href="/auth/logout"
           className="flex items-center gap-3 p-3 rounded-md hover:bg-red-700 hover:text-white mt-6 transition-colors duration-200"
         >
           <LogOut className="w-5 h-5 text-red-400" />
           Logout
-        </Link>
+        </Link> */}
       </nav>
     </div>
   );

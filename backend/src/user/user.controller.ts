@@ -72,8 +72,8 @@ export class UserController {
 
 
   // Protect this route with AuthGuard (update a user by ID, needs authentication)
-  // @UseGuards(AuthGuard)
-  // @UseGuards(RolesGuard)
+  // @UseGuards(AuthGuard, RolesGuard)
+  // @Roles(0) // Admin role
   @Patch('admin/:id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     const isValid = mongoose.Types.ObjectId.isValid(id);
@@ -260,15 +260,15 @@ export class UserController {
 
 
     @UseGuards(AuthGuard)
-@Post('rateEpisode')
-async rateEpisode(
-  @Req() req,
-  @Body('episodeId') episodeId: string,
-  @Body('value') value: number
-) {
-  const userId = req.userId; // from JWT payload
-  return this.userService.rateEpisode(userId, episodeId, value);
-}
+    @Post('rateEpisode')
+    async rateEpisode(
+      @Req() req,
+      @Body('episodeId') episodeId: string,
+      @Body('value') value: number
+    ) {
+      const userId = req.userId; // from JWT payload
+      return this.userService.rateEpisode(userId, episodeId, value);
+    }
 
 // @Post('rateEpisode')
 // async rateEpisode(
@@ -280,6 +280,10 @@ async rateEpisode(
   
 // }
 
+    @Get('/stats/roles')
+    getUsersByRoles() {
+      return this.userService.countUsersByRoles();
+    }
 
   
 

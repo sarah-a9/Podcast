@@ -87,8 +87,8 @@ const EpisodeDetail = ({ params }: { params: Promise<{ id: string; episodeId: st
   };
   
 return (
-  <div className="scrollable-container scrollbar-hide h-screen bg-gray-900 text-white rounded-lg">
-    <div className="bg-gradient-to-b from-[#1e1e1e] to-black p-8 rounded-lg shadow-xl w-full flex flex-col">
+  <div className="scrollable-container scrollbar-hide h-screen  text-white rounded-lg">
+    <div className="bg-gradient-to-b from-gray-900 to-black p-8 rounded-lg shadow-xl w-full flex flex-col">
       {episode ? (
         <>
           {/* Header Section */}
