@@ -26,7 +26,7 @@ export default function AdminPodcastList() {
       <div className="flex justify-end mb-6">
         <button
           onClick={() => setShowCreatePopup(true)}
-          className="bg-purple-900 hover:bg-purple-500 text-white font-bold py-2 px-4 rounded"
+          className="bg-gradient-to-r from-purple-900 via-purple-600 to-purple-400 rounded-xl shadow-md hover:scale-105 transition-transform text-white font-bold py-2 px-4"
         >
           + Create Podcast
         </button>

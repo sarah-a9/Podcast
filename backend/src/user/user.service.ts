@@ -215,6 +215,31 @@ async findOne(id: string) {
     
   }
   
-  
-  
+
+async countUsersByRoles(): Promise<{ role: string; count: number }[]> {
+  const users = await this.UserModel.find().populate('podcasts');
+
+  let adminCount = 0;
+  let creatorCount = 0;
+  let listenerCount = 0;
+
+  users.forEach(user => {
+    const userRole = Number(user.role);
+    if (userRole === 0) {
+      adminCount++;
+    } else if (userRole === 1) {
+      if (user.podcasts && user.podcasts.length > 0) {
+        creatorCount++;
+      } else {
+        listenerCount++;
+      }
+    }
+  });
+
+  return [
+    { role: 'Admin', count: adminCount },
+    { role: 'Creator', count: creatorCount },
+    { role: 'Listener', count: listenerCount },
+  ];
+}
 }

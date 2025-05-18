@@ -174,5 +174,79 @@ export class PodcastService {
       .exec();
   }
   
+  async getPodcastCreationStats() {
+    return this.PodcastModel.aggregate([
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: '%Y-%m-%d', date: '$createdAt' },
+          },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+      {
+        $project: {
+          date: '$_id',
+          count: 1,
+          _id: 0,
+        },
+      },
+    ]);
+  }
+
+  async getTopCreatorsByPodcastCount(limit = 5) {
+    return this.PodcastModel.aggregate([
+      {
+        $group: {
+          _id: '$creator',
+          podcastCount: { $sum: 1 },
+        },
+      },
+      { $sort: { podcastCount: -1 } },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: 'users',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'creatorInfo',
+        },
+      },
+      {
+        $unwind: '$creatorInfo',
+      },
+      {
+        $project: {
+          creatorName: {
+            $concat: ['$creatorInfo.firstName', ' ', '$creatorInfo.lastName'],
+          },
+          podcastCount: 1,
+          _id: 0,
+        },
+      },
+    ]);
+  }
+
+
+  async getMostFavoritedPodcasts(limit = 10) {
+    const docs = await this.PodcastModel
+      .find()
+      .sort({ 'favoritedByUsers.length': -1 }) // sort by array size
+      .limit(limit)
+      .select('podcastName favoritedByUsers')
+      .lean()
+      .exec();
+
+    return docs.map(doc => ({
+      podcastName: doc.podcastName,
+      favoriteCount: Array.isArray(doc.favoritedByUsers) 
+        ? doc.favoritedByUsers.length 
+        : 0,
+    }));
+  }
+
+
+
   
 }

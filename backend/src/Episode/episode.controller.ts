@@ -86,6 +86,7 @@ export class EpisodeController {
     return this.episodeService.getEpisodes();
   }
 
+
   @Get(':id')
   async getEpisodeById(@Param('id') id: string) {
     const isValid = mongoose.Types.ObjectId.isValid(id);
