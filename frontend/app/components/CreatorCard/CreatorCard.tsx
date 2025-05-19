@@ -1,19 +1,20 @@
+// "use client";
 import { User } from '@/app/Types';
-import React, { useEffect } from 'react';
-
-// interface UserProps{
-//     id:string;
-//     firstName:string;
-//     lastName:string ;
-//     profilePic:string;
-// }
+import { useRouter } from 'next/navigation';
 
 
 
-const CreatorCard = ({ firstName, profilePic }: User) => {
+
+const CreatorCard = ({_id, firstName, profilePic }: User) => {
+   const router = useRouter();
+
+  const handleClick = () => {
+    router.push(`../CreatorProfile/${_id}`);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="w-30 h-30 rounded-full overflow-hidden mb-2">
+      <div className="w-30 h-30 rounded-full overflow-hidden mb-2 cursor-pointer" onClick={handleClick}>
         <img
           src={profilePic}
           alt={firstName}

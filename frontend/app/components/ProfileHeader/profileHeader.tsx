@@ -1,18 +1,20 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
-import MenuButton from '../../components/MenuButton/MenuButton';
-import { ProfileHeaderProps } from '../../Types';
+import { useEffect, useRef, useState } from "react";
+import MenuButton from "../../components/MenuButton/MenuButton";
+import { ProfileHeaderProps } from "../../Types";
 
-const ProfileHeader: React.FC<ProfileHeaderProps> = ({ 
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   // id: string, //yasmine added this
   firstName,
   lastName,
-  bio, 
-  profilePic, 
-  onEdit, 
+  bio,
+  profilePic,
+  onEdit,
   onDelete,
-  onChangePassword 
+  onChangePassword,
+  followers ,
+  following ,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -31,8 +33,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -50,7 +52,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               src={profilePic}
               alt="User Profile"
               className={`w-20 h-20 rounded-full object-cover transition-opacity duration-300 ${
-                imageLoaded ? 'opacity-100' : 'opacity-0'
+                imageLoaded ? "opacity-100" : "opacity-0"
               }`}
               onLoad={() => setImageLoaded(true)}
               onError={() => setImageLoaded(true)} // hide skeleton if image fails
@@ -58,8 +60,18 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           )}
         </div>
         <div>
-        <h1 className="text-3xl font-bold text-white">{`${firstName ?? ''} ${lastName ?? ''}`.trim()}</h1>
-        <p className="text-gray-400">{bio || 'No bio available.'}</p>
+          <h1 className="text-3xl font-bold text-white">
+            {`${firstName ?? ""} ${lastName ?? ""}`.trim()}
+          </h1>
+          <p className="text-gray-400">{bio || "No bio available."}</p>
+          <div className="flex gap-4 mt-2 text-gray-400 text-sm">
+            <span>
+              <strong className="text-white">{followers}</strong> Followers
+            </span>
+            <span>
+              <strong className="text-white">{following}</strong> Following
+            </span>
+          </div>
         </div>
       </div>
 
@@ -92,7 +104,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               </li>
               <li
                 onClick={() => {
-                  onChangePassword?.(); 
+                  onChangePassword?.();
                   setShowMenu(false);
                 }}
                 className="p-2 rounded-lg hover:bg-gray-800 cursor-pointer"

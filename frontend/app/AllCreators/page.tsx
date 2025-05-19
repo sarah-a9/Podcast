@@ -42,8 +42,7 @@ const AllCreators = () => {
               password={user.password}
               favoritePodcasts={user.favoritePodcasts}
               likedEpisodes={user.likedEpisodes}
-              playlists={user.playlists}
-            />
+              playlists={user.playlists} role={0} createdAt={user.createdAt} updatedAt={user.updatedAt}            />
           ))
         ) : (
           <p>No creators available.</p>
