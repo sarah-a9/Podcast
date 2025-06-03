@@ -115,12 +115,13 @@ const EpisodeCard = ({
     >
       {/* Episode Image */}
       <div className="col-span-1">
-        <img
-          className={`rounded-lg ${imageClassName}`}
-          src={`http://localhost:3000/uploads/podcasts/${podcast.podcastImage}`} 
-          alt={episode.episodeTitle}
-        />
-      </div>
+  <img
+    className={`rounded-lg h-32 w-35  object-cover ${imageClassName}`}
+    src={`http://localhost:3000/uploads/podcasts/${podcast.podcastImage}`} 
+    alt={episode.episodeTitle}
+  />
+</div>
+
 
       {/* Episode Title & Description */}
       <div className="col-span-3 mt-1">

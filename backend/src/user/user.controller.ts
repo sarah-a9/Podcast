@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpException,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -16,7 +27,7 @@ export class UserController {
     private readonly userService: UserService,
     private readonly podcastService: PodcastService,
     private readonly episodeService: EpisodeService,
-    private readonly playlistService: PlaylistService
+    private readonly playlistService: PlaylistService,
   ) {}
 
   // Public route to create a user (No authentication needed)
@@ -38,38 +49,29 @@ export class UserController {
     const isValid = mongoose.Types.ObjectId.isValid(id);
     if (!isValid) throw new HttpException('User Not Found', 404);
     const findUser = await this.userService.findOne(id);
-    if (!findUser) throw new HttpException("User Not Found", 404);
+    if (!findUser) throw new HttpException('User Not Found', 404);
     return findUser;
   }
 
-
-
   @UseGuards(AuthGuard)
   @Get(':id/favoritePodcasts')
-  async getFavoritePodcasts(@Param('id') id:string){
+  async getFavoritePodcasts(@Param('id') id: string) {
     const isValid = mongoose.Types.ObjectId.isValid(id);
     if (!isValid) throw new HttpException('User Not Found', 404);
     const favoritePodcasts = await this.userService.getFavoritePodcasts(id);
-    if (!favoritePodcasts) throw new HttpException("User Not Found", 404);
+    if (!favoritePodcasts) throw new HttpException('User Not Found', 404);
     return favoritePodcasts;
-
   }
-
-
-
 
   @UseGuards(AuthGuard)
   @Get(':id/likedEpisodes')
-  async getLikedEpisodes(@Param('id') id:string){
+  async getLikedEpisodes(@Param('id') id: string) {
     const isValid = mongoose.Types.ObjectId.isValid(id);
     if (!isValid) throw new HttpException('Usee Not Found', 404);
     const LikedEpisodes = await this.userService.getLikedEpisodes(id);
-    if (!LikedEpisodes) throw new HttpException("User Not Found", 404);
+    if (!LikedEpisodes) throw new HttpException('User Not Found', 404);
     return LikedEpisodes;
-
   }
-
-
 
   // Protect this route with AuthGuard (update a user by ID, needs authentication)
   // @UseGuards(AuthGuard, RolesGuard)
@@ -77,92 +79,86 @@ export class UserController {
   @Patch('admin/:id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     const isValid = mongoose.Types.ObjectId.isValid(id);
-    if (!isValid) throw new HttpException("Invalid ID", 400);
+    if (!isValid) throw new HttpException('Invalid ID', 400);
     const updateUser = await this.userService.update(id, updateUserDto);
     if (!updateUser) throw new HttpException('User Not Found', 404);
     return updateUser;
   }
 
+  @UseGuards(AuthGuard)
+  @Patch('updateProfile')
+  async updateCurrentUser(@Body() updateUserDto: UpdateUserDto, @Req() req) {
+    const userId = req.userId;
 
-    @UseGuards(AuthGuard)
-    @Patch('updateProfile')
-    async updateCurrentUser(@Body() updateUserDto: UpdateUserDto, @Req() req) {
-
-      const userId = req.userId;
-
-      if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-        throw new HttpException("Invalid or missing user ID "+ userId, 400);
-      }
-
-      const updatedUser = await this.userService.update(userId, updateUserDto);
-
-      if (!updatedUser) {
-        throw new HttpException("User Not Found", 404);
-      } 
-
-      return updatedUser;
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      throw new HttpException('Invalid or missing user ID ' + userId, 400);
     }
 
+    const updatedUser = await this.userService.update(userId, updateUserDto);
 
-    // @UseGuards(AuthGuard)
-    // @Patch('testUpdateProfile')
-    // async testUpdate(@Body() updateUserDto: UpdateUserDto) {
-    //   const userId = "67c9a714df38d2f10adf2e52"; // Valid userId from your DB
-    
-    //   if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-    //     throw new HttpException("Invalid or missing user ID", 400);
-    //   }
-    
-    //   const updatedUser = await this.userService.update(userId, updateUserDto);
-    
-    //   if (!updatedUser) {
-    //     throw new HttpException("User Not Found", 404);
-    //   }
-    
-    //   return updatedUser;
-    // }
-    
+    if (!updatedUser) {
+      throw new HttpException('User Not Found', 404);
+    }
+
+    return updatedUser;
+  }
+
+  // @UseGuards(AuthGuard)
+  // @Patch('testUpdateProfile')
+  // async testUpdate(@Body() updateUserDto: UpdateUserDto) {
+  //   const userId = "67c9a714df38d2f10adf2e52"; // Valid userId from your DB
+
+  //   if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+  //     throw new HttpException("Invalid or missing user ID", 400);
+  //   }
+
+  //   const updatedUser = await this.userService.update(userId, updateUserDto);
+
+  //   if (!updatedUser) {
+  //     throw new HttpException("User Not Found", 404);
+  //   }
+
+  //   return updatedUser;
+  // }
 
   @UseGuards(AuthGuard)
   @Delete('profile')
   async deleteCurrentUser(@Req() req) {
     const userId = req.userId;
-    
+
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-      throw new HttpException("Invalid or missing user ID", 400);
+      throw new HttpException('Invalid or missing user ID', 400);
     }
 
     const deletedUser = await this.userService.remove(userId);
-    if (!deletedUser) throw new HttpException("User Not Found", 404);
-    return { message: "User successfully deleted" };
+    if (!deletedUser) throw new HttpException('User Not Found', 404);
+    return { message: 'User successfully deleted' };
   }
-
-
 
   // Protect this route with AuthGuard (delete a user by ID, needs authentication)
   // @UseGuards(AuthGuard)
   // @UseGuards(RolesGuard) // if not applied globally
-  // @Roles(0) 
+  // @Roles(0)
   @Delete(':id')
   async remove(@Param('id') id: string) {
     const isValid = mongoose.Types.ObjectId.isValid(id);
-    if (!isValid) throw new HttpException("Invalid ID", 400);
+    if (!isValid) throw new HttpException('Invalid ID', 400);
     const deletedUser = await this.userService.remove(id);
-    if (!deletedUser) throw new HttpException("User Not Found", 404);
+    if (!deletedUser) throw new HttpException('User Not Found', 404);
     return deletedUser;
   }
 
-
   @UseGuards(AuthGuard)
   @Post(':userId/favorite/:podcastId')
-  async FavoritePodcast(@Param('userId') userId: string,@Param('podcastId') podcastId: string,) {
-    
-    
+  async FavoritePodcast(
+    @Param('userId') userId: string,
+    @Param('podcastId') podcastId: string,
+  ) {
     const user = await this.userService.findOne(userId);
     const podcast = await this.podcastService.getPodcastById(podcastId);
 
-     const podcastObjectId = new Types.ObjectId(podcastId);
-     const userObjectId = new Types.ObjectId(userId);
+    const podcastObjectId = new Types.ObjectId(podcastId);
+    const userObjectId = new Types.ObjectId(userId);
 
     if (!user || !podcast) {
       throw new Error('User or Podcast not found');
@@ -187,7 +183,9 @@ export class UserController {
     await user.save();
     await podcast.save();
 
-    return { message: isAlreadyFavorited ? 'Podcast unfavorited' : 'Podcast favorited' };
+    return {
+      message: isAlreadyFavorited ? 'Podcast unfavorited' : 'Podcast favorited',
+    };
   }
 
   @UseGuards(AuthGuard)
@@ -238,54 +236,103 @@ export class UserController {
     }
   }
 
-
-
-
-  
-    // Get playlists by user
-    @UseGuards(AuthGuard)
-    @Get(':userId/playlists')
-    async getPlaylistsByUser(@Param('userId') userId: string) {
-      // Call the UserService to get the playlists by userId
-      try {
-        const playlists = await this.userService.getPlaylistsByUser(userId);
-        if (!playlists) {
-          throw new HttpException('Playlists not found', 404);
-        }
-        return playlists; // Return the playlists fetched by the UserService
-      } catch (error) {
-        throw new HttpException('User not found', 404); // Handle the case where the user is not found
+  // Get playlists by user
+  @UseGuards(AuthGuard)
+  @Get(':userId/playlists')
+  async getPlaylistsByUser(@Param('userId') userId: string) {
+    // Call the UserService to get the playlists by userId
+    try {
+      const playlists = await this.userService.getPlaylistsByUser(userId);
+      if (!playlists) {
+        throw new HttpException('Playlists not found', 404);
       }
+      return playlists; // Return the playlists fetched by the UserService
+    } catch (error) {
+      throw new HttpException('User not found', 404); // Handle the case where the user is not found
     }
+  }
 
+  @UseGuards(AuthGuard)
+  @Post('rateEpisode')
+  async rateEpisode(
+    @Req() req,
+    @Body('episodeId') episodeId: string,
+    @Body('value') value: number,
+  ) {
+    const userId = req.userId; // from JWT payload
+    return this.userService.rateEpisode(userId, episodeId, value);
+  }
 
-    @UseGuards(AuthGuard)
-    @Post('rateEpisode')
-    async rateEpisode(
-      @Req() req,
-      @Body('episodeId') episodeId: string,
-      @Body('value') value: number
-    ) {
-      const userId = req.userId; // from JWT payload
-      return this.userService.rateEpisode(userId, episodeId, value);
+  // @Post('rateEpisode')
+  // async rateEpisode(
+  //   @Body('episodeId') episodeId: string,
+  //   @Body('value') value: number
+  // ) {
+  //   const userId = '67c9a714df38d2f10adf2e52'; // your test user's ObjectId
+  //   return this.userService.rateEpisode(userId, episodeId, value);
+
+  // }
+
+  @Get('/stats/roles')
+  getUsersByRoles() {
+    return this.userService.countUsersByRoles();
+  }
+
+  @UseGuards(AuthGuard)
+  @Post(':id/follow')
+  async followUser(@Param('id') targetUserId: string, @Req() req) {
+    const userId = req.userId;
+    return this.userService.followUser(userId, targetUserId);
+  }
+ 
+  @UseGuards(AuthGuard)
+  @Delete(':id/unfollow')
+  async unfollowUser(@Param('id') targetUserId: string, @Req() req) {
+    const userId = req.userId;
+    return this.userService.unfollowUser(userId, targetUserId);
+  }
+
+  @Get(':id/followers-count')
+  async getFollowersCount(@Param('id') userId: string) {
+    const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new HttpException('User Not Found', 404);
     }
+    return { followers: user.followers.length };
+  }
 
-// @Post('rateEpisode')
-// async rateEpisode(
-//   @Body('episodeId') episodeId: string,
-//   @Body('value') value: number
-// ) {
-//   const userId = '67c9a714df38d2f10adf2e52'; // your test user's ObjectId
-//   return this.userService.rateEpisode(userId, episodeId, value);
-  
-// }
 
-    @Get('/stats/roles')
-    getUsersByRoles() {
-      return this.userService.countUsersByRoles();
+  @Get(':id/following-count')
+  async getFollowingCount(@Param('id') userId: string) {
+    const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new HttpException('User Not Found', 404);
     }
+    return { following: user.following.length };
+  }
 
-  
+
+ 
+@UseGuards(AuthGuard)
+ @Get(':targetUserId/is-following')
+async isFollowing(
+  @Param('targetUserId') targetUserId: string,
+   @Req() req
+) {
+  const currentUserId = req.userId;
+  const isFollowing = await this.userService.isFollowing(currentUserId, targetUserId);
+  return { isFollowing };
+}
+
+@Get(':id/followingList')
+async getUserFollowings(@Param('id') userId: string) {
+  const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new HttpException('User Not Found', 404);
+    }
+  return this.userService.getUserFollowings(userId);
+}
+
+
 
 }
-// 

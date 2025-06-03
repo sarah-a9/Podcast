@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { User } from '../../Types';  // Import the User interface
 import UserCard from '../../components/UserCard/UserCard';
 import EditUserPopup from '../../components/PopUps/EditUserPopUp';
-import DeleteProfilePopup from '../../components/PopUps/DeleteProfilePopUp';
+import DeleteProfilePopup from '../../components/PopUps/deleteProfilePopUp';
 import { useRouter } from 'next/navigation';
 
 

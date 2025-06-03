@@ -42,6 +42,19 @@ export class CategoryService {
         return this.categoryModel.findByIdAndDelete(id);
     }
 
+  async getCategoriesByPodcast(podcastId: string) {
+  const podcastObjectId = new Types.ObjectId(podcastId);
+
+  return this.categoryModel.find({ 
+    listePodcasts: podcastObjectId 
+  }).populate({
+    path: 'listePodcasts',
+    model: 'Podcast',
+    select: 'podcastName podcastDescription podcastImage'
+  }).exec();
+}
+
+
    
 
 }

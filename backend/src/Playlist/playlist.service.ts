@@ -159,7 +159,7 @@ async removeEpisode(playlistId: string, episodeId: string) {
 
   // Find playlists by user and populate episodes
   async findByUser(userId: string): Promise<Playlist[]> {
-    return this.PlaylistModel.find({ user: userId })
+    return this.PlaylistModel.find({ creator: userId })
       .populate('episodes') // Fetch full episode data
       .exec();
   }

@@ -50,7 +50,7 @@ const AllCategories = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 bg-gray-900 text-white min-h-screen rounded-lg">
+    <div className="container mx-auto p-6 bg-gray-900 text-white height rounded-lg">
       <h2 className="text-3xl font-semibold pb-5">All Categories</h2>
 
       {isAdmin && (

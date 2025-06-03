@@ -197,6 +197,7 @@ export default function AdminDashboard() {
       },
     ],
   };
+  console.log("hbar data", HBarChartData);
 
 
   const CategoryDonutData = {
@@ -224,6 +225,7 @@ export default function AdminDashboard() {
   console.log("Most Favorited Data:", mostFavorited);
   console.log("Most Liked Data:", mostLiked);
   console.log("Top Rated Data:", topRated);
+  console.log("top podcasts creators:", topCreators);
 
 
   const lineData = {

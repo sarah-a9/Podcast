@@ -143,7 +143,7 @@ return (
           <div className="flex flex-col gap-6">
             <div className="flex items-center gap-2 text-gray-300">
               <MdOutlineAccessTime size={24} />
-              <span className="text-lg">Duration</span>
+              <span className="text-lg">duration</span>
             </div>
             <ActionButtons
               episode={episode}

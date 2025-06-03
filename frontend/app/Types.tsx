@@ -122,6 +122,8 @@ export interface Episode {
     onEdit: () => void;
     onDelete: () => void;
     onChangePassword: () => void;
+    followers?: number;
+    following?: number;
   }
 
   export interface CreatePodcastPopupProps {
@@ -147,3 +149,10 @@ export interface Episode {
     isEditable: boolean; // Whether the user can change their rating
     episodeId: string; // The episode ID to send to the backend
   }
+
+  export interface FollowUnfollowButtonProps {
+  isFollowing: boolean;
+  onFollow: () => void;
+  onUnfollow: () => void;
+  TargetUserId: string;
+}

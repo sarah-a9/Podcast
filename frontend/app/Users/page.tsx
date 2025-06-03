@@ -43,7 +43,7 @@ const handleUserUpdate = (updatedUser: User) => {
   if (error) return <p className="text-red-500 p-6">Error: {error}</p>;
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8 space-y-6">
+    <div className="height bg-gray-900 text-white p-8 space-y-6 scrollable-container scrollbar-hide">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-semibold">Users</h1>
         <button

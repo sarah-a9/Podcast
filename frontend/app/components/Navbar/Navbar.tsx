@@ -86,7 +86,7 @@ console.log("User:", user?.profilePic);
                   {/* This is the default "Filter" label */}
                   <option value="podcast">Podcast</option>
                   <option value="episode">Episode</option>
-                  <option value="creator">Creator</option>
+                  <option value="creator">Profile</option>
                   <option value="category">Category</option>
                 </select>
               </div>
@@ -95,9 +95,9 @@ console.log("User:", user?.profilePic);
         </div>
 
         <div className="w-1/3 flex items-center justify-end gap-4">
-          <button className="p-3 rounded-lg hover:bg-gray-800">
+          {/* <button className="p-3 rounded-lg hover:bg-gray-800">
             <Sun size={20} />
-          </button>
+          </button> */}
 
           {user ? (
             <div className="relative">
