@@ -324,4 +324,15 @@ async isFollowing(
   return { isFollowing };
 }
 
+@Get(':id/followingList')
+async getUserFollowings(@Param('id') userId: string) {
+  const user = await this.userService.findOne(userId);
+    if (!user) {
+      throw new HttpException('User Not Found', 404);
+    }
+  return this.userService.getUserFollowings(userId);
+}
+
+
+
 }

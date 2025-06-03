@@ -308,6 +308,19 @@ async isFollowing(currentUserId: string, targetUserId: string): Promise<boolean>
   return user.following.includes(targetUserObjectId); // Check if the current user is following the target user
 }
 
+async getUserFollowings(userId: string) {
+  const user = await this.UserModel.findById(userId).populate({
+    path: 'following',
+    select: 'firstName lastName email bio profilePic',
+    model: 'User', // Ensure this matches your User model name
+  });
+
+  if (!user) {
+    throw new NotFoundException('User not found');
+  }
+
+  return user.following;
+}
 
 
 

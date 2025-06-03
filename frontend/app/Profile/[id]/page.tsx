@@ -9,16 +9,18 @@ import CreatePodcastButton from "../../components/CreatePodcastButton/CreatePodc
 import PodcastCard from "../../components/PodcastCard/PodcastCard";
 import { useRouter } from "next/navigation";
 import ChangePasswordPopup from "../../components/PopUps/ChangePasswordPopUp";
+import CreatorCard from "@/app/components/CreatorCard/CreatorCard";
 
 const Profile = () => {
-  const { user, setUser } = useAuth();
+  const { user, setUser,token } = useAuth();
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [showChangePasswordPopup, setShowChangePasswordPopup] = useState(false);
   const [myPodcasts, setMyPodcasts] = useState<any[]>([]);
   const router = useRouter();
-   const [followersCount, setFollowersCount] = useState<number>(0);
+  const [followersCount, setFollowersCount] = useState<number>(0);
   const [followingCount, setFollowingCount] = useState<number>(0);
+  const [followingCreators, setFollowingCreators] = useState<any[]>([]);
 
   useEffect(() => {
     fetchMyPodcasts();
@@ -46,13 +48,11 @@ const Profile = () => {
       const followingData = await followingRes.json();
 
       setFollowersCount(followersData.followers);
-      setFollowingCount(followingData.following); 
+      setFollowingCount(followingData.following);
     } catch (error) {
       console.error(error);
     }
   };
-  
-
 
   // Fetch podcasts created by this user.
   const fetchMyPodcasts = async () => {
@@ -174,6 +174,32 @@ const Profile = () => {
   // console.log("profile pic",`http://localhost:3000/uploads/podcasts/${Podcast.podcastImage}`);
   console.log("user", user._id);
 
+  useEffect(() => {
+    if (user) {
+      fetchFollowingCreators();
+    }
+  }, [user]);
+
+  const fetchFollowingCreators = async () => {
+    try {
+      const res = await fetch(
+  `http://localhost:3000/user/${user._id}/followingList`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }
+);
+
+      if (!res.ok) throw new Error("Could not fetch following creators");
+      const data = await res.json();
+      setFollowingCreators(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  console.log("Following Creators:", followingCreators);
+
   return (
     <div className="p-6 h-screen bg-gray-900 text-white rounded-lg  scrollable-container scrollbar-hide">
       <ProfileHeader
@@ -195,7 +221,7 @@ const Profile = () => {
       <div className="mt-10">
         <h2 className="text-2xl font-semibold mb-4">My Podcasts</h2>
         {myPodcasts.length > 0 ? (
-          <div className="flex overflow-x-auto gap-4">
+          <div className="flex overflow-x-auto gap-4 scrollbar-hide">
             {myPodcasts.map((podcast) => (
               <PodcastCard
                 key={podcast._id}
@@ -209,6 +235,31 @@ const Profile = () => {
           </div>
         ) : (
           <p>No podcasts to show yet...</p>
+        )}
+      </div>
+      <div className="mt-10">
+        <h2 className="text-2xl font-semibold mb-4">Following Creators</h2>
+        {followingCreators.length > 0 ? (
+          <div className="flex overflow-x-auto gap-4 scrollbar-hide">
+            {followingCreators.map((creator) => (
+             <CreatorCard
+              _id={creator._id} 
+              role={1} 
+              firstName={creator.firstName} 
+              lastName={creator.lastName} 
+              bio={creator.bio} 
+              email={creator.email} 
+              password={""} 
+              profilePic={creator.profilePic} 
+              favoritePodcasts={[]} 
+              likedEpisodes={[]} 
+              playlists={[]} 
+              createdAt={""} 
+              updatedAt={""}/>
+            ))}
+          </div>
+        ) : (
+          <p>You are not following anyone yet...</p>
         )}
       </div>
 

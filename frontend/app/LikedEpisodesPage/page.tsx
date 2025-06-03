@@ -64,9 +64,9 @@ export default function LikedEpisodesPage() {
     }
 
   return (
-    <div >
+    <div className='height-[40vh]'>
     <h1 className="text-2xl font-bold mb-4">Your Liked Episodes</h1>
-    <div className='scrollable-container scrollbar-hide h-full  '>
+    <div className='scrollable-container scrollbar-hide '>
     {likedEpisodes.map((episode) => (
       <EpisodeCard key={episode._id} episode={episode} podcast={episode.podcast}  />
     ))}
