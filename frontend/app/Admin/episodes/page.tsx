@@ -47,28 +47,38 @@ const EpisodeListPage = () => {
         <p>No episodes found.</p>
       ) : (
         <div className="space-y-4">
-            {episodes.map((episode) => (
-                <div
-                key={episode._id}
-                className="bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition duration-200"
-                >
-                <h2 className="text-xl font-semibold">{episode.episodeTitle}</h2>
-                <p className="text-sm text-gray-400">
-                    Podcast: {episode.podcast.podcastName}
-                </p>
-                <p className="text-sm text-gray-400">
-                    Creator: {episode.podcast.creator.firstName} {episode.podcast.creator.lastName}
-                </p>
-                <p className="text-sm text-gray-300 line-clamp-2">{episode.episodeDescription}</p>
-                <Link
-                href={`/PodcastDetail/${episode.podcast._id}/EpisodeDetail/${episode._id}`}
+          {episodes.map((episode) => (
+            <div
+              key={episode._id}
+              className="bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition duration-200"
+            >
+              <h2 className="text-xl font-semibold">{episode.episodeTitle}</h2>
+              <p className="text-sm text-gray-400">
+                Podcast:{" "}
+                {episode.podcast
+                  ? episode.podcast.podcastName
+                  : "Unknown Podcast"}
+              </p>
+              <p className="text-sm text-gray-400">
+                Creator:{" "}
+                {episode.podcast
+                  ? `${episode.podcast.creator.firstName} ${episode.podcast.creator.lastName}`
+                  : "Unknown Creator"}
+              </p>
+              <p className="text-sm text-gray-300 line-clamp-2">
+                {episode.episodeDescription}
+              </p>
+              <Link
+                href={`/PodcastDetail/${
+                  episode.podcast ? episode.podcast._id : "#"
+                }/EpisodeDetail/${episode._id}`}
                 className="text-amber-400 hover:underline text-sm mt-2 inline-block"
-                >
+              >
                 View Details
-                </Link>     
-                </div>
-            ))}
+              </Link>
             </div>
+          ))}
+        </div>
       )}
     </div>
   );
