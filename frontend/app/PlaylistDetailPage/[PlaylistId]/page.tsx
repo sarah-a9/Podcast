@@ -166,7 +166,7 @@ const PlaylistDetailPage = ({ params }: { params: { PlaylistId: string } }) => {
   return (
     <div
       style={{ background: bgGradient }}
-      className="flex flex-col p-6 rounded-lg h-[79.3vh] overflow-y-auto scrollbar-hide"
+      className="flex flex-col p-6 rounded-lg height overflow-y-auto scrollbar-hide"
     >
       <div className="flex gap-6 mb-8">
         <div style={{ height: "5.3cm", width: "8cm" }} className="w-1/3">
