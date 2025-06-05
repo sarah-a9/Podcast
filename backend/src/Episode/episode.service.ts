@@ -30,23 +30,29 @@ export class EpisodeService {
   ) {}
 
   // this will run every minute and we made it so we can convert from scheduled to published
+  // Cron job to flip any “scheduled” episodes whose scheduledAt ≤ now → published
   @Cron(CronExpression.EVERY_MINUTE)
-  private async publishScheduled() {
+  async publishScheduled() {
     const now = new Date();
     const toPublish = await this.EpisodeModel.find({
       status: Episodestatus.SCHEDULED,
       scheduledAt: { $lte: now },
     });
+
     for (const ep of toPublish) {
       ep.status = Episodestatus.PUBLISHED;
+      // Clear scheduledAt if you prefer (optional)
+      // ep.scheduledAt = undefined;
       await ep.save();
     }
+
     if (toPublish.length) {
       this.logger.log(
-        `Auto-published ${toPublish.length} scheduled episode(s)`,
+        `Auto-published ${toPublish.length} episode(s) that were scheduled.`
       );
     }
   }
+
 
   async createEpisode(dto: CreateEpisodeDto, audioFile?: Express.Multer.File) {
     const podcast = await this.PodcastModel.findById(dto.podcast);
@@ -99,10 +105,41 @@ export class EpisodeService {
   }
 
   
+  async updateEpisode(id: string, dto: UpdateEpisodeDto) {
+    const episode = await this.EpisodeModel.findById(id);
+    if (!episode) throw new NotFoundException('Episode not found');
 
-  updateEpisode(id: string, updateEpisodeDto: UpdateEpisodeDto) {
-    return this.EpisodeModel.findByIdAndUpdate(id, updateEpisodeDto);
+    // Update title/description if provided
+    if (dto.episodeTitle !== undefined) {
+      episode.episodeTitle = dto.episodeTitle;
+    }
+    if (dto.episodeDescription !== undefined) {
+      episode.episodeDescription = dto.episodeDescription;
+    }
+
+    // Update status if provided
+    if (dto.status) {
+      episode.status = dto.status;
+    }
+
+    // Update scheduledAt if provided
+    if (dto.scheduledAt) {
+      episode.scheduledAt = new Date(dto.scheduledAt);
+    }
+
+    // Update audioUrl if provided
+    if (dto.audioUrl) {
+      episode.audioUrl = dto.audioUrl;
+    }
+
+    // If status changed to PUBLISHED, clear scheduledAt
+    if (dto.status === Episodestatus.PUBLISHED) {
+      episode.scheduledAt = undefined;
+    }
+
+    return await episode.save();
   }
+
 
   deleteEpisode(id: string) {
     return this.EpisodeModel.findByIdAndDelete(id);

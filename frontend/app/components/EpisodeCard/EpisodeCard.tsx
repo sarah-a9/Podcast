@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ActionButtons from "../EpisodeActionButtons/EpisodeActionButtons";
-import { useAuth } from "../Providers/AuthContext/AuthContext"; // Import the useAuth hook
+import { useAuth } from "../Providers/AuthContext/AuthContext"; 
 import { Episode, Podcast } from "@/app/Types";
 
 const EpisodeCard = ({
@@ -9,41 +9,42 @@ const EpisodeCard = ({
   podcast,
   className = "",
   imageClassName = "",
-  playlistId = null,   // 👈 added this
+  playlistId = null,
+  onEditEpisode,
 }: {
   episode: Episode;
   podcast: Podcast;
   className?: string;
   imageClassName?: string;
   playlistId?: string | null;
+  onEditEpisode?: (ep: Episode) => void;
 }) => {
   const router = useRouter();
-  const { user, setUser , token } = useAuth();
+  const { user, setUser, token } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
   const [liked, setLiked] = useState(false);
-  const [playlist, setPlaylist] = useState<Episode[]>([]);  // Assuming playlist is an array of episodes
-  
+  const [playlist, setPlaylist] = useState<Episode[]>([]);
+
+  // Only the creator sees draft/scheduled badges
+  const isCreator = user?._id === podcast.creator._id;
 
   useEffect(() => {
-    console.log("episode test", episode.episodeTitle);
     if (user && user.likedEpisodes) {
       setLiked(user.likedEpisodes.includes(episode._id));
     }
   }, [user, episode._id]);
 
   useEffect(() => {
-    // Assume you have a method to fetch the playlist for the given playlistId
     if (playlistId) {
       fetchPlaylistData();
     }
   }, [playlistId]);
 
   const fetchPlaylistData = async () => {
-    // Example fetch call for playlist data (replace with actual API logic)
     try {
       const response = await fetch(`http://localhost:3000/playlist/${playlistId}`);
       const data = await response.json();
-      setPlaylist(data.episodes);  // Assuming response contains an array of episodes
+      setPlaylist(data.episodes);
     } catch (error) {
       console.error("Error fetching playlist data:", error);
     }
@@ -76,36 +77,29 @@ const EpisodeCard = ({
   };
 
   const handleRemoveFromPlaylist = async (episodeId: string) => {
-    // Step 1: Immediately update the state to reflect the removal in the UI
     const updatedPlaylist = playlist.filter((ep) => ep._id !== episodeId);
     setPlaylist(updatedPlaylist);
-  
-    // Step 2: Send the DELETE request to the server (to sync with the backend)
+
     try {
-      const response = await fetch(`http://localhost:3000/playlist/${playlistId}/episode/${episodeId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-  
+      const response = await fetch(
+        `http://localhost:3000/playlist/${playlistId}/episode/${episodeId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
       if (!response.ok) {
-        // If the request fails, you can undo the change or show an error
         throw new Error("Failed to remove episode from playlist");
       }
-  
-      // Optionally, handle a success message or any additional state updates here
       console.log("Episode removed successfully from the playlist.");
     } catch (error) {
-      // Step 3: Handle the error (e.g., show a notification or revert the state)
       console.error("Error removing episode from playlist:", error);
-      
-      // Optionally, you could revert the state update if there's an error
-      // setPlaylist(playlist); // Uncomment to revert if needed
     }
   };
-  
 
   return (
     <div
@@ -115,24 +109,42 @@ const EpisodeCard = ({
     >
       {/* Episode Image */}
       <div className="col-span-1">
-  <img
-    className={`rounded-lg h-32 w-35  object-cover ${imageClassName}`}
-    src={`http://localhost:3000/uploads/podcasts/${podcast.podcastImage}`} 
-    alt={episode.episodeTitle}
-  />
-</div>
+        <img
+          className={`rounded-lg h-32 w-35 object-cover ${imageClassName}`}
+          src={`http://localhost:3000/uploads/podcasts/${podcast.podcastImage}`}
+          alt={episode.episodeTitle}
+        />
+      </div>
 
-
-      {/* Episode Title & Description */}
-      <div className="col-span-3 mt-1">
+      {/* Title, Description, and Badge */}
+      <div className="col-span-3 mt-1 space-y-2">
+        {/* Title */}
         <p className="text-xl">{episode.episodeTitle}</p>
+        {/* Description */}
         <p className="text-sm text-gray-400">{episode.episodeDescription}</p>
+        
+        {/* ─── Prettier badge under description, only for creator & non-published ─── */}
+        {isCreator && episode.status !== "published" && (
+          <div
+            className={`
+              inline-block text-xs font-semibold text-white 
+              bg-gradient-to-r from-purple-600 via-pink-600 to-rose-500 
+              px-3 py-1 rounded-xl shadow-md 
+              hover:scale-105 transform transition-transform
+            `}
+          >
+            {episode.status === "draft" ? "Draft" : "Scheduled"}
+          </div>
+        )}
       </div>
 
       {/* Episode Date */}
       <div className="col-span-1">
         <p className="text-sm text-gray-400 mt-16">
-          {episode.createdAt ? episode.createdAt.split("T")[0] : "Unknown Date"}
+          published on:
+          {episode.createdAt
+            ? episode.createdAt.split("T")[0]
+            : "Unknown Date"}
         </p>
       </div>
 
@@ -148,14 +160,15 @@ const EpisodeCard = ({
           podcast={podcast}
           isLiked={liked}
           onLikeClick={handleLikeClick}
-          showMenu={showMenu} // Pass down showMenu as a prop
-          setShowMenu={setShowMenu} // Pass down setShowMenu to control it from here
-          playlistId={playlistId}  // Pass down playlistId to the ActionButtons component
-          onRemoveFromPlaylist={handleRemoveFromPlaylist} // Callback to remove episode from playlist
+          showMenu={showMenu}
+          setShowMenu={setShowMenu}
+          playlistId={playlistId}
+          onRemoveFromPlaylist={handleRemoveFromPlaylist}
+          onEdit={onEditEpisode}
         />
       </div>
 
-      {/* Optional Separator */}
+      {/* Separator */}
       <div className="col-span-8">
         <hr style={{ color: "grey" }} />
       </div>

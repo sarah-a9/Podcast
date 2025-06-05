@@ -6,11 +6,14 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Episode, EpisodeSchema } from '../schemas/Episode.schema';
 import { PodcastModule } from '../Podcast/podcast.module';
 import { UserModule } from '../user/user.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports:[
     MongooseModule.forFeature([{ name: Episode.name, schema: EpisodeSchema }]),
-    forwardRef(() => PodcastModule),forwardRef(() => UserModule)
+    forwardRef(() => PodcastModule),
+    forwardRef(() => UserModule),
+    ScheduleModule.forRoot(),
   ],
   providers: [EpisodeService],
   controllers: [EpisodeController],

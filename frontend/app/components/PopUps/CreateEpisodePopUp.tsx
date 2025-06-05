@@ -54,6 +54,7 @@ export default function CreateEpisodePopup({
     const res = await fetch('http://localhost:3000/episode/create', {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
+      
       body: form,
     });
 
@@ -140,11 +141,12 @@ export default function CreateEpisodePopup({
         <div className="flex justify-end gap-2">
           <button
             className="px-4 py-2 bg-gray-500 rounded text-white"
-            onClick={() => submit(EpisodeStatus.DRAFT)}
+            onClick={onClose}   // ← simply close the modal
             type="button"
           >
             Cancel
           </button>
+
           <button
             className="px-4 py-2 bg-indigo-600 rounded text-white hover:bg-indigo-700"
             onClick={() => submit(status)}

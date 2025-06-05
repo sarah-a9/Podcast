@@ -12,10 +12,6 @@ export class CreateEpisodeDto{
     episodeDescription : string;
 
 
-    // @IsNotEmpty()
-    // @IsString()
-    // audioUrl: string;
-
     @IsString()
     @IsNotEmpty()
     podcast: string;  // The podcast this episode belongs to
