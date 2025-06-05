@@ -1,14 +1,15 @@
+// src/app/[your-path]/EpisodeDetail.tsx
 "use client";
 
-import ActionButtons from "@/app/components/EpisodeActionButtons/EpisodeActionButtons";
-import { useAuth } from "@/app/components/Providers/AuthContext/AuthContext"; // Import the useAuth hook
-import StarRating from "@/app/components/StarRating/StarRating";
-import { Podcast } from "@/app/Types";
+import React, { use, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
-import React, { use, useEffect, useState } from "react";
 import { MdOutlineAccessTime } from "react-icons/md";
+import ActionButtons from "@/app/components/EpisodeActionButtons/EpisodeActionButtons";
+import StarRating from "@/app/components/StarRating/StarRating";
+import { useAuth } from "@/app/components/Providers/AuthContext/AuthContext";
+import EditEpisodePopUp from "@/app/components/PopUps/EditEpisodePopUp";
+import DeleteEpisodePopUp from "@/app/components/PopUps/DeleteEpisodePopUp";
 
 const EpisodeDetail = ({ params }: { params: Promise<{ id: string; episodeId: string }> }) => {
   const { id, episodeId } = use(params);
@@ -18,7 +19,14 @@ const EpisodeDetail = ({ params }: { params: Promise<{ id: string; episodeId: st
   const { user, setUser, token } = useAuth();
   const router = useRouter();
 
-  // Fetch episode details
+  // ───‐ showMenu is now passed down to ActionButtons ───
+  const [showMenu, setShowMenu] = useState(false);
+
+  // ─── Popup states ───
+  const [showEditPopup, setShowEditPopup] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // ─── Fetch episode details ───
   const fetchEpisode = async () => {
     try {
       const res = await fetch(`http://localhost:3000/podcast/${id}/episode/${episodeId}`);
@@ -33,21 +41,14 @@ const EpisodeDetail = ({ params }: { params: Promise<{ id: string; episodeId: st
     if (user) {
       try {
         const res = await fetch(`http://localhost:3000/user/${user._id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
-        console.log("user data", data);
-
         const episodeRating = data.ratings.find(
           (r: any) => String(r.episode) === String(episodeId)
         );
-
-        console.log("user rating", episodeRating);
-
-        const roundedRating = episodeRating ? Math.round(episodeRating.value) : 0;
-        setUserRating(roundedRating);
+        const rounded = episodeRating ? Math.round(episodeRating.value) : 0;
+        setUserRating(rounded);
       } catch (error) {
         console.error("Error fetching user rating:", error);
       }
@@ -65,13 +66,13 @@ const EpisodeDetail = ({ params }: { params: Promise<{ id: string; episodeId: st
     }
   }, [user, episode]);
 
-  const handleLikeClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
+  const handleLikeClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (user && episode) {
-      const updatedLikedEpisodes = liked
-        ? user.likedEpisodes.filter((id) => id !== episode._id)
+      const updated = liked
+        ? user.likedEpisodes.filter((eid) => eid !== episode._id)
         : [...user.likedEpisodes, episode._id];
-      setUser({ ...user, likedEpisodes: updatedLikedEpisodes });
+      setUser({ ...user, likedEpisodes: updated });
     }
     setLiked(!liked);
   };
@@ -80,105 +81,133 @@ const EpisodeDetail = ({ params }: { params: Promise<{ id: string; episodeId: st
     router.push(`/PodcastDetail/${episode?.podcast._id}`);
   };
 
-  // 
-  const handleRating = (newAverageRating: number) => {
-    // Only update average rating or fetch episode if needed
+  const handleRating = (newAvg: number) => {
     fetchEpisode();
   };
-  
-return (
-  <div className="scrollable-container scrollbar-hide h-screen  text-white rounded-lg">
-    <div className="bg-gradient-to-b from-gray-900 to-black p-8 rounded-lg shadow-xl w-full flex flex-col">
-      {episode ? (
-        <>
-          {/* Header Section */}
-          <div className="grid grid-cols-6 gap-8 items-center mb-10">
-            {/* Episode Image */}
-            <div className="col-span-1">
-              <img
-                className="rounded-xl shadow-lg w-full"
-                src={`http://localhost:3000/uploads/podcasts/${episode.podcast.podcastImage}`}
-                alt={episode.podcast.podcastName}
-              />
-            </div>
 
-            {/* Episode Metadata */}
-            <div className="col-span-5">
-              <div className="flex justify-between items-start">
-                <div>
-                  {/* <p className="uppercase text-sm text-gray-400 tracking-widest">Podcast Episode</p> */}
-                  <h1 className="text-4xl font-extrabold mt-2 mb-6">{episode.episodeTitle}</h1>
-                  
-                  <div className="space-y-1">
-                    <Link
-                      href={`/PodcastDetail/${episode.podcast._id}`}
-                      className="text-xl text-purple-500 hover:underline"
-                    >
-                      {episode.podcast.podcastName}
-                    </Link>
-                    <p className="text-md text-gray-400">
-                      Created by {episode.podcast.creator.firstName} {episode.podcast.creator.lastName}
-                    </p>
+  return (
+    <div className="scrollable-container scrollbar-hide h-screen text-white rounded-lg">
+      <div className="bg-gradient-to-b from-gray-900 to-black p-8 rounded-lg shadow-xl w-full flex flex-col">
+        {episode ? (
+          <>
+            {/* ── Header Section ── */}
+            <div className="grid grid-cols-6 gap-8 items-center mb-10">
+              <div className="col-span-1">
+                <img
+                  className="rounded-xl shadow-lg w-full"
+                  src={`http://localhost:3000/uploads/podcasts/${episode.podcast.podcastImage}`}
+                  alt={episode.podcast.podcastName}
+                />
+              </div>
+              <div className="col-span-5">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h1 className="text-4xl font-extrabold mt-2 mb-6">
+                      {episode.episodeTitle}
+                    </h1>
+                    <div className="space-y-1">
+                      <Link
+                        href={`/PodcastDetail/${episode.podcast._id}`}
+                        className="text-xl text-purple-500 hover:underline"
+                      >
+                        {episode.podcast.podcastName}
+                      </Link>
+                      <p className="text-md text-gray-400">
+                        Created by{" "}
+                        {episode.podcast.creator.firstName}{" "}
+                        {episode.podcast.creator.lastName}
+                      </p>
+                    </div>
                   </div>
-                </div>
-
-                {/* Rating */}
-                <div className="mt-4 text">
-                  <StarRating
-                    value={userRating}
-                    maxStars={5}
-                    onRate={handleRating}
-                    isEditable={!!user}
-                    episodeId={episode._id}
-                  />
+                  {/* Rating */}
+                  <div className="mt-4">
+                    <StarRating
+                      value={userRating}
+                      maxStars={5}
+                      onRate={handleRating}
+                      isEditable={!!user}
+                      episodeId={episode._id}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Divider */}
-          <div className="my-6 border-t border-gray-700" />
+            {/* ── Divider ── */}
+            <div className="my-6 border-t border-gray-700" />
 
-          {/* Action Section */}
-          <div className="flex flex-col gap-6">
-            <div className="flex items-center gap-2 text-gray-300">
-              <MdOutlineAccessTime size={24} />
-              <span className="text-lg">duration</span>
+            {/* ── Action Section ── */}
+            <div className="flex items-center justify-between gap-4 mt-4">
+              {/* Duration */}
+              <div className="flex items-center gap-2 text-gray-300">
+                <MdOutlineAccessTime size={20} />
+                <span className="text-md">
+                  {episode?.duration ? `${episode.duration} min` : "Unknown duration"}
+                </span>
+              </div>
+
+              {/* ActionButtons now handles the menu */}
+              <ActionButtons
+                episode={episode}
+                podcast={episode.podcast}
+                isLiked={liked}
+                onLikeClick={handleLikeClick}
+                size="lg"
+                showMenu={showMenu}
+                setShowMenu={setShowMenu}
+                onEdit={() => setShowEditPopup(true)}
+                onDelete={() => setShowDeleteConfirm(true)}
+              />
             </div>
-            <ActionButtons
-              episode={episode}
-              podcast={episode.podcast}
-              isLiked={liked}
-              onLikeClick={handleLikeClick}
-              size="lg"
-              showMenu={false}
-              setShowMenu={() => {}}
-            />
-          </div>
 
-          {/* Description */}
-          <div className="mt-10 bg-[#121212] p-6 rounded-xl shadow-inner">
-            <p className="text-2xl font-semibold mb-4">Episode Description</p>
-            <p className="text-md text-gray-300 leading-relaxed whitespace-pre-line">{episode.episodeDescription}</p>
-          </div>
+            {/* ── Description ── */}
+            <div className="mt-10 bg-[#121212] p-6 rounded-xl shadow-inner">
+              <p className="text-2xl font-semibold mb-4">Episode Description</p>
+              <p className="text-md text-gray-300 leading-relaxed whitespace-pre-line">
+                {episode.episodeDescription}
+              </p>
+            </div>
 
-          {/* Bottom Button */}
-          <div className="mt-12 flex justify-end">
-            <button
-              className="text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-4 py-2 rounded-xl shadow-md hover:scale-105 transition-transform"
-              onClick={handleOnClick}
-            >
-              See Episodes
-            </button>
-          </div>
-        </>
-      ) : (
-        <p className="text-xl text-gray-400">Episode not found.</p>
-      )}
+            {/* ── Bottom Button ── */}
+            <div className="mt-12 flex justify-end">
+              <button
+                className="text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-4 py-2 rounded-xl shadow-md hover:scale-105 transition-transform"
+                onClick={handleOnClick}
+              >
+                See Episodes
+              </button>
+            </div>
+          </>
+        ) : (
+          <p className="text-xl text-gray-400">Episode not found.</p>
+        )}
+
+        {/* ── Edit Episode Popup ── */}
+        {showEditPopup && (
+          <EditEpisodePopUp
+            isOpen={showEditPopup}
+            onClose={() => setShowEditPopup(false)}
+            episode={episode}
+            podcastId={episode.podcast._id}
+            creatorId={episode.podcast.creator._id}
+          />
+        )}
+
+        {/* ── Delete Confirmation Popup ── */}
+        {showDeleteConfirm && (
+          <DeleteEpisodePopUp
+            isOpen={showDeleteConfirm}
+            onClose={() => setShowDeleteConfirm(false)}
+            episodeId={episode._id}
+            onDeleted={() => {
+              setShowDeleteConfirm(false);
+              router.push(`/PodcastDetail/${id}`);
+            }}
+          />
+        )}
+      </div>
     </div>
-  </div>
-);
-
+  );
 };
 
 export default EpisodeDetail;

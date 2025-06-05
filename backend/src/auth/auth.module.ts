@@ -7,10 +7,15 @@ import { RefreshToken, RefreshTokenSchema } from '../schemas/refresh-token.schem
 import { UserModule } from '../user/user.module';
 import { EmailModule } from '../email/email.module';
 import { ResetToken, ResetTokenSchema } from '../schemas/reset-token.schema';
+import { JwtModule } from '@nestjs/jwt';
 // import { ResetToken, ResetTokenSchema } from '../schemas/reset-token.schema';
 
 @Module({
   imports: [
+    JwtModule.register({
+       secret: process.env.JWT_SECRET || 'secret_key', 
+      //  signOptions: { expiresIn: '1h' },
+     }),
     MongooseModule.forFeature([
     { name: User.name, schema: UserSchema },
     { name: RefreshToken.name, schema: RefreshTokenSchema },

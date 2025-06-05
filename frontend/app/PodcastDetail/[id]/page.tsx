@@ -10,11 +10,13 @@ import { useAuth } from "../../components/Providers/AuthContext/AuthContext";
 import DeletePodcastPopup from "../../components/PopUps/DeletePodcastPopup";
 import EditPodcastPopup from "../../components/PopUps/EditPodcastPopup";
 import { Episode } from "@/app/Types";
+import EditEpisodePopup from "../../components/PopUps/EditEpisodePopUp";
 
 export default function PodcastDetails() {
   const { id: podcastId } = useParams() as { id: string };
   const router = useRouter();
-  const { user, setUser } = useAuth();
+  const { user,token, setUser } = useAuth();
+
 
   // ────────────────────────────────────────────────────────────────────────────────
   //  ░░ State
@@ -37,6 +39,9 @@ export default function PodcastDetails() {
   const [showEdit, setShowEdit] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const [showEditEpisode, setShowEditEpisode] = useState(false);
+  const [editingEpisode, setEditingEpisode] = useState<Episode | null>(null);
+
 
   // ────────────────────────────────────────────────────────────────────────────────
   //  ░░ Derived role‑based booleans
@@ -49,19 +54,32 @@ export default function PodcastDetails() {
   //  ░░ Fetch podcast  
   // ────────────────────────────────────────────────────────────────────────────────
   useEffect(() => {
-    fetch(`http://localhost:3000/podcast/${podcastId}`)
-      .then(res => res.json())
+
+    // Build headers object; include Authorization only if `token` exists
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    fetch(`http://localhost:3000/podcast/${podcastId}`, { headers })
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to fetch podcast");
+        return res.json();
+      })
       .then(data => {
         setPodcast(data);
 
-        // favourite state for regular users only
+        // favourite‐button state (unchanged)
         if (user && data) {
-          const favs = Array.isArray(user.favoritePodcasts) ? user.favoritePodcasts : [];
+          const favs = Array.isArray(user.favoritePodcasts)
+            ? user.favoritePodcasts
+            : [];
           setIsFavorite(favs.includes(data._id));
         }
       })
       .catch(console.error);
-  }, [podcastId, user]);
+  }, [podcastId, user, token]); // include `token` so fetch re-runs if login state changes
+
 
   // ────────────────────────────────────────────────────────────────────────────────
   //  ░░ Close creator menu on outside click ░░
@@ -102,61 +120,9 @@ export default function PodcastDetails() {
     <div className="bg-gradient-to-b from-gray-900 to-black p-8 rounded-lg shadow-xl w-full flex flex-col">
       {/* ── Header Row ── */}
       <div className="flex justify-between items-start mb-8">
-        
-
-        {/* Creator menu – Creator only */}
-        {isCreator && (
-          <div className="relative" ref={menuRef}>
-            <button
-              onClick={() => setShowCreatorMenu(prev => !prev)}
-              className="p-2 rounded-full hover:bg-white/10 transition"
-            >
-              <MoreHorizontal size={24} />
-            </button>
-            {showCreatorMenu && (
-              <ul className="absolute right-0 mt-2 bg-black/80 backdrop-blur-md border border-white/10 rounded-lg shadow-lg z-10">
-                <li
-                  onClick={() => {
-                    setShowEdit(true);
-                    setShowCreatorMenu(false);
-                  }}
-                  className="px-4 py-2 hover:bg-white/10 cursor-pointer"
-                >
-                  Edit Podcast
-                </li>
-                <li
-                  onClick={() => {
-                    setShowDelete(true);
-                    setShowCreatorMenu(false);
-                  }}
-                  className="px-4 py-2 hover:bg-white/10 cursor-pointer"
-                >
-                  Delete Podcast
-                </li>
-              </ul>
-            )}
-          </div>
-        )}
       </div>
 
-      {/* Admin buttons */}
-      {isAdmin && (
-        <div className="flex gap-4 mb-4 self-end">
-          <button
-            onClick={() => setShowEdit(true)}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-800 rounded transition-colors"
-          >
-            Update Podcast
-          </button>
-
-          <button
-            onClick={() => setShowDelete(true)}
-            className="px-4 py-2 bg-rose-500 hover:bg-rose-700 rounded transition-colors"
-          >
-            Delete Podcast
-          </button>
-        </div>
-      )}
+    
 
       {/* ── Podcast Info Section ── */}
       <div className="grid grid-cols-6 gap-6 bg-white/5 p-6 rounded-2xl backdrop-blur-md shadow-md">
@@ -171,13 +137,15 @@ export default function PodcastDetails() {
 
         {/* Info */}
         <div className="col-span-4 space-y-6">
-          {/* Title */}
-        <h2 className="text-4xl font-extrabold truncate max-w-[70%] drop-shadow-lg">
-          {podcast.podcastName}
-        </h2>
+          <h2 className="text-4xl font-extrabold truncate max-w-[70%] drop-shadow-lg">
+            {podcast.podcastName}
+          </h2>
           <p className="text-lg text-gray-300">{podcast.podcastDescription}</p>
           <p className="text-md text-gray-400">
-            Created by <span className="font-semibold text-white">{podcast.creator.firstName} {podcast.creator.lastName}</span>
+            Created by{" "}
+            <span className="font-semibold text-white">
+              {podcast.creator.firstName} {podcast.creator.lastName}
+            </span>
           </p>
           <div className="flex flex-wrap gap-2">
             {podcast.categories.length > 0 ? (
@@ -195,9 +163,63 @@ export default function PodcastDetails() {
           </div>
         </div>
 
-        {/* Favorite Button */}
-        {isRegularUser && (
-          <div className="col-span-1 content-center">
+        {/* Right-side: Creator menu or Favorite button */}
+        <div className="col-span-1 flex justify-end items-start">
+          {/* Creator menu – Creator only */}
+          {isCreator && (
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setShowCreatorMenu(prev => !prev)}
+                className="p-2 rounded-full hover:bg-white/10 transition"
+              >
+                <MoreHorizontal size={24} />
+              </button>
+              {showCreatorMenu && (
+                <ul className="absolute right-0 mt-2 bg-black/80 backdrop-blur-md border border-white/10 rounded-lg shadow-lg z-10  min-w-[10rem]">
+                  <li
+                    onClick={() => {
+                      setShowEdit(true);
+                      setShowCreatorMenu(false);
+                    }}
+                    className="px-4 py-2 hover:bg-white/10 cursor-pointer"
+                  >
+                    Edit Podcast
+                  </li>
+                  <li
+                    onClick={() => {
+                      setShowDelete(true);
+                      setShowCreatorMenu(false);
+                    }}
+                    className="px-4 py-2 hover:bg-white/10 cursor-pointer"
+                  >
+                    Delete Podcast
+                  </li>
+                </ul>
+              )}
+            </div>
+          )}
+
+          {/* Admin buttons */}
+          {isAdmin && (
+            <div className="flex gap-4 mb-4 self-end">
+              <button
+                onClick={() => setShowEdit(true)}
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-800 rounded transition-colors"
+              >
+                Update Podcast
+              </button>
+
+              <button
+                onClick={() => setShowDelete(true)}
+                className="px-4 py-2 bg-rose-500 hover:bg-rose-700 rounded transition-colors"
+              >
+                Delete Podcast
+              </button>
+            </div>
+          )}
+
+          {/* Regular user favorite button (fallback if not creator) */}
+          {!isCreator && isRegularUser && (
             <FavoriteButton
               podcastId={podcast._id}
               isFavorite={isFavorite}
@@ -205,8 +227,8 @@ export default function PodcastDetails() {
               buttonSize=""
               iconSize={50}
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* ── Episodes Section ── */}
@@ -229,8 +251,15 @@ export default function PodcastDetails() {
 
         <div className="pr-2">
           {podcast.episodes.length > 0 ? (
-            podcast.episodes.map(ep => (
-              <EpisodeCard key={ep._id} episode={ep} podcast={podcast} />
+            // Only show scheduled if isCreator; otherwise, only show published
+            podcast.episodes
+            .filter(ep => isCreator || ep.status === 'published')
+            .map(ep => (
+              <EpisodeCard key={ep._id} episode={ep} podcast={podcast} 
+                      onEditEpisode={(e) => {
+                        setEditingEpisode(e);
+                        setShowEditEpisode(true);
+                      }}/>
             ))
           ) : (
             <p className="text-gray-400">No episodes available</p>
@@ -247,6 +276,17 @@ export default function PodcastDetails() {
           creatorId={podcast.creator._id}
           podcastImage={podcast.podcastImage}
         />
+
+        <EditEpisodePopup
+         isOpen={showEditEpisode}
+         onClose={() => {
+           setShowEditEpisode(false);
+           setEditingEpisode(null);
+         }}
+         episode={editingEpisode}
+         podcastId={podcast._id}
+         creatorId={podcast.creator._id}
+       />
 
         <EditPodcastPopup
           isOpen={showEdit}

@@ -13,7 +13,8 @@ import {
     UploadedFile,
     Request, 
     NotFoundException,
-    Query
+    Query,
+    Req
 } from '@nestjs/common';
 import { PodcastService } from './podcast.service';
 import { CreatePodcastDto } from './dto/create-podcast.dto';
@@ -23,10 +24,13 @@ import { AuthGuard } from '../guards/auth.guard'; // Import the AuthGuard
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('podcast')
 export class PodcastController {
-    constructor(private readonly podcastService: PodcastService) {}
+    constructor(private readonly podcastService: PodcastService,
+                private readonly jwtService: JwtService,// private readonly userService: UserService, // Uncomment if you need user service=
+    ) {}
 
     // Protect this route with the AuthGuard
     // @UseGuards(AuthGuard)
@@ -118,18 +122,53 @@ async createPodcast(
 
     // This route can be public, so no need to protect it with AuthGuard
     @Get(':id')
-    async getPodcastById(@Param('id') id: string) {
-        if (!Types.ObjectId.isValid(id)) {
-            throw new HttpException('Invalid ID', HttpStatus.BAD_REQUEST);
+    async getPodcastById(@Param('id') id: string, @Req() req: Request) {
+    let currentUserId: string | undefined = undefined;
+    let currentUserRole: number | undefined = undefined;
+
+    // 1) Check if an Authorization header is present
+    const authHeader = req.headers['authorization'];
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.slice(7); // remove 'Bearer '
+      try {
+        // 2) Verify the token. If valid, extract _id and role from its payload.
+        //    Adjust these property names according to your JWT payload structure!
+        const decoded: any = this.jwtService.verify(token);
+
+        // Assume payload has properties: _id (string) and role (number)
+        if (decoded.sub && typeof decoded.sub === 'string') {
+          currentUserId = decoded.sub;
+        } else if (decoded._id && typeof decoded._id === 'string') {
+          currentUserId = decoded._id;
+        } else if (decoded.userId && typeof decoded.userId === 'string') {
+          currentUserId = decoded.userId;
         }
 
-        const podcast = await this.podcastService.getPodcastById(id);
-        if (!podcast) {
-            throw new HttpException('Podcast Not Found', HttpStatus.NOT_FOUND);
+        if (typeof decoded.role === 'number') {
+          currentUserRole = decoded.role;
+        } else if (typeof decoded.userRole === 'number') {
+          currentUserRole = decoded.userRole;
         }
 
-        return podcast;
+      } catch (err) {
+        // If token is invalid or expired, we simply treat as “no user”
+        currentUserId = undefined;
+        currentUserRole = undefined;
+      }
     }
+
+    // 3) Call the service with (id, currentUserId, currentUserRole)
+    const podcast = await this.podcastService.getPodcastById(
+      id,
+      currentUserId,
+      currentUserRole,
+    );
+
+    if (!podcast) {
+      throw new HttpException('Podcast Not Found', HttpStatus.NOT_FOUND);
+    }
+    return podcast;
+  }
     
     @Get(':podcastId/episode/:episodeId')
     async getEpisodeByPodcastId(

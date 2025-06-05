@@ -14,6 +14,7 @@ export enum Episodestatus {
 
 @Schema({ timestamps: true })
 export class Episode extends Document {
+  
   @Prop({ required: true, unique: false, sparse: true })
   episodeTitle: string;
 

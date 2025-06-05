@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { Podcast, PodcastDocument } from 'src/schemas/Podcast.schema';
 import { CreatePodcastDto } from './dto/create-podcast.dto';
 import { UpdatePodcastDto } from './dto/update-podcast.dto';
-import { Episode, EpisodeDocument } from 'src/schemas/Episode.schema'; // Import Episode schema
+import { Episode, EpisodeDocument, Episodestatus } from 'src/schemas/Episode.schema'; // Import Episode schema
 import { User, UserDocument } from 'src/schemas/User.schema';
 import { Category, CategoryDocument } from 'src/schemas/Category.schema';
 import { populate } from 'dotenv';
@@ -48,22 +48,44 @@ export class PodcastService {
       .exec();
   }
 
-  async getPodcastById(id: string) {
+  async getPodcastById(id: string,
+    currentUserId?: string,
+    currentUserRole?: number,
+  ) {
     const podcast = await this.PodcastModel
       .findById(id)
       .populate({
-        path: 'creator',  // Populate only the creator field
-        select: 'firstName'  // Only the creator's firstName, not all user details
-      }).populate({
-        path: 'episodes', // Populate episodes
-         model:"Episode",
-        select: 'episodeTitle episodeDescription  createdAt audioUrl' // Specify which fields you want from the episodes
-      }).populate({path: 'categories', // Populate episodes
-        model:"Category" ,select:'categoryName'}).exec();
+        path: 'creator',
+        select: 'firstName lastName role',
+      })
+      .populate({
+        path: 'episodes',
+        model: 'Episode',
+        select: 'episodeTitle episodeDescription createdAt audioUrl status scheduledAt',
+      })
+      .populate({
+        path: 'categories',
+        model: 'Category',
+        select: 'categoryName',
+      })
+      .exec();
 
-      if (!podcast) {
-        throw new NotFoundException("Podcast not found");
-      }
+    if (!podcast) {
+      throw new NotFoundException("Podcast not found");
+    }
+
+    // Determine if the caller is the creator or an admin
+    const isCreator = currentUserId
+      ? podcast.creator._id.toString() === currentUserId
+      : false;
+    const isAdmin = currentUserRole === 0;
+
+    if (!isCreator && !isAdmin) {
+      // Only keep episodes with status === 'published'
+      podcast.episodes = podcast.episodes.filter(
+        (ep: any) => ep.status === Episodestatus.PUBLISHED,
+      );
+    }
       
      return podcast;
   }

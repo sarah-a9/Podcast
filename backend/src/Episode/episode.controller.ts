@@ -98,75 +98,56 @@ export class EpisodeController {
     return episode;
   }
 
-  //    // Endpoint to like/unlike an episode
-  //    @Post(':episodeId/like')
-  //    async likeEpisode(
-  //      @Param('episodeId') episodeId: string,
-  //      @Body('userId') userId: string,
-  //    ) {
-  //      // Convert the episodeId to ObjectId
-  //      const episodeObjectId = new Types.ObjectId(episodeId);
-  //      const userObjectId = new Types.ObjectId(userId);
-
-  //      // Find the user
-  //      const user = await this.userService.findOne(userId);
-  //      if (!user) {
-  //        return { message: 'User not found' };
-  //      }
-
-  //      // Find the episode
-  //      const episode = await this.episodeService.getEpisodeById(episodeId);
-  //      if (!episode) {
-  //        return { message: 'Episode not found' };
-  //      }
-
-  //      // Check if the episode is already liked by the user
-  //      if (!user.likedEpisodes.includes(episodeObjectId)) {
-  //        // Add episode ID to likedEpisodes if it's not already there
-  //        user.likedEpisodes.push(episodeObjectId);
-  //        episode.likedByUsers.push(userObjectId); // Add userId to likedByUsers in the episode
-
-  //        await user.save();
-  //        await episode.save(); // Save episode with updated likedByUsers
-
-  //        return { message: 'Episode liked successfully' };
-  //      } else {
-  //        // Remove the episode from likedEpisodes if already liked
-  //        user.likedEpisodes = user.likedEpisodes.filter(
-  //          (id) => !id.equals(episodeObjectId), // Use equals() for ObjectId comparison
-  //        );
-
-  //        // Remove userId from likedByUsers in the episode
-  //        episode.likedByUsers = episode.likedByUsers.filter(
-  //          (id) => !id.equals(userId),
-  //        );
-
-  //        await user.save();
-  //        await episode.save(); // Save episode with updated likedByUsers
-
-  //        return { message: 'Episode unliked successfully' };
-  //      }
-  //    }
-
+ 
   // Protect the update route with AuthGuard
   @UseGuards(AuthGuard)
   @Patch(':id')
-  updateEpisode(
+  @UseInterceptors(
+    FileInterceptor('audioFile', {
+      storage: diskStorage({
+        destination: './public/audio',
+        filename: (_req, file, cb) => {
+          const name = Date.now() + extname(file.originalname);
+          cb(null, name);
+        },
+      }),
+      fileFilter: (_req, file, cb) => {
+        cb(null, !!file.mimetype.match(/\/(mpeg|mp3|wav)$/));
+      },
+    }),
+  )
+  async updateEpisode(
     @Param('id') id: string,
-    @Body() updateEpisodeDto: UpdateEpisodeDto,
+    @UploadedFile() audioFile: Express.Multer.File,
+    @Body() body: any,
   ) {
+    // 1) Validate ID
     const isValid = mongoose.Types.ObjectId.isValid(id);
-    if (!isValid) throw new HttpException('Invalid ID', 400);
+    if (!isValid) throw new HttpException('Invalid ID', HttpStatus.BAD_REQUEST);
 
-    const savedEpisode = this.episodeService.updateEpisode(
-      id,
-      updateEpisodeDto,
-    );
-    if (!savedEpisode) throw new HttpException('Episode Not Found', 404);
+    // 2) Build an UpdateEpisodeDto from body
+    const dto: UpdateEpisodeDto = {
+      episodeTitle: body.episodeTitle,
+      episodeDescription: body.episodeDescription,
+      status: body.status,
+      scheduledAt: body.scheduledAt,
+      // We do NOT include audioUrl here; we’ll set it manually if audioFile is present
+    };
 
-    return savedEpisode;
+    // 3) If a new audio file was uploaded, build its URL
+    if (audioFile) {
+      // Assuming your episodes store audioUrl as a full URL:
+      dto.audioUrl = `http://127.0.0.1:3000/audio/${audioFile.filename}`;
+    }
+
+    // 4) Call the service
+    const updatedEpisode = await this.episodeService.updateEpisode(id, dto);
+
+    if (!updatedEpisode) {
+      throw new HttpException('Episode Not Found', HttpStatus.NOT_FOUND);
+    }
+    return updatedEpisode;
   }
-
   // Protect the delete route with AuthGuard
   // @UseGuards(AuthGuard)
   @Delete(':id')
@@ -183,6 +164,8 @@ export class EpisodeController {
 async incrementListens(@Param('id') id: string) {
   return this.episodeService.incrementListens(id);
 }
+
+
 
 
  

@@ -28,6 +28,7 @@ export interface Episode {
     status: string;
     averageRating: number;
     listens: number;
+    scheduledAt: string | null; // ISO date string or null if not scheduled
   }
   
 

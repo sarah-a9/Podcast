@@ -18,8 +18,8 @@ const LayoutContent = ({ children }: { children: React.ReactNode }) => {
           {children}
         </div>
       </div>
-      <AudioPlayerBar />
-    </div>
+      {/* Only show AudioPlayerBar if the user is not an admin */}
+      {user && user.role !== 0 && <AudioPlayerBar />}    </div>
   );
 };
 
