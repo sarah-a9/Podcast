@@ -77,12 +77,32 @@ const ActionButtons: React.FC<Props> = ({
         )}
 
         {/* Regular: report */}
+        {/* Report/Un-report */}
         {isRegularUser && (
           <button
             onClick={(e) => {
               e.stopPropagation();
               if (!token) return toast.error("Log in to report.");
-              // ... your report logic
+              const newStatus =
+                episode.status === "reported" ? "published" : "reported";
+              fetch(`http://localhost:3000/episode/${episode._id}`, {
+                method: "PATCH",
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ status: newStatus }),
+              })
+                .then((res) => {
+                  if (!res.ok) throw new Error();
+                  window.location.reload();
+                  toast.success(
+                    episode.status === "reported"
+                      ? "Episode unreported"
+                      : "Episode reported"
+                  );
+                })
+                .catch(() => toast.error("Could not update report status."));
             }}
             className={`text-xl px-2 py-1 rounded transition ${
               episode.status === "reported" ? "text-red-600" : "text-white"
@@ -131,15 +151,7 @@ const ActionButtons: React.FC<Props> = ({
                   </li>
                 )}
 
-                {/* Admin: Archive if reported */}
-                {isAdmin && episode.status === "reported" && (
-                  <li
-                    onClick={() => { onArchive?.(episode); setShowMenu(false); }}
-                    className="cursor-pointer p-2 hover:bg-yellow-600 rounded text-center text-yellow-300"
-                  >
-                    Archive Episode
-                  </li>
-                )}
+          
 
                 {/* Playlist actions */}
                 {(isCreator || isRegularUser) && (
