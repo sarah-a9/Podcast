@@ -16,9 +16,10 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
   return (
     // The backdrop uses a blur and a semi-transparent background for a modern aesthetic.
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-gray-900/30"
-      onClick={onClose}  // close when clicking on backdrop
+      className="fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-sm bg-gray-900/30"
+      onClick={onClose}
     >
+
       {/* Stop propagation so clicking inside the modal does not close it */}
       <div className="bg-gray-800 p-6 rounded-2xl shadow-lg w-[600px] relative" onClick={(e) => e.stopPropagation()}>
         {/* Optional title */}

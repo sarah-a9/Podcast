@@ -27,6 +27,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       /^\/PodcastDetail\/[^/]+$/, // matches /PodcastDetail/123
       /^\/PodcastDetail\/[^/]+\/EpisodeDetail\/[^/]+$/, // matches /PodcastDetail/123/episode/456
       /^\/categoryFeed\/[^/]+$/, // matches /categoryFeed/12
+      /^\/Search\/[^/]+$/, // matches /search/term	
+      /^\/CreatorProfile\/[^/]+$/, // matches /CreatorProfile/123
     ];
   
     return publicPatterns.some((regex) => regex.test(pathname));

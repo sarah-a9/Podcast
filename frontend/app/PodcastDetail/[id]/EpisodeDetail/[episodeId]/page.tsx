@@ -26,6 +26,12 @@ const EpisodeDetail = ({ params }: { params: Promise<{ id: string; episodeId: st
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  //roles check up
+  const isCreator = user?._id === episode?.podcast.creator._id;
+  const isAdmin = user?.role === 0;
+  const isRegularUser = user?.role === 1 && !isCreator;
+
+
   // ─── Fetch episode details ───
   const fetchEpisode = async () => {
     try {
@@ -120,6 +126,7 @@ const EpisodeDetail = ({ params }: { params: Promise<{ id: string; episodeId: st
                     </div>
                   </div>
                   {/* Rating */}
+                  {isRegularUser && (
                   <div className="mt-4">
                     <StarRating
                       value={userRating}
@@ -129,6 +136,7 @@ const EpisodeDetail = ({ params }: { params: Promise<{ id: string; episodeId: st
                       episodeId={episode._id}
                     />
                   </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -140,10 +148,10 @@ const EpisodeDetail = ({ params }: { params: Promise<{ id: string; episodeId: st
             <div className="flex items-center justify-between gap-4 mt-4">
               {/* Duration */}
               <div className="flex items-center gap-2 text-gray-300">
-                <MdOutlineAccessTime size={20} />
+                {/* <MdOutlineAccessTime size={20} />
                 <span className="text-md">
                   {episode?.duration ? `${episode.duration} min` : "Unknown duration"}
-                </span>
+                </span> */}
               </div>
 
               {/* ActionButtons now handles the menu */}

@@ -62,11 +62,26 @@ export default function FavoritePodcastPage() {
   }
 
   if (favoritePodcasts.length === 0) {
-    return <div>No favorite podcasts yet. Add some to your favorites!</div>; // Message if no favorite podcasts
+    return (
+      <div className="flex flex-col items-center justify-center h-[78vh] bg-gray-900 rounded-lg text-center px-6">
+        <div className="text-4xl mb-4 text-yellow-400">🎧</div>
+        <h2 className="text-2xl font-semibold text-white mb-2">No Favorite Podcasts Yet</h2>
+        <p className="text-gray-400 mb-6 max-w-md">
+          You haven't favorited any podcasts yet. Discover amazing content and add your favorites here!
+        </p>
+        <button
+          className="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded transition"
+          onClick={() => window.location.href = '/'}
+        >
+          Go to Home
+        </button>
+      </div>
+    );
   }
 
+
   return (
-    <div>
+    <div className="scrollable-container scrollbar-hide bg-gray-900 rounded-lg pl-6 ">
   <h1 className='text-2xl font-bold mb-4'>Your Favorite Podcasts</h1>
   
   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-7">

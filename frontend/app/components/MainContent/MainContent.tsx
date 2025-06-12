@@ -7,6 +7,7 @@ import { User } from "@/app/Types";
 import { useRouter } from "next/navigation";
 import SeeMoreButton from "../SeeMoreButton/SeeMoreButton";
 import { useAuth } from "../Providers/AuthContext/AuthContext";
+import AdminDashboard from "../../DashboardAdminPage/page";
 
 const MainContent = () => {
   const [podcasts, setPodcasts] = useState<
@@ -25,9 +26,11 @@ const MainContent = () => {
   const router = useRouter(); // Initialize useRouter
 const {user}=useAuth();
 const currentUserId = user?._id || ""; // Get the current user's ID, default to empty string if not available
-  useEffect(() => {
+  
+useEffect(() => {
     console.log("Fetching podcasts...");
 
+    
     // Fetch podcasts
     fetch("http://localhost:3000/podcast")
       .then((res) => res.json())
@@ -77,6 +80,10 @@ const currentUserId = user?._id || ""; // Get the current user's ID, default to 
   const handleSeeMore = (type: string) => {
     router.push(`/All${type}`); // Redirect to /all/{type} page
   };
+
+   if (user && user.role === 0) {
+    return <AdminDashboard />;
+  }
 
   return (
     <div className="scrollable-container scrollbar-hide bg-gray-900 rounded-lg pl-6 ">

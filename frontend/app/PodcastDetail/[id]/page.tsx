@@ -251,20 +251,29 @@ export default function PodcastDetails() {
 
         <div className="pr-2">
           {podcast.episodes.length > 0 ? (
-            // Only show scheduled if isCreator; otherwise, only show published
             podcast.episodes
-            .filter(ep => isCreator || ep.status === 'published')
-            .map(ep => (
-              <EpisodeCard key={ep._id} episode={ep} podcast={podcast} 
-                      onEditEpisode={(e) => {
-                        setEditingEpisode(e);
-                        setShowEditEpisode(true);
-                      }}/>
-            ))
+              .filter(ep => {
+                if (isCreator) return true;
+                if (isAdmin) return ['published', 'reported', 'archived'].includes(ep.status);
+                return ['published', 'reported'].includes(ep.status);
+              })
+
+              .map(ep => (
+                <EpisodeCard
+                  key={ep._id}
+                  episode={ep}
+                  podcast={podcast}
+                  onEditEpisode={e => {
+                    setEditingEpisode(e);
+                    setShowEditEpisode(true);
+                  }}
+                />
+              ))
           ) : (
             <p className="text-gray-400">No episodes available</p>
           )}
         </div>
+
       </div>
 
 

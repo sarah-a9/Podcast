@@ -1,16 +1,22 @@
+// File: components/EpisodeCard/EpisodeCard.tsx
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ActionButtons from "../EpisodeActionButtons/EpisodeActionButtons";
-import { useAuth } from "../Providers/AuthContext/AuthContext"; 
+import { useAuth } from "../Providers/AuthContext/AuthContext";
 import { Episode, Podcast } from "@/app/Types";
+import DeleteEpisodePopUp from "../PopUps/DeleteEpisodePopUp";
 
-const EpisodeCard = ({
+export default function EpisodeCard({
   episode,
   podcast,
   className = "",
   imageClassName = "",
   playlistId = null,
   onEditEpisode,
+  onDeleteEpisode,
+  onStatusChange, // ✅ NEW PROP
 }: {
   episode: Episode;
   podcast: Podcast;
@@ -18,96 +24,86 @@ const EpisodeCard = ({
   imageClassName?: string;
   playlistId?: string | null;
   onEditEpisode?: (ep: Episode) => void;
-}) => {
+  onDeleteEpisode?: (ep: Episode) => void;
+  onStatusChange?: () => void; // ✅ NEW PROP TYPE
+}) {
   const router = useRouter();
   const { user, setUser, token } = useAuth();
-  const [showMenu, setShowMenu] = useState(false);
   const [liked, setLiked] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [playlist, setPlaylist] = useState<Episode[]>([]);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // Only the creator sees draft/scheduled badges
   const isCreator = user?._id === podcast.creator._id;
-
-  useEffect(() => {
-    if (user && user.likedEpisodes) {
-      setLiked(user.likedEpisodes.includes(episode._id));
-    }
-  }, [user, episode._id]);
-
-  useEffect(() => {
-    if (playlistId) {
-      fetchPlaylistData();
-    }
-  }, [playlistId]);
-
-  const fetchPlaylistData = async () => {
-    try {
-      const response = await fetch(`http://localhost:3000/playlist/${playlistId}`);
-      const data = await response.json();
-      setPlaylist(data.episodes);
-    } catch (error) {
-      console.error("Error fetching playlist data:", error);
-    }
-  };
-
-  const handleOnClick = () => {
-    router.push(`/PodcastDetail/${podcast._id}/EpisodeDetail/${episode._id}`, {
-      scroll: false,
-    });
-  };
-
-  const toggleMenu = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowMenu(!showMenu);
-  };
+  const isRegular = user?.role === 1 && !isCreator;
 
   const handleLikeClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (user && user.likedEpisodes) {
-      const updatedLikedEpisodes = liked
-        ? user.likedEpisodes.filter((id) => id !== episode._id)
-        : [...user.likedEpisodes, episode._id];
-
-      setUser({
-        ...user,
-        likedEpisodes: updatedLikedEpisodes,
-      });
-    }
+    if (!user) return;
+    const updated = liked
+      ? user.likedEpisodes.filter((id) => id !== episode._id)
+      : [...user.likedEpisodes, episode._id];
+    setUser({ ...user, likedEpisodes: updated });
     setLiked(!liked);
   };
 
-  const handleRemoveFromPlaylist = async (episodeId: string) => {
-    const updatedPlaylist = playlist.filter((ep) => ep._id !== episodeId);
-    setPlaylist(updatedPlaylist);
+  useEffect(() => {
+    setLiked(user?.likedEpisodes.includes(episode._id) ?? false);
+    if (playlistId) {
+      fetchPlaylistData();
+    }
+  }, [user, episode._id, playlistId]);
 
+  const fetchPlaylistData = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:3000/playlist/${playlistId}/episode/${episodeId}`,
+      const res = await fetch(`http://localhost:3000/playlist/${playlistId}`);
+      const data = await res.json();
+      setPlaylist(data.episodes);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleAddToPlaylist = (episodeId: string, playlistId: string) => {
+    setPlaylist((pl) => [...pl, { ...episode, _id: episodeId }]);
+  };
+
+  const handleRemoveFromPlaylist = (episodeId: string) => {
+    setPlaylist((pl) => pl.filter((ep) => ep._id !== episodeId));
+  };
+
+  const handleClick = () =>
+    router.push(
+      `/PodcastDetail/${podcast._id}/EpisodeDetail/${episode._id}`,
+      { scroll: false }
+    );
+
+  // ✅ ARCHIVE HANDLER
+  const handleArchive = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const res = await fetch(
+        `http://localhost:3000/episode/archive/${episode._id}`,
         {
-          method: "DELETE",
+          method: "PATCH",
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
           },
         }
       );
+      if (!res.ok) throw new Error("Failed to archive episode");
 
-      if (!response.ok) {
-        throw new Error("Failed to remove episode from playlist");
-      }
-      console.log("Episode removed successfully from the playlist.");
+      if (onStatusChange) onStatusChange(); // ✅ Notify parent
     } catch (error) {
-      console.error("Error removing episode from playlist:", error);
+      console.error("Error archiving episode:", error);
     }
   };
 
   return (
     <div
-      key={episode._id}
-      className="grid grid-cols-8 gap-4 cursor-pointer rounded-2xl hover:bg-black/50 transition duration-200"
-      onClick={handleOnClick}
+      className={`grid grid-cols-8 gap-4 cursor-pointer rounded-2xl hover:bg-black/50 transition duration-200 ${className}`}
+      onClick={handleClick}
     >
-      {/* Episode Image */}
       <div className="col-span-1">
         <img
           className={`rounded-lg h-32 w-35 object-cover ${imageClassName}`}
@@ -116,45 +112,48 @@ const EpisodeCard = ({
         />
       </div>
 
-      {/* Title, Description, and Badge */}
       <div className="col-span-3 mt-1 space-y-2">
-        {/* Title */}
         <p className="text-xl">{episode.episodeTitle}</p>
-        {/* Description */}
         <p className="text-sm text-gray-400">{episode.episodeDescription}</p>
-        
-        {/* ─── Prettier badge under description, only for creator & non-published ─── */}
-        {isCreator && episode.status !== "published" && (
-          <div
-            className={`
-              inline-block text-xs font-semibold text-white 
-              bg-gradient-to-r from-purple-600 via-pink-600 to-rose-500 
-              px-3 py-1 rounded-xl shadow-md 
-              hover:scale-105 transform transition-transform
-            `}
-          >
-            {episode.status === "draft" ? "Draft" : "Scheduled"}
-          </div>
-        )}
+
+        {(isCreator || (user?.role === 0 && ["archived", "reported"].includes(episode.status))) &&
+          episode.status !== "published" && (
+            <div
+              className={`
+                inline-block text-xs font-semibold text-white 
+                bg-gradient-to-r px-3 py-1 rounded-xl shadow-md 
+                hover:scale-105 transform transition-transform
+                ${
+                  episode.status === "draft" || episode.status === "scheduled"
+                    ? "from-purple-600 via-pink-600 to-rose-500"
+                    : episode.status === "reported"
+                    ? "from-red-600 via-red-700 to-red-800"
+                    : episode.status === "archived"
+                    ? "from-orange-500 via-orange-600 to-yellow-400"
+                    : ""
+                }
+              `}
+            >
+              {episode.status === "archived"
+                ? isCreator
+                  ? "Blocked"
+                  : "Archived"
+                : episode.status
+                ? episode.status.charAt(0).toUpperCase() + episode.status.slice(1)
+                : "Unknown"}
+            </div>
+          )}
       </div>
 
-      {/* Episode Date */}
       <div className="col-span-1">
         <p className="text-sm text-gray-400 mt-16">
-          published on:
-          {episode.createdAt
-            ? episode.createdAt.split("T")[0]
-            : "Unknown Date"}
+          {(episode.createdAt ?? "").split("T")[0] || "Date inconnue"}
         </p>
       </div>
 
-      {/* Duration (empty for now) */}
-      <div className="col-span-1">
-        <p className="text-sm text-gray-400 mt-5"></p>
-      </div>
+      <div className="col-span-1" />
 
-      {/* Action Buttons */}
-      <div className="col-span-1 flex items-center space-x-10">
+      <div className="col-span-1 flex items-center space-x-4">
         <ActionButtons
           episode={episode}
           podcast={podcast}
@@ -163,17 +162,38 @@ const EpisodeCard = ({
           showMenu={showMenu}
           setShowMenu={setShowMenu}
           playlistId={playlistId}
+          onAddToPlaylist={handleAddToPlaylist}
           onRemoveFromPlaylist={handleRemoveFromPlaylist}
           onEdit={onEditEpisode}
+          onDelete={() => setShowDeleteConfirm(true)}
         />
+
+        {/* ✅ ARCHIVE BUTTON (TEMP EXAMPLE) */}
+        {user?.role === 0 && episode.status === "reported" && (
+          <button
+            className="px-2 py-1 text-xs text-white bg-orange-500 rounded hover:bg-orange-600"
+            onClick={handleArchive}
+          >
+            Archive
+          </button>
+        )}
+
+        {showDeleteConfirm && (
+          <DeleteEpisodePopUp
+            isOpen={showDeleteConfirm}
+            onClose={() => setShowDeleteConfirm(false)}
+            episodeId={episode._id}
+            onDeleted={() => {
+              setShowDeleteConfirm(false);
+              router.push(`/PodcastDetail/${podcast._id}`);
+            }}
+          />
+        )}
       </div>
 
-      {/* Separator */}
       <div className="col-span-8">
         <hr style={{ color: "grey" }} />
       </div>
     </div>
   );
-};
-
-export default EpisodeCard;
+}
