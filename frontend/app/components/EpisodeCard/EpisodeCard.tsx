@@ -168,15 +168,7 @@ export default function EpisodeCard({
           onDelete={() => setShowDeleteConfirm(true)}
         />
 
-        {/* ✅ ARCHIVE BUTTON (TEMP EXAMPLE) */}
-        {user?.role === 0 && episode.status === "reported" && (
-          <button
-            className="px-2 py-1 text-xs text-white bg-orange-500 rounded hover:bg-orange-600"
-            onClick={handleArchive}
-          >
-            Archive
-          </button>
-        )}
+        
 
         {showDeleteConfirm && (
           <DeleteEpisodePopUp
