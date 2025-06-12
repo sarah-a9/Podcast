@@ -16,6 +16,7 @@ import {
   LineElement,
 } from "chart.js";
 import Link from "next/link";
+import CreatePodcastButton from "../components/CreatePodcastButton/CreatePodcastButton";
 
 ChartJS.register(
   ArcElement,
@@ -37,6 +38,8 @@ export default function Dashboard() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
   const [followersCount, setFollowersCount] = useState<number>(0);
+  const [showCreatePodcastPopUp, setShowCreatePodcastPopUp] = useState(false);
+
 
 
   const [loading, setLoading] = useState(true);
@@ -320,8 +323,19 @@ console.log("Followers Count:", followersCount);
 
   return (
     <div className="p-6 space-y-8 scrollable-container scrollbar-hide bg-gray-900 rounded-lg">
-      {podcasts.length > 0 ? (
-        <>
+      {loading ? (
+      <p className="text-white">Loading...</p>
+    ) : user?.role === 1 && podcasts.length === 0 ? (
+      <div className="flex flex-col items-center justify-center text-white space-y-6 p-12 bg-gray-950 rounded-lg shadow-md">
+        <h2 className="text-3xl font-bold">Welcome, {user?.firstName}</h2>
+        <p className="text-lg text-center max-w-lg">
+          You haven’t started creating any content yet. Get started by creating your first podcast and uploading some episodes!
+        </p>
+        <CreatePodcastButton />
+
+      </div>
+    ) : (
+      <>
           <h1 className="text-3xl font-bold">Welcome, {user?.firstName}</h1>
 
           {/* Global Overview Section */}
@@ -472,44 +486,6 @@ console.log("Followers Count:", followersCount);
             </div>
           </div>
         </>
-      ) : (
-        <div className="p-8  text-white rounded-lg shadow-xl flex flex-col items-center justify-center space-y-6">
-          <h2 className="text-3xl font-semibold text-center mb-4">
-            You have no content yet!
-          </h2>
-          <p className="text-lg text-center mb-6">
-            Create a podcast and upload episodes to see your stats here!
-          </p>
-
-          {/* Button wrapped with Link component */}
-          <Link href={`/Profile/me`}>
-            <button className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full shadow-lg hover:scale-105 transition duration-300 ease-in-out transform">
-              Start Creating Content
-            </button>
-          </Link>
-
-          {/* Icon with blue and purple color scheme */}
-          <div className="mt-6">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="w-12 h-12 text-gradient-to-r from-blue-500 to-purple-500 animate-pulse"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <path d="M12 8v4l3 3" />
-            </svg>
-          </div>
-
-          <p className="text-sm text-gray-400 text-center">
-            Start creating content to track your progress and grow your
-            audience.
-          </p>
-        </div>
       )}
     </div>
   );

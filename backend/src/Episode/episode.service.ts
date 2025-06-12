@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -215,6 +216,40 @@ export class EpisodeService {
       rating: Number(doc.averageRating.toFixed(2)),  // round to 2 decimals
       reviewCount: doc.reviewCount,
     }));
+  }
+
+
+    
+   // Return the raw EpisodeDocument (un-populated). Used by report/archive logic.
+   
+  async findByIdRaw(id: string): Promise<EpisodeDocument | null> {
+    return this.EpisodeModel.findById(id).exec();
+  }
+
+  
+   // Archive an already-reported episode. Only call after verifying caller is admin.
+  
+  async archiveEpisode(id: string): Promise<EpisodeDocument> {
+    const episode = await this.EpisodeModel.findById(id);
+    if (!episode) throw new NotFoundException('Episode not found');
+    if (episode.status !== Episodestatus.REPORTED) {
+      throw new ForbiddenException('Only reported episodes can be archived');
+    }
+    episode.status = Episodestatus.ARCHIVED;
+    return await episode.save();
+  }
+
+  
+   //Report a published episode. Only call after verifying caller is not creator.
+  
+  async reportEpisode(id: string): Promise<EpisodeDocument> {
+    const episode = await this.EpisodeModel.findById(id);
+    if (!episode) throw new NotFoundException('Episode not found');
+    if (episode.status !== Episodestatus.PUBLISHED) {
+      throw new ForbiddenException('Only published episodes can be reported');
+    }
+    episode.status = Episodestatus.REPORTED;
+    return await episode.save();
   }
 
 

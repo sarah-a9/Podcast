@@ -1,10 +1,13 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpException,
   HttpStatus,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -24,12 +27,15 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { RateEpisodeDto } from './dto/rate-episode.dto';
+import { Episodestatus } from '../schemas/Episode.schema';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('episode')
 export class EpisodeController {
   constructor(
     // private readonly userService: UserService,
     private readonly episodeService: EpisodeService,
+    private readonly jwtService: JwtService,
   ) {}
 
   // Protect the CreateEpisode route with AuthGuard
@@ -165,6 +171,65 @@ async incrementListens(@Param('id') id: string) {
   return this.episodeService.incrementListens(id);
 }
 
+// ── REPORT an episode (authenticated only) ──
+  @UseGuards(AuthGuard)
+  @Patch(':id/report')
+  async reportEpisode(@Param('id') id: string, @Req() req: any) {
+    // 1) Verify JWT & extract userId from payload:
+    const authHeader = req.headers['authorization'];
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(authHeader.slice(7));
+    } catch {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    const currentUserId = payload._id;
+
+    // Fetch raw episode (no populate):
+    const episode = await this.episodeService.findByIdRaw(id);
+    if (!episode) throw new NotFoundException('Episode not found');
+
+    
+
+    // Only a “PUBLISHED” episode may be reported:
+    if (episode.status !== Episodestatus.PUBLISHED) {
+      throw new BadRequestException('Only published episodes can be reported');
+    }
+
+    // Flip to REPORTED:
+    await this.episodeService.reportEpisode(id);
+    return { message: 'Episode has been reported' };
+  }
+
+  //  ARCHIVE a reported episode (admin only) ──
+  @UseGuards(AuthGuard)
+  @Patch(':id/archive')
+  async archiveEpisode(@Param('id') id: string, @Req() req: any) {
+    // Verify JWT & extract role:
+    const authHeader = req.headers['authorization'];
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(authHeader.slice(7));
+    } catch {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    const currentUserRole = payload.role;
+
+    // Only role 0 (admin) can archive:
+    if (currentUserRole !== 0) {
+      throw new ForbiddenException('Only admins can archive episodes');
+    }
+
+    // Archive it:
+    await this.episodeService.archiveEpisode(id);
+    return { message: 'Episode archived' };
+  }
 
 
 

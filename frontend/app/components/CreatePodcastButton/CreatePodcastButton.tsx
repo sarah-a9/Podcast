@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { PlusCircle } from "lucide-react"; // or use a similar icon
 import CreatePodcastPopup from "../PopUps/CreatePodcastPopUp";
+import CreatePodcastPopUp from "../PopUps/CreatePodcastPopUp";
 
 export default function CreatePodcastButton() {
   const [open, setOpen] = useState(false);
@@ -18,7 +19,7 @@ export default function CreatePodcastButton() {
         Create Your Own Podcast
       </button>
 
-      <CreatePodcastPopup isOpen={open} onClose={() => setOpen(false)} />
+      <CreatePodcastPopUp isOpen={open} onClose={() => setOpen(false)} isAdmin={false} />
     </div>
   );
 }

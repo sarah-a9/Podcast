@@ -60,11 +60,26 @@ export default function LikedEpisodesPage() {
       }
 
     if (likedEpisodes.length === 0){
-        return<div> No liked episodes yet . Add some to your Liked Episodes !</div>
+      return (
+        <div className="flex flex-col items-center justify-center h-[78vh] bg-gray-900 rounded-lg text-center px-6">
+          <div className="text-4xl mb-4 text-purple-500">💔</div>
+          <h2 className="text-2xl font-semibold text-white mb-2">No Liked Episodes Yet</h2>
+          <p className="text-gray-400 mb-6 max-w-md">
+            It looks a bit quiet here... Start exploring and tap the heart icon on episodes you love to see them here!
+          </p>
+          <button
+            className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded transition"
+            onClick={() => window.location.href = '/'} 
+          >
+            Discover Episodes
+          </button>
+        </div>
+      );
     }
 
+
   return (
-    <div className='height-[40vh]'>
+    <div className='height-[40vh] bg-gray-900 rounded-lg pl-6 overflow-y-auto'>
     <h1 className="text-2xl font-bold mb-4">Your Liked Episodes</h1>
     <div className='scrollable-container scrollbar-hide '>
     {likedEpisodes.map((episode) => (

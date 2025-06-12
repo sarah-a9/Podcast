@@ -51,7 +51,7 @@ const AdminSidebar = () => {
   const pathname = usePathname();
 
   return (
-    <div className="sticky height bg-gray-900 text-white p-6 w-70 shadow-xl flex flex-col">
+    <div className="sticky h-screen height bg-gray-900 text-white p-6 w-70 shadow-xl flex flex-col">
       <h2 className="text-2xl font-bold mb-8 text-center">Admin Panel</h2>
 
       <nav className="space-y-4">

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "../../components/Providers/AuthContext/AuthContext";
 import { Playlist, Episode } from "@/app/Types";
 // @ts-ignore
@@ -18,7 +18,7 @@ interface PlaylistDetailResponse extends Playlist {
   episodes: Episode[];
 }
 
-const PlaylistDetailPage = ({ params }: { params: { PlaylistId: string } }) => {
+const PlaylistDetailPage = () => {
   const { user, token } = useAuth();
   const router = useRouter();
   const [playlist, setPlaylist] = useState<PlaylistDetailResponse | null>(null);
@@ -31,17 +31,15 @@ const PlaylistDetailPage = ({ params }: { params: { PlaylistId: string } }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showMenu, setShowMenu] = useState(false); // To control menu visibility
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const params = useParams();
+  const playlistId = params?.PlaylistId as string;
 
 
-
-
-
-  
   const fetchPlaylistDetail = async () => {
     if (!user || !token) return;
     try {
       const res = await fetch(
-        `http://localhost:3000/playlist/${params.PlaylistId}`,
+        `http://localhost:3000/playlist/${playlistId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -226,24 +224,32 @@ const PlaylistDetailPage = ({ params }: { params: { PlaylistId: string } }) => {
         Your Episodes
       </h2>
       <div className="space-y-4 mb-6">
-        {playlist.episodes.length === 0 ? (
+        {allEpisodes.filter(ep =>
+          playlist.episodes.some(pe => pe._id === ep._id) &&
+          ep.status === "published"
+        ).length === 0 ? (
           <p className="text-white italic">No episodes added yet.</p>
         ) : (
-          playlist.episodes?.map((episode) =>
-            episode?._id ? (
-              <EpisodeCard
-                key={episode._id}
-                episode={episode}
-                podcast={episode.podcast}
-                className="text-sm gap-2"
-                imageClassName="w-16 h-16 object-cover mt-2"
-                playlistId={playlist._id} 
-
-              />
-            ) : null
-          )
+          allEpisodes
+            .filter(ep =>
+              playlist.episodes.some(pe => pe._id === ep._id) &&
+              ep.status === "published"
+            )
+            .map((episode) =>
+              episode._id ? (
+                <EpisodeCard
+                  key={episode._id}
+                  episode={episode}
+                  podcast={episode.podcast}
+                  className="text-sm gap-2"
+                  imageClassName="w-16 h-16 object-cover mt-2"
+                  playlistId={playlist._id}
+                />
+              ) : null
+            )
         )}
       </div>
+
 
       <p className="text-white mb-2">Find Episodes for your Playlist</p>
 

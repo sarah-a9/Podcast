@@ -6,8 +6,6 @@ import Image from "next/image";
 import { Playlist } from "@/app/Types";
 
 
-
-
 const PlaylistCard: React.FC<Playlist> = ({
   _id,
   playlistName,
@@ -18,7 +16,7 @@ const PlaylistCard: React.FC<Playlist> = ({
 
   return (
     <div
-      className="bg-gray-900 rounded-2xl shadow-md hover:shadow-xl transition cursor-pointer p-3"
+      className="bg-gray-800 rounded-2xl shadow-md hover:shadow-xl transition cursor-pointer p-3"
       onClick={() => router.push(`../PlaylistDetailPage/${_id}`)}
     >
       <div className="w-full h-40 rounded-xl overflow-hidden mb-2">

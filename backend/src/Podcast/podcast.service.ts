@@ -48,7 +48,8 @@ export class PodcastService {
       .exec();
   }
 
-  async getPodcastById(id: string,
+   async getPodcastById(
+    id: string,
     currentUserId?: string,
     currentUserRole?: number,
   ) {
@@ -56,7 +57,7 @@ export class PodcastService {
       .findById(id)
       .populate({
         path: 'creator',
-        select: 'firstName lastName role',
+        select: 'firstName lastName role',   // we need the creator’s _id and role for comparison
       })
       .populate({
         path: 'episodes',
@@ -71,23 +72,27 @@ export class PodcastService {
       .exec();
 
     if (!podcast) {
-      throw new NotFoundException("Podcast not found");
+      throw new NotFoundException('Podcast not found');
     }
 
-    // Determine if the caller is the creator or an admin
-    const isCreator = currentUserId
-      ? podcast.creator._id.toString() === currentUserId
-      : false;
+    // “Is the caller the creator of this podcast?”
+    const isCreator =
+      currentUserId != null &&
+      podcast.creator._id.toString() === currentUserId;
+
+    // “Is the caller an admin?”
     const isAdmin = currentUserRole === 0;
 
     if (!isCreator && !isAdmin) {
-      // Only keep episodes with status === 'published'
-      podcast.episodes = podcast.episodes.filter(
-        (ep: any) => ep.status === Episodestatus.PUBLISHED,
-      );
+      // Allow both PUBLISHED and REPORTED for regular users.
+    podcast.episodes = (podcast.episodes as any[]).filter(
+      (ep: any) =>
+        ep.status === Episodestatus.PUBLISHED ||
+        ep.status === Episodestatus.REPORTED,
+    );
     }
-      
-     return podcast;
+    // If caller is creator OR admin, do not filter—show episodes of all statuses
+    return podcast;
   }
 
 

@@ -27,7 +27,7 @@ const AllPodcasts = () => {
   }, []);
 
   return (
-    <div className="h-screen container mx-auto pl-6 scrollable-container scrollbar-hide">
+    <div className="h-screen container mx-auto pl-6 scrollable-container scrollbar-hide bg-gray-900  rounded-lg">
       <h2 className="text-3xl font-semibold pb-5 ">All Podcasts</h2>
       <div className="podcast-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-y-auto scrollbar-hide">
         {podcasts.length > 0 ? (
